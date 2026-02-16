@@ -1,0 +1,247 @@
+{% extends 'base.html' %}
+{% block title %}Company Dashboard{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h2><i class="fas fa-building me-2"></i>Company Dashboard - {{ company.name }}</h2>
+    
+    {% if company.approval_status == 'pending' %}
+    <div class="alert alert-warning">
+        <i class="fas fa-clock"></i> Your company is pending approval.
+    </div>
+    {% elif company.approval_status == 'approved' %}
+    <div class="alert alert-success">
+        <i class="fas fa-check"></i> Your company is approved!
+    </div>
+    {% elif company.approval_status == 'rejected' %}
+    <div class="alert alert-danger">
+        <i class="fas fa-times"></i> Your company application was rejected.
+    </div>
+    {% endif %}
+    
+    <!-- Stats Row -->
+    <div class="row my-4 g-3">
+        <div class="col-md-3">
+            <div class="card text-center border-primary">
+                <div class="card-body">
+                    <h3 class="text-primary">{{ total_packages }}</h3>
+                    <p class="mb-0">Total Packages</p>
+                    <small class="text-muted">{{ approved_packages }} approved</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center border-success">
+                <div class="card-body">
+                    <h3 class="text-success">{{ total_products }}</h3>
+                    <p class="mb-0">Total Products</p>
+                    <small class="text-muted">{{ approved_products }} approved</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center border-info">
+                <div class="card-body">
+                    <h3 class="text-info">{{ total_bookings }}</h3>
+                    <p class="mb-0">Total Bookings</p>
+                    <small class="text-muted">{{ confirmed_bookings }} confirmed</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center border-warning">
+                <div class="card-body">
+                    <h3 class="text-warning">{{ pending_bookings }}</h3>
+                    <p class="mb-0">Pending Bookings</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mb-4 g-3">
+        <div class="col-md-3">
+            <a href="{% url 'packages:add_package' %}" class="btn btn-primary btn-lg w-100">
+                <i class="fas fa-plus"></i> Add Package
+            </a>
+        </div>
+        <div class="col-md-3">
+            <a href="{% url 'packages:add_product' %}" class="btn btn-success btn-lg w-100">
+                <i class="fas fa-box-open"></i> Add Product
+            </a>
+        </div>
+        <div class="col-md-3">
+            <a href="{% url 'packages:company_bookings' %}" class="btn btn-info btn-lg w-100 text-white">
+                <i class="fas fa-calendar-check"></i> All Bookings
+            </a>
+        </div>
+    </div>
+
+    <!-- Packages Table -->
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h4 class="mb-0"><i class="fas fa-suitcase me-2"></i>Your Packages</h4>
+        </div>
+        <div class="card-body">
+            {% if packages %}
+            <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Price</th>
+                        <th>Duration</th>
+                        <th>Rating</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for package in packages %}
+                    <tr>
+                        <td>{{ package.name }}</td>
+                        <td>{{ package.get_package_type_display }}</td>
+                        <td>PKR {{ package.price_per_person|floatformat:0 }}</td>
+                        <td>{{ package.duration_days }}D/{{ package.duration_nights }}N</td>
+                        <td>
+                            <i class="fas fa-star text-warning"></i> {{ package.rating }}
+                            <small class="text-muted">({{ package.get_reviews_count }})</small>
+                        </td>
+                        <td>
+                            {% if package.is_approved %}
+                            <span class="badge bg-success">Approved</span>
+                            {% else %}
+                            <span class="badge bg-warning">Pending</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'packages:edit_package' package.id %}" class="btn btn-sm btn-outline-primary" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="{% url 'packages:delete_package' package.id %}" class="btn btn-sm btn-outline-danger" title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            </div>
+            {% else %}
+            <p class="text-muted">No packages yet. Add your first package!</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Products Table -->
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h4 class="mb-0"><i class="fas fa-box me-2"></i>Your Products</h4>
+        </div>
+        <div class="card-body">
+            {% if products %}
+            <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Image</th>
+                        <th>Name</th>
+                        <th>Category</th>
+                        <th>Price</th>
+                        <th>Stock</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in products %}
+                    <tr>
+                        <td>
+                            {% if product.image %}
+                            <img src="{{ product.image.url }}" alt="{{ product.name }}" style="width:40px;height:40px;object-fit:cover;border-radius:4px;">
+                            {% else %}
+                            <div style="width:40px;height:40px;background:#eee;border-radius:4px;display:flex;align-items:center;justify-content:center;"><i class="fas fa-image text-muted"></i></div>
+                            {% endif %}
+                        </td>
+                        <td>{{ product.name }}</td>
+                        <td>{{ product.get_category_display }}</td>
+                        <td>PKR {{ product.price|floatformat:0 }}</td>
+                        <td>{{ product.stock_quantity }}</td>
+                        <td>
+                            {% if product.is_approved %}
+                            <span class="badge bg-success">Approved</span>
+                            {% else %}
+                            <span class="badge bg-warning">Pending Approval</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'packages:edit_product' product.id %}" class="btn btn-sm btn-outline-primary" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="{% url 'packages:delete_product' product.id %}" class="btn btn-sm btn-outline-danger" title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            </div>
+            {% else %}
+            <p class="text-muted">No products yet. Add your first product!</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Recent Bookings -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h4 class="mb-0"><i class="fas fa-calendar me-2"></i>Recent Bookings</h4>
+            <a href="{% url 'packages:company_bookings' %}" class="btn btn-sm btn-outline-primary">View All</a>
+        </div>
+        <div class="card-body">
+            {% if company_bookings %}
+            <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Reference</th>
+                        <th>Customer</th>
+                        <th>Package</th>
+                        <th>Travel Date</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in company_bookings %}
+                    <tr>
+                        <td><strong>{{ booking.booking_reference }}</strong></td>
+                        <td>{{ booking.user.username }}</td>
+                        <td>{{ booking.package.name }}</td>
+                        <td>{{ booking.travel_date|date:"M d, Y" }}</td>
+                        <td>PKR {{ booking.total_amount|floatformat:0 }}</td>
+                        <td>
+                            {% if booking.status == 'confirmed' %}
+                            <span class="badge bg-success">Confirmed</span>
+                            {% elif booking.status == 'pending' %}
+                            <span class="badge bg-warning">Pending</span>
+                            {% elif booking.status == 'completed' %}
+                            <span class="badge bg-info">Completed</span>
+                            {% elif booking.status == 'cancelled' %}
+                            <span class="badge bg-danger">Cancelled</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            </div>
+            {% else %}
+            <p class="text-muted">No bookings yet.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

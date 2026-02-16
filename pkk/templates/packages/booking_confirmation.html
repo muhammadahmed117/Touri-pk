@@ -1,0 +1,257 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Booking Confirmed | TouriPK{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Success Message -->
+            <div class="text-center mb-4">
+                <div class="success-icon mb-3">
+                    <i class="fas fa-check-circle text-success" style="font-size: 80px;"></i>
+                </div>
+                <h2 class="mb-2">Booking Request Submitted!</h2>
+                <p class="text-muted">Thank you for choosing TouriPK</p>
+            </div>
+
+            <!-- Booking Details Card -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-receipt"></i> Booking Summary</h5>
+                </div>
+                <div class="card-body">
+                    <!-- Booking Reference -->
+                    <div class="alert alert-info d-flex align-items-center">
+                        <i class="fas fa-info-circle fa-2x me-3"></i>
+                        <div>
+                            <strong>Your Booking Reference:</strong>
+                            <h4 class="mb-0 mt-1">{{ booking.booking_reference }}</h4>
+                            <small>Please save this reference number for future communication</small>
+                        </div>
+                    </div>
+
+                    <!-- Package Details -->
+                    <h6 class="border-bottom pb-2 mb-3"><i class="fas fa-suitcase"></i> Package Details</h6>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p class="mb-2"><strong>Package:</strong><br>{{ booking.package.name }}</p>
+                            <p class="mb-2"><strong>Tour Operator:</strong><br>{{ booking.package.company.name }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="mb-2"><strong>Duration:</strong><br>{{ booking.package.duration_days }} Days / {{ booking.package.duration_nights }} Nights</p>
+                            <p class="mb-2"><strong>Destinations:</strong><br>{{ booking.package.destination_names }}</p>
+                        </div>
+                    </div>
+
+                    <!-- Travel Details -->
+                    <h6 class="border-bottom pb-2 mb-3"><i class="fas fa-calendar"></i> Travel Details</h6>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p class="mb-2"><strong>Departure Date:</strong><br>{{ booking.travel_date|date:"F d, Y (l)" }}</p>
+                            <p class="mb-2"><strong>Return Date:</strong><br>{{ booking.return_date|date:"F d, Y (l)" }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="mb-2"><strong>Travelers:</strong><br>{{ booking.num_adults }} Adult(s), {{ booking.num_children }} Child(ren)</p>
+                            <p class="mb-2"><strong>Total Travelers:</strong><br>{{ booking.total_travelers }} Person(s)</p>
+                        </div>
+                    </div>
+
+                    <!-- Contact Information -->
+                    <h6 class="border-bottom pb-2 mb-3"><i class="fas fa-user"></i> Contact Information</h6>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p class="mb-2"><strong>Name:</strong><br>{{ booking.contact_name }}</p>
+                            <p class="mb-2"><strong>Email:</strong><br>{{ booking.contact_email }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="mb-2"><strong>Phone:</strong><br>{{ booking.contact_phone }}</p>
+                            {% if booking.emergency_contact %}
+                            <p class="mb-2"><strong>Emergency Contact:</strong><br>{{ booking.emergency_contact }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Pricing -->
+                    <h6 class="border-bottom pb-2 mb-3"><i class="fas fa-money-bill"></i> Price Breakdown</h6>
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <tr>
+                                <td>Adults ({{ booking.num_adults }} × Rs. {{ booking.package.price_per_person|floatformat:0 }})</td>
+                                <td class="text-end">Rs. {{ booking.base_price|floatformat:0 }}</td>
+                            </tr>
+                            {% if booking.child_price_total > 0 %}
+                            <tr>
+                                <td>Children ({{ booking.num_children }} × Rs. {{ booking.package.child_price|floatformat:0 }})</td>
+                                <td class="text-end">Rs. {{ booking.child_price_total|floatformat:0 }}</td>
+                            </tr>
+                            {% endif %}
+                            {% if booking.discount_amount > 0 %}
+                            <tr class="text-success">
+                                <td>Discount</td>
+                                <td class="text-end">- Rs. {{ booking.discount_amount|floatformat:0 }}</td>
+                            </tr>
+                            {% endif %}
+                            <tr class="fw-bold border-top">
+                                <td><strong>Total Amount</strong></td>
+                                <td class="text-end text-primary fs-5"><strong>Rs. {{ booking.total_price|floatformat:0 }}</strong></td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <!-- Status -->
+                    <div class="alert alert-warning">
+                        <strong><i class="fas fa-hourglass-half"></i> Status:</strong>
+                        <span class="badge bg-warning text-dark ms-2">{{ booking.get_status_display }}</span>
+                        <p class="mb-0 mt-2 small">Your booking is currently pending confirmation. The tour operator will contact you within 24-48 hours to confirm availability and discuss payment options.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Next Steps Card -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-tasks"></i> What Happens Next?</h5>
+                </div>
+                <div class="card-body">
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-icon bg-success">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div class="timeline-content">
+                                <h6>Booking Received ✓</h6>
+                                <p class="mb-0 small">Your booking request has been successfully submitted.</p>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="timeline-icon bg-info">
+                                <i class="fas fa-phone"></i>
+                            </div>
+                            <div class="timeline-content">
+                                <h6>Confirmation Call</h6>
+                                <p class="mb-0 small">{{ booking.package.company.name }} will contact you at {{ booking.contact_phone }} to confirm availability.</p>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="timeline-icon bg-warning">
+                                <i class="fas fa-credit-card"></i>
+                            </div>
+                            <div class="timeline-content">
+                                <h6>Payment</h6>
+                                <p class="mb-0 small">Payment details and options will be discussed during confirmation.</p>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="timeline-icon bg-primary">
+                                <i class="fas fa-plane-departure"></i>
+                            </div>
+                            <div class="timeline-content">
+                                <h6>Get Ready for Your Trip!</h6>
+                                <p class="mb-0 small">Once confirmed and paid, prepare for an amazing experience!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="d-grid gap-2 d-md-flex justify-content-md-center mb-4">
+                <a href="{% url 'packages:booking_detail' booking.booking_reference %}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-eye"></i> View Booking Details
+                </a>
+                <a href="{% url 'dashboard' %}" class="btn btn-outline-primary btn-lg">
+                    <i class="fas fa-tachometer-alt"></i> Go to Dashboard
+                </a>
+                <a href="{% url 'packages:package_list' %}" class="btn btn-outline-secondary btn-lg">
+                    <i class="fas fa-search"></i> Browse More Packages
+                </a>
+            </div>
+
+            <!-- Important Notes -->
+            <div class="alert alert-light border">
+                <h6><i class="fas fa-lightbulb"></i> Important Notes:</h6>
+                <ul class="mb-0 small">
+                    <li>A confirmation email has been sent to <strong>{{ booking.contact_email }}</strong></li>
+                    <li>Please keep your booking reference <strong>{{ booking.booking_reference }}</strong> handy</li>
+                    <li>Check your email and phone for updates from {{ booking.package.company.name }}</li>
+                    <li>If you don't hear back within 48 hours, please contact them at {{ booking.package.company.phone }}</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.success-icon {
+    animation: scaleIn 0.5s ease-out;
+}
+
+@keyframes scaleIn {
+    from {
+        transform: scale(0);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.timeline {
+    position: relative;
+    padding-left: 50px;
+}
+
+.timeline-item {
+    position: relative;
+    padding-bottom: 30px;
+}
+
+.timeline-item:last-child {
+    padding-bottom: 0;
+}
+
+.timeline-item:before {
+    content: '';
+    position: absolute;
+    left: -35px;
+    top: 30px;
+    width: 2px;
+    height: calc(100% - 10px);
+    background: #dee2e6;
+}
+
+.timeline-item:last-child:before {
+    display: none;
+}
+
+.timeline-icon {
+    position: absolute;
+    left: -46px;
+    top: 0;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 12px;
+}
+
+.timeline-content h6 {
+    margin-bottom: 5px;
+    color: #2d3748;
+}
+
+.card {
+    border: none;
+}
+</style>
+{% endblock %}
+

@@ -1,0 +1,391 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ package.name }} - Touri.pk{% endblock %}
+
+{% block content %}
+{% if error %}
+<div class="container py-5">
+    <div class="alert alert-danger">{{ error }}</div>
+</div>
+{% else %}
+<!-- Package Hero -->
+<section class="position-relative" style="height: 400px; overflow: hidden;">
+    {% if package.image %}
+    <img src="{{ package.image.url }}" alt="{{ package.name }}" style="width: 100%; height: 100%; object-fit: cover;">
+    {% else %}
+    <div style="width: 100%; height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div>
+    {% endif %}
+    <div class="position-absolute top-0 start-0 w-100 h-100" style="background: rgba(0,0,0,0.5);"></div>
+    <div class="position-absolute bottom-0 start-0 w-100 p-5 text-white">
+        <div class="container">
+            <span class="badge bg-info mb-2">{{ package.get_package_type_display }}</span>
+            <h1 class="display-4 fw-bold mb-2">{{ package.name }}</h1>
+            <p class="lead mb-0">
+                <i class="fas fa-building"></i> {{ package.company.name }}
+            </p>
+        </div>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <!-- Main Content -->
+            <div class="col-lg-8">
+                <!-- Overview -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body">
+                        <h3 class="card-title mb-4"><i class="fas fa-info-circle text-primary"></i> Overview</h3>
+                        <p class="lead">{{ package.description }}</p>
+                        
+                        <div class="row g-3 mt-3">
+                            <div class="col-md-4">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-clock fa-2x text-primary me-3"></i>
+                                    <div>
+                                        <small class="text-muted d-block">Duration</small>
+                                        <strong>{{ package.duration_days }}D / {{ package.duration_nights }}N</strong>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-users fa-2x text-primary me-3"></i>
+                                    <div>
+                                        <small class="text-muted d-block">Group Size</small>
+                                        <strong>{{ package.min_people }} - {{ package.max_people }} people</strong>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-eye fa-2x text-primary me-3"></i>
+                                    <div>
+                                        <small class="text-muted d-block">Views</small>
+                                        <strong>{{ package.views_count }}</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Destinations -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body">
+                        <h3 class="card-title mb-3"><i class="fas fa-map-marked-alt text-primary"></i> Destinations</h3>
+                        <div class="d-flex flex-wrap gap-2">
+                            {% for destination in package.get_destinations_list %}
+                            <span class="badge bg-primary bg-gradient px-3 py-2">
+                                <i class="fas fa-map-marker-alt"></i> {{ destination }}
+                            </span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Inclusions -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body">
+                        <h3 class="card-title mb-3"><i class="fas fa-check-circle text-success"></i> What's Included</h3>
+                        <ul class="list-unstyled">
+                            {% for inclusion in package.get_inclusions_list %}
+                            <li class="mb-2">
+                                <i class="fas fa-check text-success me-2"></i> {{ inclusion }}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Exclusions -->
+                {% if package.exclusions %}
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body">
+                        <h3 class="card-title mb-3"><i class="fas fa-times-circle text-danger"></i> What's Not Included</h3>
+                        <ul class="list-unstyled">
+                            {% for exclusion in package.get_exclusions_list %}
+                            <li class="mb-2">
+                                <i class="fas fa-times text-danger me-2"></i> {{ exclusion }}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Itinerary -->
+                {% if package.itinerary %}
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body">
+                        <h3 class="card-title mb-3"><i class="fas fa-route text-primary"></i> Itinerary</h3>
+                        <div class="itinerary-content">
+                            {{ package.itinerary|linebreaks }}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Reviews Section -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body">
+                        <h3 class="card-title mb-3">
+                            <i class="fas fa-star text-warning"></i> Reviews
+                            {% if reviews %}
+                            <span class="badge bg-primary ms-2">{{ reviews|length }}</span>
+                            {% endif %}
+                        </h3>
+                        
+                        {% if package.get_average_rating > 0 %}
+                        <div class="mb-4 p-3 bg-light rounded">
+                            <div class="d-flex align-items-center">
+                                <h2 class="mb-0 me-3">{{ package.get_average_rating|floatformat:1 }}</h2>
+                                <div>
+                                    {% with avg=package.get_average_rating %}
+                                    {% for i in "12345" %}
+                                    {% if forloop.counter <= avg %}
+                                    <i class="fas fa-star text-warning"></i>
+                                    {% else %}
+                                    <i class="far fa-star text-warning"></i>
+                                    {% endif %}
+                                    {% endfor %}
+                                    {% endwith %}
+                                    <small class="text-muted d-block">{{ package.get_reviews_count }} review{{ package.get_reviews_count|pluralize }}</small>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if reviews %}
+                        {% for review in reviews %}
+                        <div class="border-bottom pb-3 mb-3">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <strong>{{ review.user.username }}</strong>
+                                    <div class="text-warning">
+                                        {% for i in "12345" %}
+                                        {% if forloop.counter <= review.rating %}
+                                        <i class="fas fa-star"></i>
+                                        {% else %}
+                                        <i class="far fa-star"></i>
+                                        {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <small class="text-muted">{{ review.created_at|date:"M d, Y" }}</small>
+                            </div>
+                            <h6 class="mt-2">{{ review.title }}</h6>
+                            <p class="text-muted mb-0">{{ review.comment }}</p>
+                        </div>
+                        {% endfor %}
+                        {% else %}
+                        <p class="text-muted">No reviews yet. Be the first to review after completing a tour!</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <!-- Pricing Card -->
+                <div class="card shadow-sm mb-4 sticky-top" style="top: 20px;">
+                    <div class="card-body">
+                        <h4 class="card-title mb-4">Book This Package</h4>
+                        
+                        <div class="mb-4">
+                            <h2 class="text-primary mb-1">PKR {{ package.price_per_person|floatformat:0 }}</h2>
+                            <small class="text-muted">per person</small>
+                            
+                            {% if package.child_price %}
+                            <div class="mt-2">
+                                <strong>Child Price:</strong> PKR {{ package.child_price|floatformat:0 }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        {% if package.available_from and package.available_to %}
+                        <div class="mb-4">
+                            <h6>Available Dates</h6>
+                            <p class="text-muted mb-0">
+                                <i class="fas fa-calendar-alt"></i> 
+                                {{ package.available_from|date:"M d, Y" }} - {{ package.available_to|date:"M d, Y" }}
+                            </p>
+                        </div>
+                        {% endif %}
+
+                        <div class="d-grid gap-2">
+                            {% if user.is_authenticated %}
+                            <button type="button" class="btn btn-success btn-lg" data-bs-toggle="modal" data-bs-target="#bookingModal">
+                                <i class="fas fa-calendar-check"></i> Book Now
+                            </button>
+                            {% else %}
+                            <a href="{% url 'login' %}" class="btn btn-success btn-lg">
+                                <i class="fas fa-sign-in-alt"></i> Login to Book
+                            </a>
+                            {% endif %}
+                            {% comment %}
+                            <a href="{% url 'chatbot:chat' %}" class="btn btn-primary btn-lg">
+                                <i class="fas fa-comments"></i> Inquire via Chat
+                            </a>
+                            {% endcomment %}
+                            <a href="tel:{{ package.company.phone }}" class="btn btn-outline-primary">
+                                <i class="fas fa-phone"></i> Call {{ package.company.phone }}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Company Info -->
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">About Company</h5>
+                        {% if package.company.logo %}
+                        <img src="{{ package.company.logo.url }}" alt="{{ package.company.name }}" class="img-fluid mb-3" style="max-height: 80px; width: 80px; height: 80px; object-fit: cover; border-radius: 50%; border: 3px solid #f0f0f0;">
+                        {% endif %}
+                        <h6>{{ package.company.name }}</h6>
+                        <p class="text-muted small">{{ package.company.description|truncatewords:30 }}</p>
+                        
+                        <div class="mb-2">
+                            <i class="fas fa-star text-warning"></i>
+                            <strong>{{ package.company.rating }}</strong> rating
+                        </div>
+                        
+                        <div class="d-grid">
+                            <a href="{% url 'packages:company_detail' package.company.slug %}" class="btn btn-outline-secondary btn-sm">
+                                View All Packages
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Related Packages -->
+        {% if related_packages %}
+        <div class="row mt-5">
+            <div class="col-12">
+                <h3 class="mb-4">More from {{ package.company.name }}</h3>
+            </div>
+            {% for related in related_packages %}
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card h-100 shadow-sm hover-lift">
+                    {% if related.image %}
+                    <img src="{{ related.image.url }}" class="card-img-top" alt="{{ related.name }}" style="height: 200px; object-fit: cover;">
+                    {% else %}
+                    <div class="card-img-top bg-gradient" style="height: 200px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div>
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ related.name }}</h5>
+                        <p class="text-muted small">{{ related.duration_days }}D / {{ related.duration_nights }}N</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <strong class="text-primary">PKR {{ related.price_per_person|floatformat:0 }}</strong>
+                            <a href="{% url 'packages:package_detail' related.slug %}" class="btn btn-sm btn-outline-primary">View</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<style>
+.hover-lift {
+    transition: transform 0.3s ease;
+}
+.hover-lift:hover {
+    transform: translateY(-5px);
+}
+.itinerary-content {
+    white-space: pre-wrap;
+}
+</style>
+
+<!-- Booking Modal -->
+<div class="modal fade" id="bookingModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title"><i class="fas fa-calendar-check me-2"></i>Book {{ package.name }}</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{% url 'packages:create_booking' package.id %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> Payment gateway will be integrated soon. For now, we'll contact you to confirm payment details.
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Travel Date <span class="text-danger">*</span></label>
+                        <input type="date" class="form-control" name="travel_date" required>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="form-label">Adults <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" name="num_adults" min="1" value="1" required>
+                            <small class="text-muted d-block mt-1">PKR {{ package.price_per_person|floatformat:0 }} per person</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Children</label>
+                            <input type="number" class="form-control" name="num_children" min="0" value="0">
+                            <small class="text-muted d-block mt-1">PKR {% if package.child_price %}{{ package.child_price|floatformat:0 }}{% else %}{{ package.price_per_person|floatformat:0 }}{% endif %} per child</small>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3 mt-3">
+                        <label class="form-label">Total Amount</label>
+                        <div class="input-group">
+                            <span class="input-group-text">PKR</span>
+                            <input type="text" class="form-control" id="totalAmount" value="{{ package.price_per_person|floatformat:0 }}" disabled>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Phone Number <span class="text-danger">*</span></label>
+                        <input type="tel" class="form-control" name="phone" placeholder="03XX-XXXXXXX" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Special Requests</label>
+                        <textarea class="form-control" name="special_requests" rows="3" placeholder="Any special requirements or preferences?"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-check"></i> Confirm Booking
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// Real-time price calculation
+document.addEventListener('DOMContentLoaded', function() {
+    const numAdultsInput = document.querySelector('input[name="num_adults"]');
+    const numChildrenInput = document.querySelector('input[name="num_children"]');
+    const totalAmountInput = document.getElementById('totalAmount');
+    
+    const adultPrice = {{ package.price_per_person }};
+    const childPrice = {% if package.child_price %}{{ package.child_price }}{% else %}{{ package.price_per_person }}{% endif %};
+    
+    function calculateTotal() {
+        const adults = parseInt(numAdultsInput.value) || 0;
+        const children = parseInt(numChildrenInput.value) || 0;
+        const total = (adults * adultPrice) + (children * childPrice);
+        totalAmountInput.value = Math.floor(total).toLocaleString('en-PK');
+    }
+    
+    numAdultsInput.addEventListener('change', calculateTotal);
+    numChildrenInput.addEventListener('change', calculateTotal);
+});
+</script>
+
+{% endif %}
+{% endblock %}

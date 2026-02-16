@@ -1,0 +1,389 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Payment - Custom Package #{{ order.order_number }}{% endblock %}
+
+{% block content %}
+<style>
+    .payment-page {
+        min-height: 100vh;
+        padding: 40px 0;
+        padding-top: 100px;
+        background: #f8f9fa;
+    }
+    .payment-container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+    .payment-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+    .payment-header {
+        background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+        color: white;
+        padding: 30px 40px;
+        text-align: center;
+    }
+    .payment-header h2 {
+        font-weight: 800;
+        margin: 0 0 5px 0;
+    }
+    .payment-header p {
+        opacity: 0.8;
+        margin: 0;
+    }
+    .payment-body {
+        padding: 40px;
+    }
+    .order-summary {
+        background: #f8f9fa;
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 30px;
+    }
+    .order-summary h4 {
+        font-weight: 800;
+        margin-bottom: 20px;
+        color: #000;
+    }
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid #e0e0e0;
+    }
+    .summary-row:last-child {
+        border-bottom: none;
+    }
+    .summary-row .label {
+        color: #666;
+        font-weight: 500;
+    }
+    .summary-row .value {
+        font-weight: 700;
+        color: #000;
+    }
+    .total-row {
+        background: #000;
+        color: white;
+        margin: 20px -25px -25px -25px;
+        padding: 20px 25px;
+        border-radius: 0 0 15px 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .total-row .label {
+        font-size: 1.2rem;
+        font-weight: 700;
+    }
+    .total-row .value {
+        font-size: 1.5rem;
+        font-weight: 900;
+    }
+    .stripe-section {
+        margin-top: 30px;
+    }
+    .stripe-section h4 {
+        font-weight: 800;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    #card-element {
+        border: 2px solid #e0e0e0;
+        border-radius: 12px;
+        padding: 15px;
+        background: #f8f9fa;
+        transition: all 0.3s;
+    }
+    #card-element:focus-within {
+        border-color: #000;
+        background: white;
+        box-shadow: 0 0 0 4px rgba(0,0,0,0.1);
+    }
+    #card-errors {
+        color: #dc3545;
+        margin-top: 10px;
+        font-size: 14px;
+    }
+    .pay-btn {
+        width: 100%;
+        padding: 18px;
+        background: #000;
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 1.1rem;
+        font-weight: 700;
+        cursor: pointer;
+        margin-top: 25px;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+    .pay-btn:hover {
+        background: #333;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+    .pay-btn:disabled {
+        background: #999;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+    .test-notice {
+        background: #fff3cd;
+        border: 2px solid #ffc107;
+        border-radius: 12px;
+        padding: 15px 20px;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+    }
+    .test-notice i {
+        color: #ffc107;
+        font-size: 1.3rem;
+        margin-top: 2px;
+    }
+    .test-notice .content h5 {
+        margin: 0 0 5px 0;
+        font-weight: 700;
+        color: #856404;
+    }
+    .test-notice .content p {
+        margin: 0;
+        color: #856404;
+        font-size: 14px;
+    }
+    .test-notice code {
+        background: rgba(0,0,0,0.1);
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-weight: 600;
+    }
+    .spinner {
+        display: none;
+        width: 20px;
+        height: 20px;
+        border: 3px solid rgba(255,255,255,0.3);
+        border-radius: 50%;
+        border-top-color: white;
+        animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+    .secure-badge {
+        text-align: center;
+        margin-top: 15px;
+        color: #888;
+        font-size: 13px;
+    }
+    .secure-badge i {
+        color: #28a745;
+    }
+</style>
+
+<div class="payment-page">
+    <div class="payment-container">
+        <div class="payment-card">
+            <div class="payment-header">
+                <h2><i class="fas fa-credit-card"></i> Secure Payment</h2>
+                <p>Custom Package #{{ order.order_number }}</p>
+            </div>
+            <div class="payment-body">
+                <!-- Test Mode Notice -->
+                <div class="test-notice">
+                    <i class="fas fa-flask"></i>
+                    <div class="content">
+                        <h5>Test Mode - For Testing Only</h5>
+                        <p>Use card number: <code>4242 4242 4242 4242</code><br>
+                        Any future expiry date and any 3-digit CVC.</p>
+                    </div>
+                </div>
+
+                <!-- Order Summary -->
+                <div class="order-summary">
+                    <h4><i class="fas fa-receipt"></i> Order Summary</h4>
+                    <div class="summary-row">
+                        <span class="label"><i class="fas fa-map-marker-alt"></i> Destination</span>
+                        <span class="value">{{ order.destination|title }}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="label"><i class="fas fa-calendar"></i> Duration</span>
+                        <span class="value">{{ order.num_days }} Days</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="label"><i class="fas fa-users"></i> People</span>
+                        <span class="value">{{ order.num_people }} People</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="label"><i class="fas fa-door-open"></i> Rooms</span>
+                        <span class="value">{{ order.num_rooms }} Rooms</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="label"><i class="fas fa-bus"></i> Vehicle</span>
+                        <span class="value">{{ order.get_vehicle_display }}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="label"><i class="fas fa-utensils"></i> Food</span>
+                        <span class="value">{{ order.get_food_display }}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="label"><i class="fas fa-hotel"></i> Accommodation</span>
+                        <span class="value">{{ order.get_accommodation_display }}</span>
+                    </div>
+                    {% if order.guide %}
+                    <div class="summary-row">
+                        <span class="label"><i class="fas fa-user-tie"></i> Tour Guide</span>
+                        <span class="value">Yes</span>
+                    </div>
+                    {% endif %}
+                    {% if order.bonfire %}
+                    <div class="summary-row">
+                        <span class="label"><i class="fas fa-fire"></i> Bonfire + Musical Night</span>
+                        <span class="value">Yes</span>
+                    </div>
+                    {% endif %}
+                    <div class="summary-row">
+                        <span class="label"><i class="fas fa-user"></i> Per Person</span>
+                        <span class="value">PKR {{ order.per_person_price|floatformat:0 }}</span>
+                    </div>
+                    <div class="total-row">
+                        <span class="label">Total Amount</span>
+                        <span class="value">PKR {{ order.total_price|floatformat:0 }}</span>
+                    </div>
+                </div>
+
+                <!-- Stripe Payment Form -->
+                <div class="stripe-section">
+                    <h4><i class="fas fa-lock"></i> Payment Details</h4>
+                    <form id="payment-form">
+                        {% csrf_token %}
+                        <div id="card-element"></div>
+                        <div id="card-errors" role="alert"></div>
+                        <button type="submit" class="pay-btn" id="submit-btn">
+                            <span id="btn-text"><i class="fas fa-lock"></i> Pay PKR {{ order.total_price|floatformat:0 }}</span>
+                            <div class="spinner" id="spinner"></div>
+                        </button>
+                    </form>
+                    <div class="secure-badge">
+                        <i class="fas fa-shield-alt"></i> Secured by Stripe - Your payment info is encrypted
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+    const stripe = Stripe('{{ stripe_publishable_key }}');
+    const elements = stripe.elements();
+    
+    const style = {
+        base: {
+            color: '#000',
+            fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, sans-serif',
+            fontSmoothing: 'antialiased',
+            fontSize: '16px',
+            '::placeholder': { color: '#aab7c4' }
+        },
+        invalid: {
+            color: '#dc3545',
+            iconColor: '#dc3545'
+        }
+    };
+    
+    const cardElement = elements.create('card', { style: style });
+    cardElement.mount('#card-element');
+    
+    cardElement.on('change', function(event) {
+        const displayError = document.getElementById('card-errors');
+        if (event.error) {
+            displayError.textContent = event.error.message;
+        } else {
+            displayError.textContent = '';
+        }
+    });
+    
+    const form = document.getElementById('payment-form');
+    form.addEventListener('submit', async function(event) {
+        event.preventDefault();
+        setLoading(true);
+        
+        try {
+            // Create PaymentIntent on the server
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            const response = await fetch('{% url "content:create_payment_intent" order.id %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken,
+                },
+            });
+            
+            const data = await response.json();
+            
+            if (data.error) {
+                showError(data.error);
+                setLoading(false);
+                return;
+            }
+            
+            // Confirm the payment with Stripe
+            const { error, paymentIntent } = await stripe.confirmCardPayment(data.clientSecret, {
+                payment_method: {
+                    card: cardElement,
+                    billing_details: {
+                        name: '{{ request.user.get_full_name|default:request.user.username }}',
+                        email: '{{ request.user.email }}',
+                    }
+                }
+            });
+            
+            if (error) {
+                showError(error.message);
+                setLoading(false);
+            } else if (paymentIntent.status === 'succeeded') {
+                // Payment successful - redirect to success page
+                window.location.href = '{% url "content:payment_success" order.id %}';
+            }
+        } catch (err) {
+            showError('An unexpected error occurred. Please try again.');
+            setLoading(false);
+        }
+    });
+    
+    function setLoading(isLoading) {
+        const btn = document.getElementById('submit-btn');
+        const spinner = document.getElementById('spinner');
+        const btnText = document.getElementById('btn-text');
+        
+        if (isLoading) {
+            btn.disabled = true;
+            spinner.style.display = 'inline-block';
+            btnText.textContent = 'Processing...';
+        } else {
+            btn.disabled = false;
+            spinner.style.display = 'none';
+            btnText.innerHTML = '<i class="fas fa-lock"></i> Pay PKR {{ order.total_price|floatformat:0 }}';
+        }
+    }
+    
+    function showError(message) {
+        const errorDiv = document.getElementById('card-errors');
+        errorDiv.textContent = message;
+        setTimeout(() => { errorDiv.textContent = ''; }, 5000);
+    }
+</script>
+{% endblock %}

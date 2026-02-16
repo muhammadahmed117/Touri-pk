@@ -1,0 +1,212 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Register - TouriPK{% endblock %}
+
+{% block content %}
+<!-- Animated Registration Background -->
+<div class="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 py-6 sm:py-12 px-4">
+    <div class="container mx-auto">
+        <div class="flex justify-center">
+            <div class="w-full max-w-2xl">
+                <div class="bg-white rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden transform transition-all duration-300 hover:shadow-emerald-200 animate-fade-in">
+                    <!-- Gradient Header -->
+                    <div class="bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500 p-6 sm:p-8 text-center relative overflow-hidden">
+                        <div class="absolute inset-0 bg-black opacity-10"></div>
+                        <div class="relative z-10">
+                            <h2 class="text-3xl sm:text-4xl font-extrabold text-white mb-2">Join Touri.pk</h2>
+                            <p class="text-green-100 text-base sm:text-lg">Start your adventure today</p>
+                        </div>
+                        <!-- Decorative waves -->
+                        <div class="absolute bottom-0 left-0 right-0">
+                            <svg viewBox="0 0 1440 100" class="w-full h-6 sm:h-8">
+                                <path fill="#ffffff" d="M0,50 Q360,0 720,50 T1440,50 L1440,100 L0,100 Z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="p-6 sm:p-8">
+                    {% if messages %}
+                    {% for message in messages %}
+                    <div class="mb-3 sm:mb-4 p-3 sm:p-4 rounded-lg sm:rounded-xl bg-gradient-to-r {% if message.tags == 'success' %}from-green-50 to-emerald-50 border-l-4 border-green-500 text-green-800{% elif message.tags == 'error' %}from-red-50 to-rose-50 border-l-4 border-red-500 text-red-800{% else %}from-blue-50 to-cyan-50 border-l-4 border-blue-500 text-blue-800{% endif %} animate-slide-up text-sm">
+                        <div class="flex items-center justify-between">
+                            <span class="flex items-center gap-2 font-medium">
+                                <i class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'error' %}fa-exclamation-circle{% else %}fa-info-circle{% endif %}"></i>
+                                {{ message }}
+                            </span>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+
+                    <form method="post" novalidate class="space-y-4 sm:space-y-5">
+                        {% csrf_token %}
+
+                        {% if form.non_field_errors %}
+                        <div class="p-3 sm:p-4 rounded-lg sm:rounded-xl bg-gradient-to-r from-red-50 to-rose-50 border-l-4 border-red-500 text-red-800 text-sm">
+                            {{ form.non_field_errors }}
+                        </div>
+                        {% endif %}
+
+                        <!-- Username with Icon -->
+                        <div class="group">
+                            <label for="{{ form.username.id_for_label }}" class="block text-xs sm:text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
+                                <i class="fas fa-user text-emerald-600"></i>
+                                {{ form.username.label }} <span class="text-red-500">*</span>
+                            </label>
+                            <div class="relative">
+                                {{ form.username }}
+                                <div class="absolute inset-0 rounded-xl bg-gradient-to-r from-emerald-400 to-teal-400 opacity-0 group-hover:opacity-20 transition-opacity duration-300 pointer-events-none"></div>
+                            </div>
+                            {% if form.username.errors %}
+                            <div class="text-red-600 text-xs sm:text-sm mt-2 flex items-center gap-1 animate-slide-up">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                {{ form.username.errors }}
+                            </div>
+                            {% endif %}
+                            {% if form.username.help_text %}
+                            <small class="text-gray-500 text-xs mt-1 block">{{ form.username.help_text }}</small>
+                            {% endif %}
+                        </div>
+
+                        <!-- Email -->
+                        <div class="group">
+                            <label for="{{ form.email.id_for_label }}" class="block text-xs sm:text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
+                                <i class="fas fa-envelope text-emerald-600"></i>
+                                {{ form.email.label }} <span class="text-red-500">*</span>
+                            </label>
+                            <div class="relative">
+                                {{ form.email }}
+                                <div class="absolute inset-0 rounded-xl bg-gradient-to-r from-emerald-400 to-teal-400 opacity-0 group-hover:opacity-20 transition-opacity duration-300 pointer-events-none"></div>
+                            </div>
+                            {% if form.email.errors %}
+                            <div class="text-red-600 text-xs sm:text-sm mt-2 flex items-center gap-1 animate-slide-up">
+                                {{ form.email.errors }}
+                            </div>
+                            {% endif %}
+                            {% if form.email.help_text %}
+                            <small class="text-gray-500 text-xs mt-1 block">{{ form.email.help_text }}</small>
+                            {% endif %}
+                        </div>
+
+                        <!-- Password -->
+                        <div class="group">
+                            <label for="{{ form.password1.id_for_label }}" class="block text-xs sm:text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
+                                <i class="fas fa-lock text-emerald-600"></i>
+                                {{ form.password1.label }} <span class="text-red-500">*</span>
+                            </label>
+                            <div class="relative">
+                                {{ form.password1 }}
+                                <div class="absolute inset-0 rounded-xl bg-gradient-to-r from-emerald-400 to-teal-400 opacity-0 group-hover:opacity-20 transition-opacity duration-300 pointer-events-none"></div>
+                            </div>
+                            {% if form.password1.errors %}
+                            <div class="text-red-600 text-xs sm:text-sm mt-2 flex items-center gap-1 animate-slide-up">
+                                {{ form.password1.errors }}
+                            </div>
+                            {% endif %}
+                            {% if form.password1.help_text %}
+                            <small class="text-gray-500 text-xs mt-1 block">{{ form.password1.help_text }}</small>
+                            {% endif %}
+                        </div>
+
+                        <!-- Confirm Password -->
+                        <div class="group">
+                            <label for="{{ form.password2.id_for_label }}" class="block text-xs sm:text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
+                                <i class="fas fa-lock text-emerald-600"></i>
+                                {{ form.password2.label }} <span class="text-red-500">*</span>
+                            </label>
+                            <div class="relative">
+                                {{ form.password2 }}
+                                <div class="absolute inset-0 rounded-xl bg-gradient-to-r from-emerald-400 to-teal-400 opacity-0 group-hover:opacity-20 transition-opacity duration-300 pointer-events-none"></div>
+                            </div>
+                            {% if form.password2.errors %}
+                            <div class="text-red-600 text-xs sm:text-sm mt-2 flex items-center gap-1 animate-slide-up">
+                                {{ form.password2.errors }}
+                            </div>
+                            {% endif %}
+                            {% if form.password2.help_text %}
+                            <small class="text-gray-500 text-xs mt-1 block">{{ form.password2.help_text }}</small>
+                            {% endif %}
+                            <div class="form-check mt-3 flex items-center gap-2">
+                                <input class="form-check-input w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500" type="checkbox" id="togglePasswords"
+                                    onclick="var p1=document.getElementById('{{ form.password1.id_for_label }}'),p2=document.getElementById('{{ form.password2.id_for_label }}'),t=this.checked?'text':'password';p1.type=t;p2.type=t;">
+                                <label class="text-xs sm:text-sm text-gray-600 cursor-pointer select-none" for="togglePasswords">Show password</label>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button with Gradient -->
+                        <button type="submit" class="w-full bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500 hover:from-green-600 hover:via-emerald-600 hover:to-teal-600 text-white font-bold py-3 sm:py-4 px-6 rounded-lg sm:rounded-xl shadow-lg hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-200 flex items-center justify-center gap-2 sm:gap-3 group mt-4 sm:mt-6 mb-4 sm:mb-6 text-sm sm:text-base">
+                            <i class="fas fa-user-check text-lg sm:text-2xl group-hover:rotate-12 transition-transform duration-200"></i>
+                            <span>Create My Account</span>
+                            <i class="fas fa-arrow-right group-hover:translate-x-2 transition-transform duration-200"></i>
+                        </button>
+
+                        <!-- Password Requirements Info -->
+                        <div class="bg-gradient-to-r from-blue-50 to-cyan-50 border-l-4 border-blue-500 rounded-lg sm:rounded-xl p-3 sm:p-4">
+                            <div class="flex items-start gap-2 sm:gap-3">
+                                <i class="fas fa-shield-alt text-blue-600 text-lg sm:text-2xl mt-1"></i>
+                                <div class="flex-1">
+                                    <strong class="text-blue-900 font-bold text-xs sm:text-sm block mb-2">Password Requirements:</strong>
+                                    <ul class="text-blue-800 text-xs space-y-1 list-none">
+                                        <li class="flex items-center gap-2"><i class="fas fa-check-circle text-blue-600"></i> At least 8 characters long</li>
+                                        <li class="flex items-center gap-2"><i class="fas fa-check-circle text-blue-600"></i> One uppercase letter</li>
+                                        <li class="flex items-center gap-2"><i class="fas fa-check-circle text-blue-600"></i> One lowercase letter</li>
+                                        <li class="flex items-center gap-2"><i class="fas fa-check-circle text-blue-600"></i> At least one number</li>
+                                        <li class="flex items-center gap-2"><i class="fas fa-check-circle text-blue-600"></i> Not too common</li>
+                                        <li class="flex items-center gap-2"><i class="fas fa-check-circle text-blue-600"></i> No personal info</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+
+                <!-- Login Link -->
+                <div class="mt-6 sm:mt-8 text-center">
+                    <div class="relative mb-4 sm:mb-6">
+                        <div class="absolute inset-0 flex items-center">
+                            <div class="w-full border-t border-gray-300"></div>
+                        </div>
+                        <div class="relative flex justify-center text-xs sm:text-sm">
+                            <span class="px-3 sm:px-4 bg-white text-gray-500 font-medium">Already have an account?</span>
+                        </div>
+                    </div>
+                    <a href="{% url 'login' %}" class="inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-2 sm:py-3 bg-white border-2 border-blue-500 text-blue-600 font-semibold rounded-lg sm:rounded-xl hover:bg-blue-50 hover:border-blue-600 hover:scale-105 transform transition-all duration-200 shadow-md hover:shadow-lg group text-sm sm:text-base">
+                        <i class="fas fa-sign-in-alt group-hover:rotate-12 transition-transform duration-200"></i>
+                        <span>Sign In</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Security Notice -->
+            <div class="text-center mt-4 sm:mt-6">
+                <small class="text-gray-600 text-xs sm:text-sm flex items-center justify-center gap-2"><i class="fas fa-lock"></i> Your information is encrypted and secure</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-control:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+</style>
+<script>
+    (function () {
+        function toggleVisibility(checkbox) {
+            var targetId = checkbox.getAttribute('data-target');
+            if (!targetId) return;
+            var input = document.getElementById(targetId);
+            if (!input) return;
+            input.type = checkbox.checked ? 'text' : 'password';
+        }
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.toggle-password').forEach(function (cb) {
+                cb.addEventListener('change', function () { toggleVisibility(cb); });
+            });
+        });
+    })();
+</script>
+{% endblock %}

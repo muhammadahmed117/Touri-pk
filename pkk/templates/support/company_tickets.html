@@ -1,0 +1,266 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Company Support Tickets | TouriPK{% endblock %}
+
+{% block content %}
+<style>
+    .tickets-page {
+        background: #f8f9fa;
+        min-height: 100vh;
+        padding: 120px 0 80px;
+    }
+    .tickets-container {
+        max-width: 1100px;
+        margin: 0 auto;
+    }
+    .page-header {
+        background: white;
+        border-radius: 20px;
+        padding: 40px;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    .page-header h1 {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #1a1a2e;
+        margin-bottom: 5px;
+    }
+    .page-header p { color: #666; margin-bottom: 0; }
+    .stats-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 15px;
+        margin-bottom: 25px;
+    }
+    .stat-card {
+        background: white;
+        border-radius: 16px;
+        padding: 20px;
+        text-align: center;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    }
+    .stat-card .stat-number {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #1a1a2e;
+    }
+    .stat-card .stat-label {
+        font-size: 0.85rem;
+        color: #666;
+        font-weight: 600;
+    }
+    .stat-card.urgent { border-bottom: 3px solid #dc3545; }
+    .stat-card.pending { border-bottom: 3px solid #ffc107; }
+    .stat-card.progress { border-bottom: 3px solid #007bff; }
+    .stat-card.resolved { border-bottom: 3px solid #28a745; }
+    .filter-bar {
+        background: white;
+        border-radius: 16px;
+        padding: 15px 25px;
+        margin-bottom: 25px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+    .filter-btn {
+        padding: 8px 20px;
+        border-radius: 50px;
+        border: 2px solid #e0e0e0;
+        background: white;
+        color: #333;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+    }
+    .filter-btn:hover, .filter-btn.active {
+        background: #000;
+        color: white;
+        border-color: #000;
+    }
+    .ticket-card {
+        background: white;
+        border-radius: 20px;
+        padding: 25px 30px;
+        margin-bottom: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+        text-decoration: none;
+        color: inherit;
+        display: block;
+    }
+    .ticket-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+        color: inherit;
+    }
+    .ticket-card.overdue-card {
+        border-left: 4px solid #dc3545;
+    }
+    .ticket-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 12px;
+    }
+    .ticket-id {
+        font-family: monospace;
+        font-size: 0.85rem;
+        color: #666;
+        font-weight: 600;
+    }
+    .ticket-subject {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: #1a1a2e;
+        margin-bottom: 8px;
+    }
+    .ticket-meta {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+        font-size: 0.9rem;
+        color: #666;
+    }
+    .ticket-meta i { margin-right: 5px; }
+    .status-badge {
+        padding: 5px 14px;
+        border-radius: 50px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+    .status-pending_company { background: #fff3cd; color: #856404; }
+    .status-in_progress { background: #cce5ff; color: #004085; }
+    .status-resolved { background: #d4edda; color: #155724; }
+    .status-escalated { background: #f8d7da; color: #721c24; }
+    .status-closed { background: #e2e3e5; color: #383d41; }
+    .overdue-badge {
+        background: #dc3545;
+        color: white;
+        padding: 3px 10px;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        margin-left: 8px;
+    }
+    .empty-state {
+        text-align: center;
+        padding: 80px 20px;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    .empty-state i { font-size: 4rem; color: #ddd; margin-bottom: 20px; }
+    .empty-state h3 { color: #1a1a2e; font-weight: 700; }
+</style>
+
+<div class="tickets-page">
+    <div class="container">
+        <div class="tickets-container">
+            <!-- Header -->
+            <div class="page-header">
+                <h1><i class="fas fa-headset" style="margin-right: 12px;"></i>Support Tickets for {{ company.name }}</h1>
+                <p>Respond to customer issues promptly. Tickets not responded to within 48 hours are escalated to an admin.</p>
+            </div>
+
+            {% if messages %}
+            <div class="mb-3">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert" style="border-radius: 12px;">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- Stats -->
+            <div class="stats-row">
+                <div class="stat-card urgent">
+                    <div class="stat-number">{{ tickets|length }}</div>
+                    <div class="stat-label">Total Tickets</div>
+                </div>
+                <div class="stat-card pending">
+                    <div class="stat-number" id="pendingCount">0</div>
+                    <div class="stat-label">Awaiting Response</div>
+                </div>
+                <div class="stat-card progress">
+                    <div class="stat-number" id="progressCount">0</div>
+                    <div class="stat-label">In Progress</div>
+                </div>
+                <div class="stat-card resolved">
+                    <div class="stat-number" id="resolvedCount">0</div>
+                    <div class="stat-label">Resolved</div>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="filter-bar">
+                <a href="{% url 'support:company_tickets' %}" class="filter-btn {% if not status_filter %}active{% endif %}">All</a>
+                <a href="{% url 'support:company_tickets' %}?status=pending_company" class="filter-btn {% if status_filter == 'pending_company' %}active{% endif %}">Waiting</a>
+                <a href="{% url 'support:company_tickets' %}?status=in_progress" class="filter-btn {% if status_filter == 'in_progress' %}active{% endif %}">In Progress</a>
+                <a href="{% url 'support:company_tickets' %}?status=escalated" class="filter-btn {% if status_filter == 'escalated' %}active{% endif %}">Escalated</a>
+                <a href="{% url 'support:company_tickets' %}?status=resolved" class="filter-btn {% if status_filter == 'resolved' %}active{% endif %}">Resolved</a>
+            </div>
+
+            <!-- Tickets -->
+            {% if tickets %}
+                {% for ticket in tickets %}
+                <a href="{% url 'support:ticket_detail' ticket.ticket_id %}" class="ticket-card {% if ticket.is_overdue and ticket.status == 'pending_company' %}overdue-card{% endif %}">
+                    <div class="ticket-header">
+                        <div>
+                            <span class="ticket-id">{{ ticket.ticket_id }}</span>
+                            {% if ticket.is_overdue and ticket.status == 'pending_company' %}
+                            <span class="overdue-badge"><i class="fas fa-exclamation-circle"></i> OVERDUE - RESPOND NOW</span>
+                            {% endif %}
+                        </div>
+                        <span class="status-badge status-{{ ticket.status }}">{{ ticket.get_status_display }}</span>
+                    </div>
+                    <div class="ticket-subject">{{ ticket.subject }}</div>
+                    <div class="ticket-meta">
+                        <span><i class="fas fa-user"></i>{{ ticket.customer.full_name|default:ticket.customer.username }}</span>
+                        <span><i class="fas fa-tag"></i>{{ ticket.get_issue_type_display }}</span>
+                        <span><i class="fas fa-flag"></i>{{ ticket.get_priority_display }}</span>
+                        <span><i class="fas fa-clock"></i>{{ ticket.created_at|timesince }} ago</span>
+                        {% if ticket.status == 'pending_company' and not ticket.is_overdue %}
+                        <span style="color: #dc3545; font-weight: 700;">
+                            <i class="fas fa-hourglass-half"></i>{{ ticket.time_remaining_hours }} left
+                        </span>
+                        {% endif %}
+                    </div>
+                </a>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-inbox"></i>
+                    <h3>No tickets yet</h3>
+                    <p>When customers submit support tickets, they'll appear here.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+// Count stats from rendered tickets
+document.addEventListener('DOMContentLoaded', function() {
+    const cards = document.querySelectorAll('.ticket-card');
+    let pending = 0, progress = 0, resolved = 0;
+    cards.forEach(card => {
+        const badge = card.querySelector('.status-badge');
+        if (badge) {
+            if (badge.classList.contains('status-pending_company')) pending++;
+            else if (badge.classList.contains('status-in_progress')) progress++;
+            else if (badge.classList.contains('status-resolved')) resolved++;
+        }
+    });
+    document.getElementById('pendingCount').textContent = pending;
+    document.getElementById('progressCount').textContent = progress;
+    document.getElementById('resolvedCount').textContent = resolved;
+});
+</script>
+{% endblock %}

@@ -1,0 +1,533 @@
+{% extends 'base.html' %}
+{% block title %}Create Custom Package{% endblock %}
+
+{% block content %}
+<div class="container my-5" style="padding-top: 80px;">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg border-0" style="border-radius: 20px;">
+                <div class="card-header text-white text-center" style="background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%); border-radius: 20px 20px 0 0; padding: 30px;">
+                    <h2 style="font-weight: 800; margin: 0;">
+                        <i class="fas fa-plus-circle"></i> Create Your Custom Package
+                    </h2>
+                    <p style="margin: 10px 0 0 0; opacity: 0.9;">Design your perfect tour experience</p>
+                </div>
+                <div class="card-body" style="padding: 40px;">
+                    <style>
+                        .stepper-wrap { display: flex; align-items: center; gap: 0; }
+                        .stepper-wrap input[type=number] { -moz-appearance: textfield; text-align: center; border-left: none; border-right: none; border-radius: 0; width: 80px; font-weight: 700; font-size: 1.1rem; }
+                        .stepper-wrap input[type=number]::-webkit-outer-spin-button,
+                        .stepper-wrap input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+                        .stepper-btn { width: 48px; height: 48px; border: 2px solid #e0e0e0; background: #f8f9fa; color: #333; font-size: 1.4rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; user-select: none; }
+                        .stepper-btn:hover { background: #000; color: #fff; border-color: #000; }
+                        .stepper-btn:active { transform: scale(0.95); }
+                        .stepper-btn.minus { border-radius: 12px 0 0 12px; }
+                        .stepper-btn.plus { border-radius: 0 12px 12px 0; }
+                    </style>
+                    <form method="post" id="customPackageForm">
+                        {% csrf_token %}
+                        
+                        <!-- Destination Selection -->
+                        <div class="mb-4">
+                            <label class="form-label" style="font-weight: 600; color: #000; font-size: 16px;">
+                                <i class="fas fa-map-marked-alt"></i> Select Destination
+                            </label>
+                            <select class="form-select form-select-lg" id="destination" name="destination" required style="border-radius: 12px; border: 2px solid #e0e0e0; padding: 15px;">
+                                <option value="">Choose your destination...</option>
+                                <option value="swat">Swat</option>
+                                <option value="naran">Naran</option>
+                                <option value="kashmir">Kashmir</option>
+                                <option value="hunza">Hunza</option>
+                                <option value="skardu">Skardu</option>
+                            </select>
+                        </div>
+
+                        <!-- Days / People / Rooms Row -->
+                        <div style="display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 1.5rem;">
+                            <!-- Number of Days -->
+                            <div style="flex: 1; min-width: 160px;">
+                                <label class="form-label" style="font-weight: 600; color: #000; font-size: 15px;">
+                                    <i class="fas fa-calendar"></i> Number of Days
+                                </label>
+                                <div class="stepper-wrap">
+                                    <button type="button" class="stepper-btn minus" data-target="numDays">−</button>
+                                    <input type="number" class="form-control form-control-lg" id="numDays" name="numDays" min="3" max="10" value="3" required style="border: 2px solid #e0e0e0; padding: 12px;">
+                                    <button type="button" class="stepper-btn plus" data-target="numDays">+</button>
+                                </div>
+                            </div>
+
+                            <!-- Number of People -->
+                            <div style="flex: 1; min-width: 160px;">
+                                <label class="form-label" style="font-weight: 600; color: #000; font-size: 15px;">
+                                    <i class="fas fa-users"></i> People <small style="color: #888; font-weight: 400;">(7-27)</small>
+                                </label>
+                                <div class="stepper-wrap">
+                                    <button type="button" class="stepper-btn minus" data-target="numPeople">−</button>
+                                    <input type="number" class="form-control form-control-lg" id="numPeople" name="numPeople" min="7" max="27" value="7" required style="border: 2px solid #e0e0e0; padding: 12px;">
+                                    <button type="button" class="stepper-btn plus" data-target="numPeople">+</button>
+                                </div>
+                            </div>
+
+                            <!-- Number of Rooms -->
+                            <div style="flex: 1; min-width: 160px;">
+                                <label class="form-label" style="font-weight: 600; color: #000; font-size: 15px;">
+                                    <i class="fas fa-door-open"></i> Rooms <small style="color: #888; font-weight: 400;">(Min 1/5 ppl)</small>
+                                </label>
+                                <div class="stepper-wrap">
+                                    <button type="button" class="stepper-btn minus" data-target="numRooms">−</button>
+                                    <input type="number" class="form-control form-control-lg" id="numRooms" name="numRooms" value="2" min="1" required style="border: 2px solid #e0e0e0; padding: 12px;">
+                                    <button type="button" class="stepper-btn plus" data-target="numRooms">+</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Vehicle Selection (Auto-selected) -->
+                        <div class="mb-4">
+                            <label class="form-label" style="font-weight: 600; color: #000; font-size: 16px;">
+                                <i class="fas fa-bus"></i> Select Vehicle <small style="color: #888; font-weight: 400;">(Auto-selected based on people)</small>
+                            </label>
+                            <select class="form-select form-select-lg" id="vehicle" name="vehicle" required disabled style="border-radius: 12px; border: 2px solid #e0e0e0; padding: 15px; background-color: #f0f0f0;">
+                                <option value="grand-cabin">Grand Cabin (7-13 people)</option>
+                                <option value="coaster">Coaster (14-27 people)</option>
+                            </select>
+                            <!-- Hidden input to ensure vehicle value is submitted -->
+                            <input type="hidden" id="vehicleHidden" name="vehicle" value="grand-cabin">
+                        </div>
+
+                        <!-- Food Selection -->
+                        <div class="mb-4">
+                            <label class="form-label" style="font-weight: 600; color: #000; font-size: 16px;">
+                                <i class="fas fa-utensils"></i> Food (Per Person / Per Day)
+                            </label>
+                            <select class="form-select form-select-lg" id="food" name="food" required style="border-radius: 12px; border: 2px solid #e0e0e0; padding: 15px;">
+                                <option value="">Choose food option...</option>
+                                <option value="both">Breakfast & Dinner (Egg, Pratha, Tea, Chanay, Bread, Jam + Chicken Dish, Daal, Rotti, Salad, Raita, Cold Drink)</option>
+                                <option value="breakfast">Breakfast Only (Egg, Pratha, Tea, Chanay, Bread, Jam)</option>
+                                <option value="dinner">Dinner Only (Chicken Dish, Daal, Rotti, Salad, Raita, Cold Drink)</option>
+                                <option value="none">No Food</option>
+                            </select>
+                        </div>
+
+                        <!-- Accommodation Selection -->
+                        <div class="mb-4">
+                            <label class="form-label" style="font-weight: 600; color: #000; font-size: 16px;">
+                                <i class="fas fa-hotel"></i> Accommodation (Per Day / Per Room)
+                            </label>
+                            <select class="form-select form-select-lg" id="accommodation" name="accommodation" required style="border-radius: 12px; border: 2px solid #e0e0e0; padding: 15px;">
+                                <option value="">Choose accommodation...</option>
+                                <option value="luxury">Luxury</option>
+                                <option value="delux">Delux</option>
+                                <option value="standard">Standard</option>
+                            </select>
+                        </div>
+
+                        <!-- Guide Selection -->
+                        <div class="mb-4">
+                            <label class="form-label" style="font-weight: 600; color: #000; font-size: 16px;">
+                                <i class="fas fa-user-tie"></i> Guide (Per Day)
+                            </label>
+                            <select class="form-select form-select-lg" id="guide" name="guide" required style="border-radius: 12px; border: 2px solid #e0e0e0; padding: 15px;">
+                                <option value="">Choose guide option...</option>
+                                <option value="yes">Yes</option>
+                                <option value="no">No</option>
+                            </select>
+                        </div>
+
+                        <!-- Bonfire+Musical Night Selection -->
+                        <div class="mb-4">
+                            <label class="form-label" style="font-weight: 600; color: #000; font-size: 16px;">
+                                <i class="fas fa-fire"></i> Bonfire + Musical Night
+                            </label>
+                            <select class="form-select form-select-lg" id="bonfire" name="bonfire" required style="border-radius: 12px; border: 2px solid #e0e0e0; padding: 15px;">
+                                <option value="">Choose option...</option>
+                                <option value="yes">Yes</option>
+                                <option value="no">No</option>
+                            </select>
+                        </div>
+
+                        <!-- Package Details Section (will be visible after selection) -->
+                        <div id="packageDetails" style="display: none;">
+                            <div class="alert alert-info" style="border-radius: 12px;">
+                                <i class="fas fa-info-circle"></i> Selected: <strong id="selectedDestination"></strong>
+                            </div>
+                            
+                            <!-- More options will be added here -->
+                        </div>
+
+                        <!-- Total Price Section (hidden until all fields selected) -->
+                        <div id="totalSection" style="display: none; margin-top: 30px;">
+                            <div class="card" style="background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%); border-radius: 15px; padding: 25px; color: white;">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3 mb-md-0">
+                                        <div style="border-right: 1px solid rgba(255,255,255,0.2); padding-right: 20px;">
+                                            <h6 style="margin: 0; font-weight: 600; opacity: 0.8; font-size: 14px;">Total Package Cost</h6>
+                                            <h2 style="margin: 10px 0 0 0; font-weight: 800;">PKR <span id="totalPrice">0</span></h2>
+                                            <p style="margin: 5px 0 0 0; opacity: 0.7; font-size: 13px;">Complete package price</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div style="padding-left: 20px;">
+                                            <h6 style="margin: 0; font-weight: 600; opacity: 0.8; font-size: 14px;">Per Person Cost</h6>
+                                            <h2 style="margin: 10px 0 0 0; font-weight: 800;">PKR <span id="perPersonPrice">0</span></h2>
+                                            <p style="margin: 5px 0 0 0; opacity: 0.7; font-size: 13px;">Cost divided by number of people</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Hidden fields to submit calculated prices -->
+                        <input type="hidden" id="totalPriceHidden" name="totalPrice" value="0">
+                        <input type="hidden" id="perPersonPriceHidden" name="perPersonPrice" value="0">
+
+                        <!-- Action Buttons -->
+                        <div class="d-flex gap-3 mt-4">
+                            <button type="submit" class="btn btn-lg" id="continueBtn" style="background: #000000; color: white; border-radius: 12px; padding: 15px 30px; font-weight: 600; flex: 1;">
+                                <i class="fas fa-credit-card"></i> Continue to Payment
+                            </button>
+                            <a href="{% url 'content:cost_calculator' %}" class="btn btn-lg btn-outline-secondary" style="border-radius: 12px; padding: 15px 30px; font-weight: 600;">
+                                <i class="fas fa-arrow-left"></i> Back
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Show package details when destination is selected
+    document.getElementById('destination').addEventListener('change', function() {
+        const packageDetails = document.getElementById('packageDetails');
+        const selectedDestination = document.getElementById('selectedDestination');
+        
+        if (this.value) {
+            const destinationText = this.options[this.selectedIndex].text;
+            selectedDestination.textContent = destinationText;
+            packageDetails.style.display = 'block';
+        } else {
+            packageDetails.style.display = 'none';
+        }
+    });
+
+    // Hidden pricing structure (not visible to users)
+    const pricing = {
+        // Swat, Naran, and Kashmir share the same pricing
+        'swat': {
+            vehicles: {
+                'coaster': {
+                    rentPerDay: 26000,
+                    fuel: 85000,
+                    toll: 15000,
+                    firstAid: 1000
+                },
+                'grand-cabin': {
+                    rentPerDay: 20000,
+                    fuel: 70000,
+                    toll: 15000,
+                    firstAid: 1000
+                }
+            },
+            accommodation: {
+                'luxury': 15000,
+                'delux': 10000,
+                'standard': 5000
+            },
+            food: {
+                'breakfast': 500,
+                'dinner': 1050
+            },
+            guide: 2500,
+            bonfire: 7000
+        },
+        'naran': {
+            vehicles: {
+                'coaster': {
+                    rentPerDay: 26000,
+                    fuel: 85000,
+                    toll: 15000,
+                    firstAid: 1000
+                },
+                'grand-cabin': {
+                    rentPerDay: 20000,
+                    fuel: 70000,
+                    toll: 15000,
+                    firstAid: 1000
+                }
+            },
+            accommodation: {
+                'luxury': 15000,
+                'delux': 10000,
+                'standard': 5000
+            },
+            food: {
+                'breakfast': 500,
+                'dinner': 1050
+            },
+            guide: 2500,
+            bonfire: 7000
+        },
+        'kashmir': {
+            vehicles: {
+                'coaster': {
+                    rentPerDay: 26000,
+                    fuel: 85000,
+                    toll: 15000,
+                    firstAid: 1000
+                },
+                'grand-cabin': {
+                    rentPerDay: 20000,
+                    fuel: 70000,
+                    toll: 15000,
+                    firstAid: 1000
+                }
+            },
+            accommodation: {
+                'luxury': 15000,
+                'delux': 10000,
+                'standard': 5000
+            },
+            food: {
+                'breakfast': 500,
+                'dinner': 1050
+            },
+            guide: 2500,
+            bonfire: 7000
+        },
+        // Other destinations
+        'hunza': {
+            vehicles: {
+                'coaster': {
+                    rentPerDay: 26000,
+                    fuel: 130000,
+                    toll: 20000,
+                    firstAid: 1000
+                },
+                'grand-cabin': {
+                    rentPerDay: 20000,
+                    fuel: 100000,
+                    toll: 20000,
+                    firstAid: 1000
+                }
+            },
+            accommodation: {
+                'luxury': 15000,
+                'delux': 10000,
+                'standard': 5000
+            },
+            food: {
+                'breakfast': 500,
+                'dinner': 1050
+            },
+            guide: 2500,
+            bonfire: 7000
+        },
+        'skardu': {
+            vehicles: {
+                'coaster': {
+                    rentPerDay: 26000,
+                    fuel: 150000,
+                    toll: 20000,
+                    firstAid: 1000
+                },
+                'grand-cabin': {
+                    rentPerDay: 20000,
+                    fuel: 130000,
+                    toll: 20000,
+                    firstAid: 1000
+                }
+            },
+            accommodation: {
+                'luxury': 15000,
+                'delux': 10000,
+                'standard': 5000
+            },
+            food: {
+                'breakfast': 500,
+                'dinner': 1050
+            },
+            guide: 2500,
+            bonfire: 7000
+        }
+    };
+
+    // Clamp numDays between 3 and 10
+    function clampDays() {
+        const daysInput = document.getElementById('numDays');
+        let val = parseInt(daysInput.value);
+        if (!val || val < 3) daysInput.value = 3;
+        if (val > 10) daysInput.value = 10;
+    }
+
+    // Clamp numPeople between 7 and 27
+    function clampPeople() {
+        const peopleInput = document.getElementById('numPeople');
+        let val = parseInt(peopleInput.value);
+        if (!val || val < 7) peopleInput.value = 7;
+        if (val > 27) peopleInput.value = 27;
+    }
+
+    // Auto-select vehicle based on number of people
+    function updateVehicle() {
+        const numPeople = parseInt(document.getElementById('numPeople').value) || 7;
+        const vehicleSelect = document.getElementById('vehicle');
+        const vehicleHidden = document.getElementById('vehicleHidden');
+        if (numPeople <= 13) {
+            vehicleSelect.value = 'grand-cabin';
+            vehicleHidden.value = 'grand-cabin';
+        } else {
+            vehicleSelect.value = 'coaster';
+            vehicleHidden.value = 'coaster';
+        }
+    }
+
+    // Set minimum rooms: 1 room per 5 people (user can select more)
+    function updateRooms() {
+        const numPeople = parseInt(document.getElementById('numPeople').value) || 7;
+        const minRooms = Math.ceil(numPeople / 5);
+        const roomsInput = document.getElementById('numRooms');
+        roomsInput.min = minRooms;
+        if (parseInt(roomsInput.value) < minRooms) {
+            roomsInput.value = minRooms;
+        }
+    }
+
+    // Handle people input changes
+    function handlePeopleChange() {
+        clampPeople();
+        updateVehicle();
+        updateRooms();
+        calculateTotal();
+    }
+
+    document.getElementById('numDays').addEventListener('input', function() { clampDays(); calculateTotal(); });
+    document.getElementById('numDays').addEventListener('blur', clampDays);
+    document.getElementById('numPeople').addEventListener('input', handlePeopleChange);
+    document.getElementById('numPeople').addEventListener('blur', function() { clampPeople(); updateVehicle(); updateRooms(); });
+    document.getElementById('numRooms').addEventListener('input', function() { updateRooms(); calculateTotal(); });
+    document.getElementById('numRooms').addEventListener('blur', updateRooms);
+
+    // Initialize vehicle and rooms on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        updateVehicle();
+        updateRooms();
+
+        // Stepper +/- buttons
+        document.querySelectorAll('.stepper-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                const input = document.getElementById(this.dataset.target);
+                const min = parseInt(input.min) || 0;
+                const max = parseInt(input.max) || 9999;
+                let val = parseInt(input.value) || min;
+                if (this.classList.contains('plus')) {
+                    if (val < max) input.value = val + 1;
+                } else {
+                    if (val > min) input.value = val - 1;
+                }
+                input.dispatchEvent(new Event('input'));
+                input.dispatchEvent(new Event('change'));
+            });
+        });
+    });
+
+    // Calculate and update total price
+    function calculateTotal() {
+        let total = 0;
+        clampDays();
+        
+        // Get selected values
+        const destination = document.getElementById('destination').value;
+        const numDays = parseInt(document.getElementById('numDays').value) || 3;
+        const numPeople = parseInt(document.getElementById('numPeople').value) || 7;
+        const numRooms = parseInt(document.getElementById('numRooms').value) || 2;
+        const vehicle = document.getElementById('vehicle').value;
+        const food = document.getElementById('food').value;
+        const accommodation = document.getElementById('accommodation').value;
+        const guide = document.getElementById('guide').value;
+        const bonfire = document.getElementById('bonfire').value;
+        
+        // Check if destination is selected
+        if (!destination || !pricing[destination]) {
+            return;
+        }
+        
+        const destPricing = pricing[destination];
+        
+        // Calculate vehicle cost
+        if (vehicle && destPricing.vehicles[vehicle]) {
+            const vehicleData = destPricing.vehicles[vehicle];
+            total += (vehicleData.rentPerDay * numDays) + vehicleData.fuel + vehicleData.toll + vehicleData.firstAid;
+        }
+        
+        // Calculate accommodation cost (per room per day)
+        if (accommodation && destPricing.accommodation[accommodation]) {
+            total += destPricing.accommodation[accommodation] * numRooms * numDays;
+        }
+        
+        // Calculate food cost (per person per day)
+        if (food && destPricing.food) {
+            let foodCost = 0;
+            if (food === 'both') {
+                foodCost = (destPricing.food['breakfast'] + destPricing.food['dinner']) * numPeople * numDays;
+            } else if (food === 'breakfast') {
+                foodCost = destPricing.food['breakfast'] * numPeople * numDays;
+            } else if (food === 'dinner') {
+                foodCost = destPricing.food['dinner'] * numPeople * numDays;
+            } else if (food === 'none') {
+                foodCost = 0;
+            }
+            total += foodCost;
+        }
+        
+        // Calculate guide cost (per day)
+        if (guide === 'yes') {
+            total += destPricing.guide * numDays;
+        }
+        
+        // Calculate bonfire cost (one time)
+        if (bonfire === 'yes') {
+            total += destPricing.bonfire;
+        }
+        
+        // Update display
+        document.getElementById('totalPrice').textContent = total.toLocaleString('en-PK');
+        
+        // Calculate and display per person cost
+        const perPersonCost = numPeople > 0 ? Math.round(total / numPeople) : 0;
+        document.getElementById('perPersonPrice').textContent = perPersonCost.toLocaleString('en-PK');
+        
+        // Update hidden fields for form submission
+        document.getElementById('totalPriceHidden').value = total;
+        document.getElementById('perPersonPriceHidden').value = perPersonCost;
+        
+        // Show total section if all required fields are selected
+        if (destination && vehicle && food && accommodation && guide && bonfire) {
+            document.getElementById('totalSection').style.display = 'block';
+        }
+    }
+
+    // Add event listeners to all inputs and dropdowns
+    document.addEventListener('DOMContentLoaded', function() {
+        const inputs = ['destination', 'numDays', 'numPeople', 'numRooms', 'vehicle', 'food', 'accommodation', 'guide', 'bonfire'];
+        inputs.forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.addEventListener('change', calculateTotal);
+                element.addEventListener('input', calculateTotal);
+            }
+        });
+    });
+</script>
+
+<style>
+    .form-select:focus {
+        border-color: #000000;
+        box-shadow: 0 0 0 0.25rem rgba(0, 0, 0, 0.1);
+    }
+    
+    .form-select option {
+        padding: 10px;
+    }
+</style>
+{% endblock %}

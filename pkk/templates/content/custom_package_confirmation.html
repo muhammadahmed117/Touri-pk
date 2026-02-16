@@ -1,0 +1,284 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Order Confirmed - #{{ order.order_number }}{% endblock %}
+
+{% block content %}
+<style>
+    .confirmation-page {
+        min-height: 100vh;
+        padding: 40px 0;
+        padding-top: 100px;
+        background: #f8f9fa;
+    }
+    .confirmation-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+    .confirmation-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+        overflow: hidden;
+        text-align: center;
+    }
+    .success-header {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+        padding: 50px 40px;
+    }
+    .success-icon {
+        width: 80px;
+        height: 80px;
+        background: rgba(255,255,255,0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        font-size: 2.5rem;
+        animation: scaleIn 0.5s ease;
+    }
+    @keyframes scaleIn {
+        from { transform: scale(0); }
+        to { transform: scale(1); }
+    }
+    .success-header h2 {
+        font-weight: 800;
+        margin: 0 0 10px 0;
+        font-size: 2rem;
+    }
+    .success-header p {
+        opacity: 0.9;
+        margin: 0;
+        font-size: 1.1rem;
+    }
+    .confirmation-body {
+        padding: 40px;
+    }
+    .order-number-badge {
+        display: inline-block;
+        background: #f0f0f0;
+        padding: 10px 25px;
+        border-radius: 50px;
+        font-weight: 800;
+        font-size: 1.2rem;
+        color: #000;
+        margin-bottom: 30px;
+        letter-spacing: 1px;
+    }
+    .details-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        text-align: left;
+        margin: 30px 0;
+    }
+    .detail-item {
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 10px;
+    }
+    .detail-item .label {
+        font-size: 12px;
+        color: #888;
+        text-transform: uppercase;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+    }
+    .detail-item .value {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #000;
+        margin-top: 5px;
+    }
+    .price-box {
+        background: linear-gradient(135deg, #000 0%, #1a1a1a 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 25px;
+        margin: 25px 0;
+    }
+    .price-box .total-label {
+        opacity: 0.8;
+        font-size: 14px;
+    }
+    .price-box .total-amount {
+        font-size: 2.2rem;
+        font-weight: 900;
+        margin: 5px 0;
+    }
+    .price-box .per-person {
+        opacity: 0.7;
+        font-size: 14px;
+    }
+    .status-badge {
+        display: inline-block;
+        padding: 8px 20px;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 14px;
+        margin: 15px 0;
+    }
+    .status-paid {
+        background: #d4edda;
+        color: #155724;
+    }
+    .status-pending {
+        background: #fff3cd;
+        color: #856404;
+    }
+    .info-message {
+        background: #e8f4fd;
+        border-left: 4px solid #0d6efd;
+        padding: 15px 20px;
+        border-radius: 0 10px 10px 0;
+        text-align: left;
+        margin: 25px 0;
+    }
+    .info-message p {
+        margin: 0;
+        color: #0d6efd;
+        font-weight: 500;
+    }
+    .action-buttons {
+        display: flex;
+        gap: 15px;
+        margin-top: 30px;
+        justify-content: center;
+    }
+    .action-buttons a {
+        padding: 15px 30px;
+        border-radius: 12px;
+        font-weight: 700;
+        text-decoration: none;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .btn-dark {
+        background: #000;
+        color: white;
+    }
+    .btn-dark:hover {
+        background: #333;
+        transform: translateY(-2px);
+        color: white;
+    }
+    .btn-outline {
+        border: 2px solid #e0e0e0;
+        color: #000;
+        background: white;
+    }
+    .btn-outline:hover {
+        border-color: #000;
+        transform: translateY(-2px);
+    }
+    @media (max-width: 768px) {
+        .details-grid {
+            grid-template-columns: 1fr;
+        }
+        .action-buttons {
+            flex-direction: column;
+        }
+    }
+</style>
+
+<div class="confirmation-page">
+    <div class="confirmation-container">
+        <div class="confirmation-card">
+            {% if order.payment_status == 'paid' %}
+            <div class="success-header">
+                <div class="success-icon">
+                    <i class="fas fa-check"></i>
+                </div>
+                <h2>Payment Successful!</h2>
+                <p>Your custom package has been booked successfully</p>
+            </div>
+            {% else %}
+            <div class="success-header" style="background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);">
+                <div class="success-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <h2>Package Request Submitted!</h2>
+                <p>Payment is pending - our admin will review your request</p>
+            </div>
+            {% endif %}
+            
+            <div class="confirmation-body">
+                <div class="order-number-badge">
+                    <i class="fas fa-hashtag"></i> {{ order.order_number }}
+                </div>
+                
+                {% if order.payment_status == 'paid' %}
+                <span class="status-badge status-paid"><i class="fas fa-check-circle"></i> Payment Complete</span>
+                {% else %}
+                <span class="status-badge status-pending"><i class="fas fa-clock"></i> Pending Payment</span>
+                {% endif %}
+                
+                <div class="details-grid">
+                    <div class="detail-item">
+                        <div class="label">Destination</div>
+                        <div class="value"><i class="fas fa-map-marker-alt"></i> {{ order.destination|title }}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="label">Duration</div>
+                        <div class="value"><i class="fas fa-calendar"></i> {{ order.num_days }} Days</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="label">Group Size</div>
+                        <div class="value"><i class="fas fa-users"></i> {{ order.num_people }} People</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="label">Rooms</div>
+                        <div class="value"><i class="fas fa-door-open"></i> {{ order.num_rooms }} Rooms</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="label">Vehicle</div>
+                        <div class="value"><i class="fas fa-bus"></i> {{ order.get_vehicle_display }}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="label">Food</div>
+                        <div class="value"><i class="fas fa-utensils"></i> {{ order.get_food_display }}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="label">Accommodation</div>
+                        <div class="value"><i class="fas fa-hotel"></i> {{ order.get_accommodation_display }}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="label">Extras</div>
+                        <div class="value">
+                            {% if order.guide %}<i class="fas fa-user-tie"></i> Guide {% endif %}
+                            {% if order.bonfire %}<i class="fas fa-fire"></i> Bonfire {% endif %}
+                            {% if not order.guide and not order.bonfire %}None{% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="price-box">
+                    <div class="total-label">Total Package Cost</div>
+                    <div class="total-amount">PKR {{ order.total_price|floatformat:0 }}</div>
+                    <div class="per-person">PKR {{ order.per_person_price|floatformat:0 }} per person</div>
+                </div>
+                
+                <div class="info-message">
+                    <p><i class="fas fa-info-circle"></i> Our tour admin will review your package and contact you shortly. You'll receive updates on your package status.</p>
+                </div>
+                
+                <div class="action-buttons">
+                    <a href="{% url 'content:my_custom_packages' %}" class="btn-dark">
+                        <i class="fas fa-list"></i> My Packages
+                    </a>
+                    <a href="{% url 'content:custom_package' %}" class="btn-outline">
+                        <i class="fas fa-plus"></i> Create Another
+                    </a>
+                    <a href="/" class="btn-outline">
+                        <i class="fas fa-home"></i> Home
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

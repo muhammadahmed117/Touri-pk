@@ -1,0 +1,221 @@
+[
+    {
+        "model": "content.destination",
+        "pk": 1,
+        "fields": {
+            "name": "Hunza Valley",
+            "description": "Hunza Valley is a mountainous valley in the Gilgit-Baltistan region of Pakistan. The valley is situated at an elevation of 2,438 meters, surrounded by snow-capped peaks including Rakaposhi, Ultar Sar, and Ladyfinger Peak.",
+            "image": "destinations/hunza-valley.jpg",
+            "city": "Karimabad",
+            "created_at": "2025-06-29T10:00:00Z"
+        }
+    },
+    {
+        "model": "content.destination",
+        "pk": 2,
+        "fields": {
+            "name": "Fairy Meadows",
+            "description": "Fairy Meadows, named by German climbers and locally known as Joot, is a grassland near Nanga Parbat base camp. Its spectacular beauty and accessibility make it one of the most popular tourist destinations in Pakistan.",
+            "image": "destinations/fairy-meadows.jpg",
+            "city": "Chilas",
+            "created_at": "2025-06-29T10:00:00Z"
+        }
+    },
+    {
+        "model": "content.destination",
+        "pk": 3,
+        "fields": {
+            "name": "Faisal Mosque",
+            "description": "The Faisal Mosque is the national mosque of Pakistan, located in the capital city Islamabad. It is one of the largest mosques in the world and an iconic symbol of Pakistani architecture.",
+            "image": "destinations/faisal-mosque.jpg",
+            "city": "Islamabad",
+            "created_at": "2025-06-29T10:00:00Z"
+        }
+    },
+    {
+        "model": "content.destination",
+        "pk": 4,
+        "fields": {
+            "name": "Badshahi Mosque",
+            "description": "The Badshahi Mosque in Lahore is one of the most iconic landmarks of Pakistan, built in 1673 during the Mughal era. It is the second largest mosque in Pakistan and a masterpiece of Mughal architecture.",
+            "image": "destinations/badshahi-mosque.jpg",
+            "city": "Lahore",
+            "created_at": "2025-06-29T10:00:00Z"
+        }
+    },
+    {
+        "model": "content.destination",
+        "pk": 5,
+        "fields": {
+            "name": "Baltit Fort",
+            "description": "The Baltit Fort in Hunza is an ancient fort dating back 700 years. Restored by the Aga Khan Trust for Culture, it's a remarkable example of local architecture and offers stunning views of the Hunza Valley.",
+            "image": "destinations/baltit-fort.jpg",
+            "city": "Karimabad",
+            "created_at": "2025-06-29T10:00:00Z"
+        }
+    },
+    {
+        "model": "content.destination",
+        "pk": 6,
+        "fields": {
+            "name": "Deosai Plains",
+            "description": "Known as the Land of Giants, Deosai Plains is the second highest plateau in the world. Located in Gilgit-Baltistan, it's a biodiversity hotspot and home to unique wildlife including the Himalayan brown bear.",
+            "image": "destinations/deosai-plains.jpg",
+            "city": "Skardu",
+            "created_at": "2025-06-29T10:00:00Z"
+        }
+    },
+    {
+        "model": "content.product",
+        "pk": 1,
+        "fields": {
+            "name": "Hunza Dried Apricots",
+            "description": "Organic dried apricots from the Hunza Valley, known for their exceptional taste and nutritional value.",
+            "price": "599.99",
+            "image": "products/dried-apricots.jpg",
+            "created_at": "2025-06-29T10:00:00Z"
+        }
+    },
+    {
+        "model": "content.product",
+        "pk": 2,
+        "fields": {
+            "name": "Swat Valley Shawl",
+            "description": "Handcrafted wool shawl made by local artisans in Swat Valley, featuring traditional patterns and designs.",
+            "price": "2499.99",
+            "image": "products/traditional-shawl.jpg",
+            "created_at": "2025-06-29T10:00:00Z"
+        }
+    },
+    {
+        "model": "content.product",
+        "pk": 3,
+        "fields": {
+            "name": "Gilgit Handicraft Box",
+            "description": "Decorative wooden box with intricate hand-carved designs, made by skilled craftsmen in Gilgit.",
+            "price": "1299.99",
+            "image": "products/handicraft-box.jpg",
+            "created_at": "2025-06-29T10:00:00Z"
+        }
+    },
+    {
+        "model": "content.costcomponent",
+        "pk": 1,
+        "fields": {
+            "name": "Basic Camping",
+            "category": "camping",
+            "base_cost": "2000.00",
+            "unit": "per night",
+            "description": "Basic camping setup with tent",
+            "destination": 1
+        }
+    },
+    {
+        "model": "content.costcomponent",
+        "pk": 2,
+        "fields": {
+            "name": "Deluxe Camping",
+            "category": "camping",
+            "base_cost": "5000.00",
+            "unit": "per night",
+            "description": "Luxury camping with amenities and guided setup",
+            "destination": 1
+        }
+    },
+    {
+        "model": "content.costcomponent",
+        "pk": 3,
+        "fields": {
+            "name": "Private Car Transfer",
+            "category": "transport",
+            "base_cost": "8000.00",
+            "unit": "per trip",
+            "description": "Round trip private car transfer from airport",
+            "destination": 1
+        }
+    },
+    {
+        "model": "content.costcomponent",
+        "pk": 4,
+        "fields": {
+            "name": "Local Bus Service",
+            "category": "transport",
+            "base_cost": "1000.00",
+            "unit": "per person",
+            "description": "Public transportation pass for the duration of stay",
+            "destination": 1
+        }
+    },
+    {
+        "model": "content.costcomponent",
+        "pk": 5,
+        "fields": {
+            "name": "Standard Meal Package",
+            "category": "food",
+            "base_cost": "1500.00",
+            "unit": "per person per day",
+            "description": "Three meals at local restaurants",
+            "destination": 1
+        }
+    },
+    {
+        "model": "content.costcomponent",
+        "pk": 6,
+        "fields": {
+            "name": "Premium Dining Experience",
+            "category": "food",
+            "base_cost": "3500.00",
+            "unit": "per person per day",
+            "description": "Three meals including fine dining experiences",
+            "destination": 1
+        }
+    },
+    {
+        "model": "content.costcomponent",
+        "pk": 7,
+        "fields": {
+            "name": "Guided Valley Tour",
+            "category": "activities",
+            "base_cost": "4000.00",
+            "unit": "per person",
+            "description": "Full day guided tour of Hunza Valley with lunch",
+            "destination": 1
+        }
+    },
+    {
+        "model": "content.costcomponent",
+        "pk": 8,
+        "fields": {
+            "name": "Cultural Show",
+            "category": "activities",
+            "base_cost": "2000.00",
+            "unit": "per person",
+            "description": "Evening of traditional music and dance",
+            "destination": 1
+        }
+    },
+    {
+        "model": "content.costcomponent",
+        "pk": 9,
+        "fields": {
+            "name": "Local Crafts Package",
+            "category": "shopping",
+            "base_cost": "5000.00",
+            "unit": "per package",
+            "description": "Selection of local handicrafts and souvenirs",
+            "destination": 1
+        }
+    },
+    {
+        "model": "content.costcomponent",
+        "pk": 10,
+        "fields": {
+            "name": "Premium Shopping Experience",
+            "category": "shopping",
+            "base_cost": "15000.00",
+            "unit": "per package",
+            "description": "Luxury local items including jewelry and artwork",
+            "destination": 1
+        }
+    }
+]

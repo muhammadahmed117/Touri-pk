@@ -1,0 +1,1793 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Touri.pk - {% block title %}{% endblock %}</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                        },
+                        accent: '#8b5cf6',
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-out',
+                        'slide-up': 'slideUp 0.6s ease-out',
+                        'bounce-slow': 'bounce 2s infinite',
+                        'shimmer': 'shimmer 2s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        },
+                        shimmer: {
+                            '0%': { transform: 'translateX(-100%)' },
+                            '100%': { transform: 'translateX(100%)' },
+                        },
+                    },
+                }
+            }
+        }
+    </script>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/custom/main.css' %}">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+            --secondary-gradient: linear-gradient(135deg, #333333 0%, #000000 100%);
+            --navbar-gradient: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
+            --text-primary: #000000;
+            --text-secondary: #333333;
+            --white: #ffffff;
+            --shadow-light: 0 4px 20px rgba(0, 0, 0, 0.15);
+            --shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.25);
+        }
+
+        /* Modern Page Layout */
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            color: var(--text-primary);
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.3s ease;
+            background-color: #ffffff !important;
+        }
+
+        /* Tailwind-Enhanced Button Styles */
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #5568d3 0%, #653a8b 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+        }
+
+        /* Card Enhancements */
+        .card {
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1) !important;
+        }
+
+        /* Smooth Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        /* Page-specific backgrounds */
+        body.home-page {
+            background: #ffffff !important;
+        }
+
+        body.destinations-page {
+            background: #f5f5f5 !important;
+        }
+
+        body.products-page {
+            background: #ffffff !important;
+        }
+
+        body.booking-page {
+            background: #f5f5f5 !important;
+        }
+
+        body.profile-page {
+            background: #ffffff !important;
+        }
+
+        body.login-page,
+        body.register-page {
+            background: #f5f5f5 !important;
+        }
+
+        body.weather-page {
+            background: #ffffff !important;
+        }
+
+        body.calculator-page {
+            background: #f5f5f5 !important;
+        }
+
+        body.chatbot-page {
+            background: #ffffff !important;
+        }
+
+        /* Default fallback */
+        body.default-page {
+            background: #f5f5f5;
+        }
+
+        /* Modern Navbar Styling */
+        .navbar-wrapper {
+            position: fixed !important;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.95);
+            z-index: 999999 !important;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-wrapper.scrolled {
+            background: rgba(255, 255, 255, 0.98);
+            padding: 10px 20px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .navbar-wrapper::before {
+            display: none;
+        }
+
+        .modern-navbar {
+            background: #ffffff !important;
+            border-radius: 60px;
+            padding: 0;
+            box-shadow: var(--shadow-medium);
+            border: 2px solid #000000;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: visible;
+        }
+
+        .modern-navbar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: transparent;
+            pointer-events: none;
+        }
+
+        .navbar-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 25px;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Logo Styles */
+        .navbar-brand-logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            padding: 5px 15px;
+            border-radius: 15px;
+        }
+
+        .navbar-brand-logo:hover {
+            transform: scale(1.05);
+            background: rgba(0, 0, 0, 0.03);
+        }
+
+        .logo-img {
+            height: 40px;
+            width: 40px;
+            object-fit: cover;
+            transition: all 0.3s ease;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+            border-radius: 50%;
+            border: 2px solid #f0f0f0;
+        }
+
+        .navbar-brand-logo:hover .logo-img {
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+        }
+
+        /* Navigation Icons and Links */
+        .nav-icon {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 20px;
+            color: #000000 !important;
+            text-decoration: none;
+            border-radius: 40px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-icon::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .nav-icon:hover::before {
+            left: 100%;
+        }
+
+        .nav-icon:hover {
+            color: #ffffff !important;
+            background: #000000;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-icon i {
+            font-size: 18px;
+            margin-right: 6px;
+        }
+
+        .nav-icon span {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        /* Main Navigation Links */
+        .nav-links {
+            display: flex;
+            gap: 5px;
+            flex: 1;
+            justify-content: center;
+        }
+
+        .nav-link-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 12px 18px;
+            color: #000000 !important;
+            text-decoration: none;
+            border-radius: 30px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            position: relative;
+            font-size: 14px;
+        }
+
+        .nav-link-item:hover {
+            color: #ffffff !important;
+            background: #000000;
+            transform: translateY(-1px);
+        }
+
+        .nav-link-item i {
+            font-size: 16px;
+        }
+
+        /* Social Icons */
+        .social-nav-icons {
+            display: flex;
+            gap: 10px;
+            margin-right: 20px;
+        }
+
+        .social-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000000 !important;
+            text-decoration: none;
+            background: #ffffff;
+            border: 2px solid #000000;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .social-icon:hover {
+            color: #ffffff !important;
+            background: #000000;
+            transform: scale(1.1);
+        }
+
+        /* Auth Links */
+        .auth-links {
+            display: flex;
+            align-items: center;
+        }
+
+        /* Mobile Menu Button */
+        .mobile-menu-btn {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 8px;
+            position: absolute;
+            right: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 3;
+        }
+
+        .mobile-menu-btn span {
+            width: 20px;
+            height: 2px;
+            background: var(--white);
+            margin: 2px 0;
+            transition: 0.3s;
+            border-radius: 2px;
+        }
+
+        /* Mobile Navigation */
+        .mobile-nav {
+            background: var(--white);
+            border-radius: 0 0 30px 30px;
+            box-shadow: var(--shadow-light);
+            margin-top: -10px;
+            padding-top: 20px;
+        }
+
+        .mobile-nav-content {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            padding: 20px;
+        }
+
+        .mobile-nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 15px 20px;
+            color: var(--text-primary);
+            text-decoration: none;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .mobile-nav-item:hover {
+            color: var(--white);
+            background: var(--primary-gradient);
+            transform: translateX(5px);
+        }
+
+        .mobile-nav-item i {
+            font-size: 18px;
+            width: 24px;
+        }
+
+        /* User Menu Styles */
+        .user-menu {
+            position: relative;
+            z-index: 9999;
+        }
+
+        .user-menu-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 20px;
+            border-radius: 40px;
+            transition: all 0.3s ease;
+            color: #000000 !important;
+        }
+
+        .user-menu-btn:hover {
+            background: #f5f5f5 !important;
+            color: #000000 !important;
+        }
+
+        .user-menu-btn:hover .dropdown-arrow,
+        .user-menu-btn:hover i,
+        .user-menu-btn:hover span {
+            color: #000000 !important;
+        }
+
+        .dropdown-arrow {
+            font-size: 12px;
+            transition: transform 0.3s ease;
+            margin-left: 4px;
+        }
+
+        .user-menu.active .dropdown-arrow {
+            transform: rotate(180deg);
+        }
+
+        .user-menu-dropdown {
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            background: var(--white);
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
+            padding: 10px;
+            min-width: 200px;
+            z-index: 99999;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .user-menu.active .user-menu-dropdown {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 15px;
+            border-radius: 10px;
+            text-decoration: none;
+            color: var(--text-primary);
+            background: none;
+            border: none;
+            width: 100%;
+            text-align: left;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .menu-item:hover {
+            background: var(--primary-gradient);
+            color: var(--white);
+            transform: translateX(3px);
+        }
+
+        .menu-item i {
+            width: 16px;
+            font-size: 14px;
+        }
+
+        .menu-divider {
+            height: 1px;
+            background: rgba(0, 0, 0, 0.1);
+            margin: 8px 0;
+        }
+
+        .logout-form {
+            margin: 0;
+        }
+
+        .logout-btn {
+            width: 100%;
+            font-family: inherit;
+        }
+
+        /* Ensure navbar is above other content */
+        .navbar-wrapper {
+            position: relative;
+            z-index: 1000;
+        }
+
+        .modern-navbar {
+            z-index: 1001;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 991.98px) {
+            .mobile-menu-btn {
+                display: flex;
+            }
+
+            .nav-links,
+            .social-nav-icons {
+                display: none !important;
+            }
+
+            .navbar-container {
+                padding: 15px 20px;
+            }
+
+            .nav-icon span {
+                display: none;
+            }
+
+            .nav-icon {
+                padding: 12px;
+            }
+        }
+
+        @media (max-width: 575.98px) {
+            .navbar-wrapper {
+                padding: 10px 15px;
+            }
+
+            .modern-navbar {
+                border-radius: 30px;
+            }
+
+            .navbar-container {
+                padding: 10px 15px;
+            }
+        }
+
+        /* Animation Effects */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInFromLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideInFromRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideInFromBottom {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Sliding classes */
+        .slide-in-top {
+            animation: slideIn 0.6s ease-out;
+        }
+
+        .slide-in-left {
+            animation: slideInFromLeft 0.8s ease-out;
+        }
+
+        .slide-in-right {
+            animation: slideInFromRight 0.8s ease-out;
+        }
+
+        .slide-in-bottom {
+            animation: slideInFromBottom 0.7s ease-out;
+        }
+
+        .fade-scale {
+            animation: fadeInScale 0.6s ease-out;
+        }
+
+        /* Staggered animations */
+        .stagger-1 {
+            animation-delay: 0.1s;
+        }
+
+        .stagger-2 {
+            animation-delay: 0.2s;
+        }
+
+        .stagger-3 {
+            animation-delay: 0.3s;
+        }
+
+        .stagger-4 {
+            animation-delay: 0.4s;
+        }
+
+        .stagger-5 {
+            animation-delay: 0.5s;
+        }
+
+        /* Card slide effects */
+        .card {
+            transition: all 0.6s ease;
+        }
+
+        /* Navigation slide effects */
+        .nav-link {
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .nav-link:hover::before {
+            left: 100%;
+        }
+
+        /* Button slide effects */
+        .btn {
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s ease, height 0.6s ease;
+        }
+
+        .btn:hover::before {
+            width: 300%;
+            height: 300%;
+        }
+
+        .modern-navbar {
+            animation: slideIn 0.6s ease-out;
+        }
+
+        /* Hover Effects */
+        .modern-navbar:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        /* Main Content Styling */
+        .main-content {
+            min-height: calc(100vh - 200px);
+            padding: 0;
+            padding-top: 100px;
+            background: transparent;
+        }
+
+        /* Container improvements */
+        .container {
+            background: transparent;
+        }
+
+        /* Additional Styles */
+        .hero-section {
+            position: relative;
+            min-height: 600px;
+            display: flex;
+            align-items: center;
+            color: white;
+            text-align: center;
+            background: linear-gradient(135deg, #1a1a1a 0%, #000000 100%);
+            border-radius: 20px;
+            margin: 20px auto;
+            max-width: 95%;
+            box-shadow: var(--shadow-medium);
+        }
+
+        .modern-hero {
+            background-attachment: fixed;
+            overflow: hidden;
+        }
+
+        .hero-title {
+            font-weight: 800;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            font-size: 3.5rem;
+        }
+
+        .hero-subtitle {
+            font-weight: 400;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            opacity: 0.95;
+        }
+
+        .modern-search-box {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(15px);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .modern-input {
+            border: none;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 15px 20px;
+            font-size: 16px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .modern-input:focus {
+            background: white;
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+            outline: none;
+            border: 2px solid #000000;
+        }
+
+        .modern-btn {
+            padding: 15px 25px;
+            font-weight: 700;
+            border-radius: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Modern Service Cards */
+        .modern-service-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px 20px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+
+        .modern-service-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        .service-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #000000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .service-icon i {
+            font-size: 32px;
+            color: white;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            color: #000000;
+        }
+
+        .section-subtitle {
+            font-size: 1.2rem;
+            color: #6B7280;
+        }
+
+        .card {
+            border: none;
+            border-radius: 20px;
+            box-shadow: var(--shadow-light);
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .btn {
+            border-radius: 25px;
+            font-weight: 600;
+            padding: 12px 30px;
+            transition: all 0.3s ease;
+            border: none;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: #000000;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: #333333;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Floating Chat Button */
+        .floating-chat-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: #000000;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-decoration: none;
+            box-shadow: var(--shadow-medium);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .floating-chat-btn:hover {
+            transform: scale(1.1);
+            color: white;
+            box-shadow: 0 6px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .floating-chat-btn i {
+            font-size: 24px;
+        }
+
+        /* Responsive Logo Styles */
+        @media (max-width: 991px) {
+            .logo-img {
+                height: 40px;
+            }
+
+            .navbar-brand-logo {
+                padding: 5px 10px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .logo-img {
+                height: 40px;
+                width: 40px;
+            }
+
+            .navbar-container {
+                padding: 10px 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Top Bar -->
+
+
+    <!-- Modern Curved Navigation -->
+    <div class="navbar-wrapper">
+        <nav class="navbar modern-navbar navbar-expand-lg">
+            <div class="container">
+                <div class="navbar-container">
+                    <!-- Logo -->
+                    <a href="{% url 'home' %}" class="navbar-brand-logo" title="Touri.pk - Explore Pakistan">
+                        <img src="/media/Logos/IMG_9587.PNG" alt="Touri.pk Logo" class="logo-img">
+                    </a>
+
+                    <!-- Navigation Links -->
+                    <div class="nav-links d-none d-lg-flex">
+                        <a class="nav-link-item" href="{% url 'content:destination_list' %}">
+                            <i class="fas fa-map-marked-alt"></i>
+                            <span>Destinations</span>
+                        </a>
+                        <a class="nav-link-item" href="{% url 'packages:package_list' %}">
+                            <i class="fas fa-suitcase"></i>
+                            <span>Packages</span>
+                        </a>
+                        <a class="nav-link-item" href="{% url 'content:product_list' %}">
+                            <i class="fas fa-shopping-bag"></i>
+                            <span>Products</span>
+                        </a>
+                        {% if user.is_authenticated %}
+                        <a class="nav-link-item" href="{% url 'content:cost_calculator' %}">
+                            <i class="fas fa-sliders-h"></i>
+                            <span>Customise</span>
+                        </a>
+                        <a class="nav-link-item" href="{% url 'content:check_weather' %}">
+                            <i class="fas fa-cloud-sun"></i>
+                            <span>Weather</span>
+                        </a>
+                        <a class="nav-link-item" href="{% if user.user_type == 'company' %}{% url 'support:company_tickets' %}{% elif user.is_staff %}{% url 'support:admin_tickets' %}{% else %}{% url 'support:my_tickets' %}{% endif %}">
+                            <i class="fas fa-headset"></i>
+                            <span>Support</span>
+                        </a>
+                        {% endif %}
+                    </div>
+
+                    <!-- Social Icons -->
+                    <div class="social-nav-icons d-none d-lg-flex">
+                        <a href="https://www.tiktok.com/@touri.pk?_r=1&_t=ZS-923VPyJdNUy" class="social-icon"
+                            title="TikTok" target="_blank" rel="noopener noreferrer">
+                            <i class="fab fa-tiktok"></i>
+                        </a>
+                        <a href="https://www.instagram.com/touri.pk?igsh=MjRpbGg4YWZqNzcx&utm_source=qr"
+                            class="social-icon" title="Instagram" target="_blank" rel="noopener noreferrer">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                    </div>
+
+                    <!-- Cart Icon -->
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'content:view_cart' %}" class="nav-icon"
+                        style="position: relative; margin-right: 10px;" title="Shopping Cart">
+                        <i class="fas fa-shopping-cart"></i>
+                        {% if request.user.shopping_cart.get_items_count > 0 %}
+                        <span class="cart-count"
+                            style="position: absolute; top: 5px; right: 5px; background: #dc3545; color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700;">
+                            {{ request.user.shopping_cart.get_items_count }}
+                        </span>
+                        {% else %}
+                        <span class="cart-count" style="display: none; position: absolute; top: 5px; right: 5px; background: #dc3545; color: white; border-radius: 50%; width: 20px; height: 20px; align-items: center; justify-content: center; font-size: 11px; font-weight: 700;">0</span>
+                        {% endif %}
+                    </a>
+                    {% endif %}
+
+                    <!-- Auth Links -->
+                    <div class="auth-links">
+                        {% if user.is_authenticated %}
+                        <div class="user-menu">
+                            <button class="nav-icon user-menu-btn" onclick="toggleUserMenu()">
+                                <i class="fas fa-user-circle"></i>
+                                <span>{{ user.full_name|default:user.username }}</span>
+                                <i class="fas fa-chevron-down dropdown-arrow"></i>
+                            </button>
+                            <div class="user-menu-dropdown" id="userMenuDropdown">
+                                <a class="menu-item" href="{% url 'dashboard' %}">
+                                    <i class="fas fa-tachometer-alt"></i>
+                                    <span>Dashboard</span>
+                                </a>
+                                {% if user.user_type == 'company' %}
+                                <a class="menu-item" href="{% url 'packages:company_portal' %}">
+                                    <i class="fas fa-building"></i>
+                                    <span>Company Portal</span>
+                                </a>
+                                <a class="menu-item" href="{% url 'support:company_tickets' %}">
+                                    <i class="fas fa-headset"></i>
+                                    <span>Support Tickets</span>
+                                </a>
+                                {% endif %}
+                                {% comment %}
+                                <a class="menu-item" href="{% url 'packages:booking_list' %}">
+                                    <i class="fas fa-calendar-check"></i>
+                                    <span>My Bookings</span>
+                                </a>
+                                {% endcomment %}
+                                <div class="menu-divider"></div>
+                                <form method="post" action="{% url 'logout' %}" class="logout-form">
+                                    {% csrf_token %}
+                                    <button type="submit" class="menu-item logout-btn">
+                                        <i class="fas fa-sign-out-alt"></i>
+                                        <span>Logout</span>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        {% else %}
+                        <a class="nav-icon" href="{% url 'login' %}">
+                            <i class="fas fa-sign-in-alt"></i>
+                            <span>Login</span>
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile Menu Button -->
+            <button class="mobile-menu-btn d-lg-none" type="button" data-bs-toggle="collapse"
+                data-bs-target="#mobileNav">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </nav>
+
+        <!-- Mobile Navigation -->
+        <div class="collapse" id="mobileNav">
+            <div class="mobile-nav">
+                <div class="container">
+                    <div class="mobile-nav-content">
+                        <a class="mobile-nav-item" href="{% url 'home' %}">
+                            <i class="fas fa-home"></i> Homepage
+                        </a>
+                        <a class="mobile-nav-item" href="{% url 'content:destination_list' %}">
+                            <i class="fas fa-map-marked-alt"></i> Destinations
+                        </a>
+                        <a class="mobile-nav-item" href="{% url 'content:tour_packages' %}">
+                            <i class="fas fa-suitcase"></i> Tour Packages
+                        </a>
+                        <a class="mobile-nav-item" href="{% url 'content:product_list' %}">
+                            <i class="fas fa-shopping-bag"></i> Products
+                        </a>
+                        {% if user.is_authenticated %}
+                        <a class="mobile-nav-item" href="{% url 'content:view_cart' %}">
+                            <i class="fas fa-shopping-cart"></i> Shopping Cart
+                            {% if request.user.shopping_cart.get_items_count > 0 %}
+                            <span class="cart-count-mobile"
+                                style="margin-left: auto; background: #dc3545; color: white; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700;">
+                                {{ request.user.shopping_cart.get_items_count }}
+                            </span>
+                            {% else %}
+                            <span class="cart-count-mobile" style="display: none; margin-left: auto; background: #dc3545; color: white; border-radius: 50%; width: 24px; height: 24px; align-items: center; justify-content: center; font-size: 12px; font-weight: 700;">0</span>
+                            {% endif %}
+                        </a>
+                        <a class="mobile-nav-item" href="{% url 'content:cost_calculator' %}">
+                            <i class="fas fa-sliders-h"></i> Customise
+                        </a>
+                        <a class="mobile-nav-item" href="{% url 'content:check_weather' %}">
+                            <i class="fas fa-cloud-sun"></i> Weather
+                        </a>
+                        <a class="mobile-nav-item" href="{% if user.user_type == 'company' %}{% url 'support:company_tickets' %}{% elif user.is_staff %}{% url 'support:admin_tickets' %}{% else %}{% url 'support:my_tickets' %}{% endif %}">
+                            <i class="fas fa-headset"></i> Support
+                        </a>
+                        <a class="mobile-nav-item" href="{% url 'dashboard' %}">
+                            <i class="fas fa-tachometer-alt"></i> Dashboard
+                        </a>
+                        {% if user.user_type == 'company' %}
+                        <a class="mobile-nav-item" href="{% url 'packages:company_portal' %}">
+                            <i class="fas fa-building"></i> Company Portal
+                        </a>
+                        {% endif %}
+                        {% comment %}
+                        <a class="mobile-nav-item" href="{% url 'booking_list' %}">
+                            <i class="fas fa-calendar-check"></i> My Bookings
+                        </a>
+                        {% endcomment %}
+                        <a class="mobile-nav-item logout-btn" href="#"
+                            onclick="event.preventDefault(); document.getElementById('mobile-logout-form').submit();">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a>
+                        <form id="mobile-logout-form" method="post" action="{% url 'logout' %}" style="display: none;">
+                            {% csrf_token %}
+                        </form>
+                        {% else %}
+                        <a class="mobile-nav-item" href="{% url 'login' %}">
+                            <i class="fas fa-sign-in-alt"></i> Login
+                        </a>
+                        <a class="mobile-nav-item" href="{% url 'register' %}">
+                            <i class="fas fa-user-plus"></i> Register
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Messages -->
+    {% if messages %}
+    <div class="container mt-3">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Floating Chat Button -->
+    {% if user.is_authenticated %}
+    <a href="{% url 'chatbot' %}" class="floating-chat-btn" title="AI Travel Assistant">
+        <i class="fas fa-robot"></i>
+    </a>
+    {% endif %}
+
+    <!-- Footer -->
+    <footer class="text-white pt-5 pb-3 mt-5" style="background: #000000;">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <h5 class="fw-bold">About Touri.pk</h5>
+                    <p class="opacity-75">Explore Pakistan's stunning landscapes and vibrant culture with our expertly
+                        guided tours and premium travel services.</p>
+                    <div class="d-flex gap-3 mt-3">
+                        <a href="#" class="text-white social-icon">
+                            <i class="fab fa-facebook"></i>
+                        </a>
+                        <a href="#" class="text-white social-icon">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="text-white social-icon">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="text-white social-icon">
+                            <i class="fab fa-linkedin"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <h5 class="fw-bold">Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="{% url 'home' %}"
+                                class="text-white opacity-75 text-decoration-none">🏠 Home</a></li>
+                        <li class="mb-2"><a href="{% url 'content:destination_list' %}"
+                                class="text-white opacity-75 text-decoration-none">🗺️ Destinations</a></li>
+                        {% comment %}
+                        <li class="mb-2"><a href="{% url 'packages:package_list' %}"
+                                class="text-white opacity-75 text-decoration-none">🧳 Tour Packages</a></li>
+                        {% endcomment %}
+                        <li class="mb-2"><a href="{% url 'content:product_list' %}"
+                                class="text-white opacity-75 text-decoration-none">🛍️ Products</a></li>
+                        {% if user.is_authenticated %}
+                        <li class="mb-2"><a href="{% url 'chatbot' %}"
+                                class="text-white opacity-75 text-decoration-none">🤖 AI Assistant</a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <h5 class="fw-bold">Contact Us</h5>
+                    <div class="text-white opacity-75">
+                        <div class="mb-2">
+                            <i class="fas fa-map-marker-alt me-2"></i>
+                            Lahore, Pakistan
+                        </div>
+                        <div class="mb-2">
+                            <i class="fas fa-phone me-2"></i>
+                            +92 123 456 7890
+                        </div>
+                        <div class="mb-2">
+                            <i class="fas fa-envelope me-2"></i>
+                            info@touri.pk
+                        </div>
+                        <div class="mb-2">
+                            <i class="fas fa-globe me-2"></i>
+                            www.touri.pk
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr class="mt-4 opacity-25">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="mb-0 opacity-75">&copy; 2025 Touri.pk. All Rights Reserved.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="mb-0 opacity-75">Made with ❤️ for Pakistan Tourism</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Simple user menu toggle function
+        function toggleUserMenu() {
+            const userMenu = document.querySelector('.user-menu');
+            userMenu.classList.toggle('active');
+        }
+
+        // Close menu when clicking outside
+        document.addEventListener('click', function (e) {
+            const userMenu = document.querySelector('.user-menu');
+            if (userMenu && !userMenu.contains(e.target)) {
+                userMenu.classList.remove('active');
+            }
+        });
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', function () {
+            const navbar = document.querySelector('.modern-navbar');
+            if (navbar) {
+                if (window.scrollY > 50) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+            }
+        });
+
+        // Add loading class to images
+        document.addEventListener('DOMContentLoaded', function () {
+            const images = document.querySelectorAll('.card-img-top');
+            images.forEach(img => {
+                img.classList.add('loading');
+                img.onload = function () {
+                    this.classList.remove('loading');
+                }
+            });
+
+            // Set page-specific body class based on URL
+            setPageTheme();
+
+            // Initialize sliding animations
+            initSlidingAnimations();
+            addPageTransition();
+        });
+
+        // Fix for browser back/forward cache (bfcache):
+        // When user navigates back, restore full brightness & visibility
+        window.addEventListener('pageshow', function (event) {
+            if (event.persisted) {
+                document.body.style.opacity = '';
+                document.body.style.transform = '';
+                document.body.style.transition = '';
+                document.querySelectorAll('.card').forEach(function (el) {
+                    el.style.opacity = '1';
+                    el.style.transform = '';
+                });
+            }
+        });
+
+        // Page-specific theme function
+        function setPageTheme() {
+            const path = window.location.pathname;
+            const body = document.body;
+
+            // Remove any existing page classes
+            body.className = body.className.replace(/\b\w*-page\b/g, '');
+
+            // Add page-specific class based on URL
+            if (path === '/' || path === '/home/') {
+                body.classList.add('home-page');
+            } else if (path.includes('/content/destinations/')) {
+                body.classList.add('destinations-page');
+            } else if (path.includes('/content/products/')) {
+                body.classList.add('products-page');
+            } else if (path.includes('/bookings/')) {
+                body.classList.add('booking-page');
+            } else if (path.includes('/users/dashboard/') || path.includes('/users/profile/')) {
+                body.classList.add('profile-page');
+            } else if (path.includes('/users/login/')) {
+                body.classList.add('login-page');
+            } else if (path.includes('/users/register/')) {
+                body.classList.add('register-page');
+            } else if (path.includes('/content/check-weather/')) {
+                body.classList.add('weather-page');
+            } else if (path.includes('/content/calculator/')) {
+                body.classList.add('calculator-page');
+            } else if (path.includes('/chatbot/')) {
+                body.classList.add('chatbot-page');
+            } else {
+                body.classList.add('default-page');
+            }
+        }
+
+        // Initialize sliding animations
+        function initSlidingAnimations() {
+            const cards = document.querySelectorAll('.card');
+
+            // Intersection Observer for scroll animations (no opacity tricks)
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, observerOptions);
+
+            // Observe all cards
+            cards.forEach(card => {
+                observer.observe(card);
+            });
+        }
+
+        // Page transition effect
+        function addPageTransition() {
+            // Intentionally disabled — opacity-based transitions cause
+            // the page to look dim/blurred when the user navigates back
+            // via the browser back button (bfcache restores old inline styles).
+        }
+    </script>
+
+    <!-- Hero Slider Styles -->
+    <style>
+        /* Hero Slider Styles */
+        .hero-slider-section {
+            position: relative;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .hero-slider {
+            position: relative;
+            height: 100%;
+            width: 100%;
+        }
+
+        .hero-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0;
+            transition: all 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            transform: scale(1.1);
+        }
+
+        .hero-slide.active {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.2) 100%);
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            height: 100%;
+            display: flex;
+            align-items: center;
+        }
+
+        .hero-title {
+            font-size: 4rem;
+            font-weight: 800;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+
+        .hero-subtitle {
+            font-size: 1.3rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 2rem;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-hero {
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .btn-hero.btn-primary {
+            background: #000000;
+            border-color: transparent;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-hero.btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .btn-hero.btn-outline-light {
+            color: white;
+            border-color: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-hero.btn-outline-light:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: white;
+            transform: translateY(-3px);
+        }
+
+        /* Slider Navigation */
+        .slider-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 3;
+            width: 100%;
+            padding: 0 30px;
+            display: flex;
+            justify-content: space-between;
+            pointer-events: none;
+        }
+
+        .slider-btn {
+            pointer-events: all;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            color: white;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .slider-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: white;
+            transform: scale(1.1);
+        }
+
+        /* Slider Dots */
+        .slider-dots {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 3;
+            display: flex;
+            gap: 15px;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.4);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .dot.active,
+        .dot:hover {
+            background: white;
+            transform: scale(1.2);
+        }
+
+        /* Search Overlay */
+        .search-overlay {
+            position: absolute;
+            bottom: 80px;
+            left: 0;
+            right: 0;
+            z-index: 3;
+        }
+
+        .advanced-search-box {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .search-field {
+            position: relative;
+            display: flex;
+            align-items: center;
+            background: white;
+            border-radius: 15px;
+            padding: 0 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-field i {
+            color: #000000;
+            margin-right: 15px;
+            font-size: 1.1rem;
+        }
+
+        .search-input {
+            border: none;
+            outline: none;
+            padding: 18px 0;
+            font-size: 1rem;
+            background: transparent;
+            width: 100%;
+        }
+
+        .search-btn {
+            background: #000000;
+            color: white;
+            border: none;
+            padding: 18px 30px;
+            border-radius: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .search-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Stats Section */
+        .stats-section {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            margin-top: -50px;
+            position: relative;
+            z-index: 4;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 40px 20px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-icon {
+            width: 80px;
+            height: 80px;
+            background: #000000;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            color: white;
+            font-size: 2rem;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9rem;
+        }
+
+        /* Animations */
+        .animate-slide-up {
+            animation: slideUp 1s ease-out forwards;
+            opacity: 0;
+            transform: translateY(50px);
+        }
+
+        .animate-slide-up-delay-1 {
+            animation: slideUp 1s ease-out 0.3s forwards;
+            opacity: 0;
+            transform: translateY(50px);
+        }
+
+        .animate-slide-up-delay-2 {
+            animation: slideUp 1s ease-out 0.6s forwards;
+            opacity: 0;
+            transform: translateY(50px);
+        }
+
+        @keyframes slideUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1.1rem;
+            }
+
+            .search-form {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .advanced-search-box {
+                margin: 0 20px;
+                padding: 20px;
+            }
+
+            .slider-nav {
+                padding: 0 15px;
+            }
+
+            .slider-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+
+    <!-- Hero Slider JavaScript -->
+    <script>
+        let currentSlideIndex = 0;
+        const slides = document.querySelectorAll('.hero-slide');
+        const dots = document.querySelectorAll('.dot');
+        const totalSlides = slides.length;
+
+        function showSlide(index) {
+            // Hide all slides
+            slides.forEach(slide => slide.classList.remove('active'));
+            dots.forEach(dot => dot.classList.remove('active'));
+
+            // Show current slide
+            slides[index].classList.add('active');
+            dots[index].classList.add('active');
+        }
+
+        function nextSlide() {
+            currentSlideIndex = (currentSlideIndex + 1) % totalSlides;
+            showSlide(currentSlideIndex);
+        }
+
+        function prevSlide() {
+            currentSlideIndex = (currentSlideIndex - 1 + totalSlides) % totalSlides;
+            showSlide(currentSlideIndex);
+        }
+
+        function currentSlide(index) {
+            currentSlideIndex = index - 1;
+            showSlide(currentSlideIndex);
+        }
+
+        function changeSlide(direction) {
+            if (direction === 1) {
+                nextSlide();
+            } else {
+                prevSlide();
+            }
+        }
+
+        // Auto-play slider
+        function startSlider() {
+            setInterval(nextSlide, 6000); // Change slide every 6 seconds
+        }
+
+        // Initialize slider when page loads
+        document.addEventListener('DOMContentLoaded', function () {
+            if (document.querySelector('.hero-slider')) {
+                showSlide(0);
+                startSlider();
+            }
+        });
+
+        // Sticky Navbar on Scroll
+        window.addEventListener('scroll', function () {
+            const navbar = document.querySelector('.navbar-wrapper');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+    </script>
+
+    <!-- Include Chatbot Widget on all pages -->
+    {% if user.is_authenticated %}
+    {% include 'chatbot/widget.html' %}
+    {% endif %}
+</body>
+
+</html>

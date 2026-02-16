@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% block title %}Edit Package - {{ package.name }}{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h3><i class="fas fa-edit me-2"></i>Edit Package: {{ package.name }}</h3>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+
+                    <form method="post" enctype="multipart/form-data" novalidate>
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Package Name *</label>
+                                <input type="text" name="name" class="form-control" value="{{ form_data.name|default:package.name }}" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Package Type *</label>
+                                <select name="package_type" class="form-control" required>
+                                    {% for value, label in package_types %}
+                                    <option value="{{ value }}" {% if form_data.package_type == value or package.package_type == value %}selected{% endif %}>{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Description *</label>
+                            <textarea name="description" class="form-control" rows="4" required>{{ form_data.description|default:package.description }}</textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Destinations (comma separated) *</label>
+                            <input type="text" name="destination_names" class="form-control" placeholder="e.g., Hunza, Skardu, Naran" value="{{ form_data.destination_names|default:package.destination_names }}" required>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">Days *</label>
+                                <input type="number" name="duration_days" class="form-control" min="1" value="{{ form_data.duration_days|default:package.duration_days }}" required>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">Nights *</label>
+                                <input type="number" name="duration_nights" class="form-control" min="0" value="{{ form_data.duration_nights|default:package.duration_nights }}" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Price Per Person (PKR) *</label>
+                                <input type="number" name="price_per_person" class="form-control" step="0.01" value="{{ form_data.price_per_person|default:package.price_per_person }}" required>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Inclusions (one per line)</label>
+                            <textarea name="inclusions" class="form-control" rows="4" placeholder="Transport&#10;Meals&#10;Hotels">{{ form_data.inclusions|default:package.inclusions }}</textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Exclusions (one per line)</label>
+                            <textarea name="exclusions" class="form-control" rows="3" placeholder="Personal expenses&#10;Tips">{{ form_data.exclusions|default:package.exclusions }}</textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Itinerary</label>
+                            <textarea name="itinerary" class="form-control" rows="6" placeholder="Day 1: ...&#10;Day 2: ...">{{ form_data.itinerary|default:package.itinerary }}</textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Package Image</label>
+                            {% if package.image %}
+                            <div class="mb-2">
+                                <img src="{{ package.image.url }}" alt="{{ package.name }}" style="max-height:100px;border-radius:8px;">
+                                <small class="text-muted d-block">Current image. Upload new to replace.</small>
+                            </div>
+                            {% endif %}
+                            <input type="file" name="image" class="form-control" accept="image/*">
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Min People</label>
+                                <input type="number" name="min_people" class="form-control" value="{{ form_data.min_people|default:package.min_people }}" min="1">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Max People</label>
+                                <input type="number" name="max_people" class="form-control" value="{{ form_data.max_people|default:package.max_people }}" min="1">
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-save me-1"></i>Save Changes</button>
+                        <a href="{% url 'packages:company_portal' %}" class="btn btn-secondary">Cancel</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

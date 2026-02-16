@@ -1,0 +1,213 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Admin - Support Tickets | TouriPK{% endblock %}
+
+{% block content %}
+<style>
+    .admin-tickets-page {
+        background: #f8f9fa;
+        min-height: 100vh;
+        padding: 120px 0 80px;
+    }
+    .tickets-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    .page-header {
+        background: white;
+        border-radius: 20px;
+        padding: 40px;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+    .page-header h1 {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #1a1a2e;
+        margin: 0;
+    }
+    .toggle-btn {
+        padding: 10px 24px;
+        border-radius: 50px;
+        border: 2px solid #000;
+        background: white;
+        color: #000;
+        text-decoration: none;
+        font-weight: 700;
+        transition: all 0.3s ease;
+    }
+    .toggle-btn:hover, .toggle-btn.active {
+        background: #000;
+        color: white;
+    }
+    .filter-bar {
+        background: white;
+        border-radius: 16px;
+        padding: 15px 25px;
+        margin-bottom: 25px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+    .filter-btn {
+        padding: 8px 20px;
+        border-radius: 50px;
+        border: 2px solid #e0e0e0;
+        background: white;
+        color: #333;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+    }
+    .filter-btn:hover, .filter-btn.active {
+        background: #000;
+        color: white;
+        border-color: #000;
+    }
+    .ticket-card {
+        background: white;
+        border-radius: 20px;
+        padding: 25px 30px;
+        margin-bottom: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+        text-decoration: none;
+        color: inherit;
+        display: block;
+    }
+    .ticket-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+        color: inherit;
+    }
+    .ticket-card.escalated-card {
+        border-left: 4px solid #dc3545;
+    }
+    .ticket-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 12px;
+    }
+    .ticket-id {
+        font-family: monospace;
+        font-size: 0.85rem;
+        color: #666;
+        font-weight: 600;
+    }
+    .ticket-subject {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: #1a1a2e;
+        margin-bottom: 8px;
+    }
+    .ticket-meta {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+        font-size: 0.9rem;
+        color: #666;
+    }
+    .ticket-meta i { margin-right: 5px; }
+    .status-badge {
+        padding: 5px 14px;
+        border-radius: 50px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+    .status-pending_company { background: #fff3cd; color: #856404; }
+    .status-in_progress { background: #cce5ff; color: #004085; }
+    .status-resolved { background: #d4edda; color: #155724; }
+    .status-escalated { background: #f8d7da; color: #721c24; }
+    .status-closed { background: #e2e3e5; color: #383d41; }
+    .empty-state {
+        text-align: center;
+        padding: 80px 20px;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    .empty-state i { font-size: 4rem; color: #ddd; margin-bottom: 20px; }
+    .empty-state h3 { color: #1a1a2e; font-weight: 700; }
+</style>
+
+<div class="admin-tickets-page">
+    <div class="container">
+        <div class="tickets-container">
+            <!-- Header -->
+            <div class="page-header">
+                <h1><i class="fas fa-shield-alt" style="margin-right: 12px;"></i>Admin - {% if show_all %}All Tickets{% else %}Escalated Tickets{% endif %}</h1>
+                <div>
+                    {% if show_all %}
+                    <a href="{% url 'support:admin_tickets' %}" class="toggle-btn">Show Escalated Only</a>
+                    {% else %}
+                    <a href="{% url 'support:admin_tickets' %}?all=1" class="toggle-btn">Show All Tickets</a>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if messages %}
+            <div class="mb-3">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert" style="border-radius: 12px;">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- Filters -->
+            <div class="filter-bar">
+                <a href="{% url 'support:admin_tickets' %}{% if show_all %}?all=1{% endif %}" class="filter-btn {% if not status_filter %}active{% endif %}">All</a>
+                <a href="{% url 'support:admin_tickets' %}?status=escalated{% if show_all %}&all=1{% endif %}" class="filter-btn {% if status_filter == 'escalated' %}active{% endif %}">Escalated</a>
+                <a href="{% url 'support:admin_tickets' %}?status=pending_company{% if show_all %}&all=1{% endif %}" class="filter-btn {% if status_filter == 'pending_company' %}active{% endif %}">Waiting</a>
+                <a href="{% url 'support:admin_tickets' %}?status=in_progress{% if show_all %}&all=1{% endif %}" class="filter-btn {% if status_filter == 'in_progress' %}active{% endif %}">In Progress</a>
+                <a href="{% url 'support:admin_tickets' %}?status=resolved{% if show_all %}&all=1{% endif %}" class="filter-btn {% if status_filter == 'resolved' %}active{% endif %}">Resolved</a>
+            </div>
+
+            <!-- Tickets -->
+            {% if tickets %}
+                {% for ticket in tickets %}
+                <a href="{% url 'support:ticket_detail' ticket.ticket_id %}" class="ticket-card {% if ticket.status == 'escalated' %}escalated-card{% endif %}">
+                    <div class="ticket-header">
+                        <div>
+                            <span class="ticket-id">{{ ticket.ticket_id }}</span>
+                            {% if ticket.escalated_at %}
+                            <span style="font-size: 0.8rem; color: #dc3545; font-weight: 600; margin-left: 8px;">
+                                <i class="fas fa-arrow-up"></i> Escalated {{ ticket.escalated_at|timesince }} ago
+                            </span>
+                            {% endif %}
+                        </div>
+                        <span class="status-badge status-{{ ticket.status }}">{{ ticket.get_status_display }}</span>
+                    </div>
+                    <div class="ticket-subject">{{ ticket.subject }}</div>
+                    <div class="ticket-meta">
+                        <span><i class="fas fa-user"></i>{{ ticket.customer.full_name|default:ticket.customer.username }}</span>
+                        <span><i class="fas fa-building"></i>{{ ticket.company.name }}</span>
+                        <span><i class="fas fa-tag"></i>{{ ticket.get_issue_type_display }}</span>
+                        <span><i class="fas fa-flag"></i>{{ ticket.get_priority_display }}</span>
+                        <span><i class="fas fa-clock"></i>{{ ticket.created_at|timesince }} ago</span>
+                    </div>
+                </a>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-check-circle"></i>
+                    <h3>{% if show_all %}No tickets found{% else %}No escalated tickets{% endif %}</h3>
+                    <p>{% if show_all %}There are no support tickets in the system.{% else %}All companies are responding within their 48-hour window. Great!{% endif %}</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

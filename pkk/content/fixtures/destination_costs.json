@@ -1,0 +1,156 @@
+[
+    {
+        "model": "content.costcomponent",
+        "fields": {
+            "name": "Standard Room",
+            "category": "camping",
+            "base_cost": 5000,
+            "unit": "per night",
+            "description": "Comfortable room with basic amenities",
+            "destination": 2
+        }
+    },
+    {
+        "model": "content.costcomponent",
+        "fields": {
+            "name": "Luxury Room",
+            "category": "camping",
+            "base_cost": 8000,
+            "unit": "per night",
+            "description": "Deluxe room with premium amenities",
+            "destination": 2
+        }
+    },
+    {
+        "model": "content.costcomponent",
+        "fields": {
+            "name": "Jeep Service",
+            "category": "transport",
+            "base_cost": 6000,
+            "unit": "per trip",
+            "description": "Round trip jeep service from Raikot Bridge",
+            "destination": 2
+        }
+    },
+    {
+        "model": "content.costcomponent",
+        "fields": {
+            "name": "Tour Guide",
+            "category": "activities",
+            "base_cost": 2500,
+            "unit": "per day",
+            "description": "Professional guide services",
+            "destination": 2
+        }
+    },
+    {
+        "model": "content.costcomponent",
+        "fields": {
+            "name": "Standard Room",
+            "category": "camping",
+            "base_cost": 4000,
+            "unit": "per night",
+            "description": "Comfortable room near Deosai Plains",
+            "destination": 6
+        }
+    },
+    {
+        "model": "content.costcomponent",
+        "fields": {
+            "name": "4x4 Transport",
+            "category": "transport",
+            "base_cost": 8000,
+            "unit": "per day",
+            "description": "4x4 vehicle rental for Deosai exploration",
+            "destination": 6
+        }
+    },
+    {
+        "model": "content.costcomponent",
+        "fields": {
+            "name": "Camping Equipment",
+            "category": "camping",
+            "base_cost": 3000,
+            "unit": "per day",
+            "description": "Complete camping gear set",
+            "destination": 6
+        }
+    },
+    {
+        "model": "content.costcomponent",
+        "fields": {
+            "name": "Guest House",
+            "category": "camping",
+            "base_cost": 3500,
+            "unit": "per night",
+            "description": "Comfortable stay near Baltit Fort",
+            "destination": 5
+        }
+    },
+    {
+        "model": "content.costcomponent",
+        "fields": {
+            "name": "Local Transport",
+            "category": "transport",
+            "base_cost": 2000,
+            "unit": "per day",
+            "description": "Local transportation in Karimabad",
+            "destination": 5
+        }
+    },
+    {
+        "model": "content.costcomponent",
+        "fields": {
+            "name": "Guided Tour",
+            "category": "activities",
+            "base_cost": 1500,
+            "unit": "per person",
+            "description": "Historical tour of Baltit Fort",
+            "destination": 5
+        }
+    },
+    {
+        "model": "content.costcomponent",
+        "fields": {
+            "name": "Hotel Room",
+            "category": "camping",
+            "base_cost": 6000,
+            "unit": "per night",
+            "description": "Hotel accommodation in Lahore",
+            "destination": 4
+        }
+    },
+    {
+        "model": "content.costcomponent",
+        "fields": {
+            "name": "Tour Guide",
+            "category": "activities",
+            "base_cost": 2000,
+            "unit": "per group",
+            "description": "Professional guide for Badshahi Mosque tour",
+            "destination": 4
+        }
+    },
+    {
+        "model": "content.costcomponent",
+        "fields": {
+            "name": "Hotel Room",
+            "category": "camping",
+            "base_cost": 5500,
+            "unit": "per night",
+            "description": "Hotel accommodation in Islamabad",
+            "destination": 3
+        }
+    },
+    {
+        "model": "content.costcomponent",
+        "fields": {
+            "name": "Guided Tour",
+            "category": "activities",
+            "base_cost": 1000,
+            "unit": "per person",
+            "description": "Guided tour of Faisal Mosque",
+            "destination": 3
+        }
+    }
+]

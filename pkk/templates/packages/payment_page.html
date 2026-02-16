@@ -1,0 +1,273 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Payment - {{ booking.booking_reference }} | TouriPK{% endblock %}
+
+{% block content %}
+<style>
+    .payment-page { min-height: 100vh; padding: 40px 0; padding-top: 100px; background: #f8f9fa; }
+    .payment-container { max-width: 900px; margin: 0 auto; padding: 0 20px; }
+    .payment-card { background: white; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.1); overflow: hidden; }
+    .payment-header { background: linear-gradient(135deg, #000 0%, #1a1a1a 100%); color: white; padding: 30px 40px; text-align: center; }
+    .payment-header h2 { font-weight: 800; margin: 0 0 5px 0; }
+    .payment-header p { opacity: .8; margin: 0; }
+    .payment-body { padding: 40px; }
+    .order-summary { background: #f8f9fa; border-radius: 15px; padding: 25px; margin-bottom: 30px; }
+    .order-summary h4 { font-weight: 800; margin-bottom: 20px; color: #000; }
+    .summary-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #e0e0e0; }
+    .summary-row:last-child { border-bottom: none; }
+    .summary-row .label { color: #666; font-weight: 500; }
+    .summary-row .value { font-weight: 700; color: #000; }
+    .total-row { background: #000; color: white; margin: 20px -25px -25px; padding: 20px 25px; border-radius: 0 0 15px 15px; display: flex; justify-content: space-between; align-items: center; }
+    .total-row .label { font-size: 1.2rem; font-weight: 700; }
+    .total-row .value { font-size: 1.5rem; font-weight: 900; }
+
+    /* Method selector */
+    .method-tab { display: flex; gap: 12px; margin-bottom: 25px; }
+    .method-tab .tab-btn { flex: 1; padding: 16px 12px; border: 2px solid #e0e0e0; border-radius: 14px; background: #f8f9fa; cursor: pointer; text-align: center; transition: all .3s; }
+    .method-tab .tab-btn:hover { border-color: #000; }
+    .method-tab .tab-btn.active { border-color: #000; background: #000; color: white; }
+    .method-tab .tab-btn i { font-size: 1.6rem; display: block; margin-bottom: 6px; }
+    .method-tab .tab-btn span { font-weight: 700; font-size: .95rem; }
+
+    /* Stripe card element */
+    #card-element { border: 2px solid #e0e0e0; border-radius: 12px; padding: 15px; background: #f8f9fa; transition: all .3s; }
+    #card-element:focus-within { border-color: #000; background: white; box-shadow: 0 0 0 4px rgba(0,0,0,.1); }
+    #card-errors { color: #dc3545; margin-top: 10px; font-size: 14px; }
+
+    .pay-btn { width: 100%; padding: 18px; background: #000; color: white; border: none; border-radius: 12px; font-size: 1.1rem; font-weight: 700; cursor: pointer; margin-top: 25px; transition: all .3s; display: flex; align-items: center; justify-content: center; gap: 10px; }
+    .pay-btn:hover { background: #333; transform: translateY(-2px); box-shadow: 0 10px 30px rgba(0,0,0,.2); }
+    .pay-btn:disabled { background: #999; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    .test-notice { background: #fff3cd; border: 2px solid #ffc107; border-radius: 12px; padding: 15px 20px; margin-bottom: 25px; display: flex; align-items: flex-start; gap: 12px; }
+    .test-notice i { color: #ffc107; font-size: 1.3rem; margin-top: 2px; }
+    .test-notice .content h5 { margin: 0 0 5px 0; font-weight: 700; color: #856404; }
+    .test-notice .content p { margin: 0; color: #856404; font-size: 14px; }
+    .test-notice code { background: rgba(0,0,0,.1); padding: 2px 6px; border-radius: 4px; font-weight: 600; }
+    .spinner { display: none; width: 20px; height: 20px; border: 3px solid rgba(255,255,255,.3); border-radius: 50%; border-top-color: white; animation: spin .8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .secure-badge { text-align: center; margin-top: 15px; color: #888; font-size: 13px; }
+    .secure-badge i { color: #28a745; }
+    .payment-section { display: none; }
+    .payment-section.active { display: block; }
+</style>
+
+<div class="payment-page">
+    <div class="payment-container">
+        <div class="payment-card">
+            <div class="payment-header">
+                <h2><i class="fas fa-credit-card"></i> Secure Payment</h2>
+                <p>Booking #{{ booking.booking_reference }}</p>
+            </div>
+            <div class="payment-body">
+                <!-- Order Summary -->
+                <div class="order-summary">
+                    <h4><i class="fas fa-receipt"></i> Booking Summary</h4>
+                    <div class="summary-row">
+                        <span class="label"><i class="fas fa-box"></i> Package</span>
+                        <span class="value">{{ booking.package.name }}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="label"><i class="fas fa-building"></i> Tour Operator</span>
+                        <span class="value">{{ booking.package.company.name }}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="label"><i class="fas fa-calendar"></i> Travel Date</span>
+                        <span class="value">{{ booking.travel_date|date:"F d, Y" }}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="label"><i class="fas fa-users"></i> Travelers</span>
+                        <span class="value">{{ booking.num_adults }} Adult(s){% if booking.num_children > 0 %}, {{ booking.num_children }} Child(ren){% endif %}</span>
+                    </div>
+                    <div class="total-row">
+                        <span class="label">Total Amount</span>
+                        <span class="value">PKR {{ booking.total_amount|floatformat:0 }}</span>
+                    </div>
+                </div>
+
+                <!-- Payment Method Tabs -->
+                <h4 style="font-weight:800;margin-bottom:15px;"><i class="fas fa-wallet"></i> Choose Payment Method</h4>
+                <div class="method-tab">
+                    <div class="tab-btn active" data-method="stripe" onclick="switchMethod('stripe')">
+                        <i class="fas fa-credit-card"></i>
+                        <span>Card Payment</span>
+                    </div>
+                    <div class="tab-btn" data-method="bank" onclick="switchMethod('bank')">
+                        <i class="fas fa-university"></i>
+                        <span>Bank Transfer</span>
+                    </div>
+                </div>
+
+                <!-- ══════════ STRIPE CARD SECTION ══════════ -->
+                <div id="stripe-section" class="payment-section active">
+                    <div class="test-notice">
+                        <i class="fas fa-flask"></i>
+                        <div class="content">
+                            <h5>Test Mode – For Testing Only</h5>
+                            <p>Use card number: <code>4242 4242 4242 4242</code><br>
+                            Any future expiry date and any 3-digit CVC.</p>
+                        </div>
+                    </div>
+
+                    <form id="stripe-form">
+                        {% csrf_token %}
+                        <label style="font-weight:700;margin-bottom:10px;display:block;">Card Details</label>
+                        <div id="card-element"></div>
+                        <div id="card-errors" role="alert"></div>
+                        <button type="submit" class="pay-btn" id="stripe-btn">
+                            <span id="stripe-btn-text"><i class="fas fa-lock"></i> Pay PKR {{ booking.total_amount|floatformat:0 }}</span>
+                            <div class="spinner" id="stripe-spinner"></div>
+                        </button>
+                    </form>
+                    <div class="secure-badge">
+                        <i class="fas fa-shield-alt"></i> Secured by Stripe – Your payment info is encrypted
+                    </div>
+                </div>
+
+                <!-- ══════════ BANK TRANSFER SECTION ══════════ -->
+                <div id="bank-section" class="payment-section">
+                    <div class="alert alert-info">
+                        <h6><i class="fas fa-university"></i> Bank Transfer Details:</h6>
+                        <p><strong>Bank:</strong> Meezan Bank</p>
+                        <p><strong>Account Title:</strong> TouriPK Services</p>
+                        <p><strong>Account Number:</strong> 01234567890</p>
+                        <p class="mb-0"><strong>IBAN:</strong> PK12MEZN0001234567890</p>
+                    </div>
+                    <div class="alert alert-secondary">
+                        <h6><i class="fas fa-info-circle"></i> What to enter as Transaction ID?</h6>
+                        <ul class="mb-0" style="padding-left:18px;">
+                            <li>If you transferred via <strong>online banking</strong> — enter the <strong>Transaction Reference Number</strong> shown in your transfer receipt</li>
+                            <li>If you transferred via <strong>ATM</strong> — enter the <strong>Transaction ID</strong> printed on the ATM receipt</li>
+                            <li>If you transferred via <strong>bank branch</strong> — enter the <strong>Deposit Slip Number</strong></li>
+                            <li>Example: <code>TRX20260215001234</code> or <code>FT26021512345678</code></li>
+                        </ul>
+                    </div>
+                    <form method="POST" action="{% url 'packages:process_payment' booking.id %}" id="bankForm">
+                        {% csrf_token %}
+                        <input type="hidden" name="payment_method" value="bank">
+                        <div class="mb-3">
+                            <label class="form-label" style="font-weight:700;">Transaction ID / Reference <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="transaction_id" id="transactionIdInput" placeholder="e.g. TRX20260215001234" minlength="5" maxlength="50" required>
+                            <div class="invalid-feedback" id="txnError">Transaction ID must be 5-50 alphanumeric characters (hyphens allowed).</div>
+                            <small class="text-muted">Enter the reference/transaction number from your bank receipt</small>
+                        </div>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="bank-terms" required>
+                            <label class="form-check-label" for="bank-terms">
+                                I confirm that I have transferred <strong>PKR {{ booking.total_amount|floatformat:0 }}</strong> and agree to the Terms &amp; Conditions
+                            </label>
+                        </div>
+                        <button type="submit" class="pay-btn" id="bank-btn">
+                            <span id="bank-btn-text"><i class="fas fa-paper-plane"></i> Submit Bank Transfer</span>
+                            <div class="spinner" id="bank-spinner"></div>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Cancel -->
+                <div class="text-center mt-3">
+                    <a href="{% url 'packages:package_list' %}" class="text-muted"><i class="fas fa-arrow-left"></i> Cancel & return to packages</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Stripe JS -->
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+// ──── Method tab switching ────
+function switchMethod(method) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector(`.tab-btn[data-method="${method}"]`).classList.add('active');
+    document.querySelectorAll('.payment-section').forEach(s => s.classList.remove('active'));
+    document.getElementById(method + '-section').classList.add('active');
+}
+
+// ──── Stripe card payment ────
+const stripe = Stripe('{{ stripe_publishable_key }}');
+const elements = stripe.elements();
+const style = {
+    base: {
+        color: '#000',
+        fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, sans-serif',
+        fontSmoothing: 'antialiased',
+        fontSize: '16px',
+        '::placeholder': { color: '#aab7c4' }
+    },
+    invalid: { color: '#dc3545', iconColor: '#dc3545' }
+};
+const cardElement = elements.create('card', { style });
+cardElement.mount('#card-element');
+
+cardElement.on('change', function(event) {
+    const el = document.getElementById('card-errors');
+    el.textContent = event.error ? event.error.message : '';
+});
+
+document.getElementById('stripe-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    setStripeLoading(true);
+
+    try {
+        const csrfToken = document.querySelector('#stripe-form [name=csrfmiddlewaretoken]').value;
+        const resp = await fetch('{% url "packages:create_booking_payment_intent" booking.id %}', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken },
+        });
+        const data = await resp.json();
+
+        if (data.error) { showCardError(data.error); setStripeLoading(false); return; }
+
+        const { error, paymentIntent } = await stripe.confirmCardPayment(data.clientSecret, {
+            payment_method: {
+                card: cardElement,
+                billing_details: {
+                    name: '{{ request.user.full_name|default:request.user.username }}',
+                    email: '{{ request.user.email }}',
+                }
+            }
+        });
+
+        if (error) { showCardError(error.message); setStripeLoading(false); }
+        else if (paymentIntent.status === 'succeeded') {
+            window.location.href = '{% url "packages:booking_payment_success" booking.id %}';
+        }
+    } catch (err) {
+        showCardError('An unexpected error occurred. Please try again.');
+        setStripeLoading(false);
+    }
+});
+
+function setStripeLoading(loading) {
+    const btn = document.getElementById('stripe-btn');
+    const spinner = document.getElementById('stripe-spinner');
+    const txt = document.getElementById('stripe-btn-text');
+    if (loading) { btn.disabled = true; spinner.style.display = 'inline-block'; txt.textContent = 'Processing...'; }
+    else { btn.disabled = false; spinner.style.display = 'none'; txt.innerHTML = '<i class="fas fa-lock"></i> Pay PKR {{ booking.total_amount|floatformat:0 }}'; }
+}
+function showCardError(msg) {
+    const el = document.getElementById('card-errors');
+    el.textContent = msg;
+    setTimeout(() => el.textContent = '', 6000);
+}
+
+// ──── Bank transfer validation ────
+document.getElementById('bankForm').addEventListener('submit', function(e) {
+    const txnInput = document.getElementById('transactionIdInput');
+    const val = txnInput.value.trim();
+    const pattern = /^[A-Za-z0-9\-]{5,50}$/;
+    if (!val || !pattern.test(val)) {
+        e.preventDefault();
+        txnInput.classList.add('is-invalid');
+        txnInput.focus();
+        return;
+    }
+    txnInput.classList.remove('is-invalid');
+    const btn = document.getElementById('bank-btn');
+    const spinner = document.getElementById('bank-spinner');
+    const txt = document.getElementById('bank-btn-text');
+    btn.disabled = true; spinner.style.display = 'inline-block'; txt.textContent = 'Submitting...';
+});
+</script>
+{% endblock %}

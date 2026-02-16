@@ -1,0 +1,1470 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - TouriPK{% endblock %}
+
+{% block content %}
+<style>
+    /* Dashboard Specific Styles */
+    .dashboard-container {
+        padding: 2rem 0;
+        min-height: 100vh;
+        background: linear-gradient(135deg, #f0f4ff 0%, #fef5ff 50%, #fff7f0 100%);
+        position: relative;
+    }
+    
+    .dashboard-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image: 
+            radial-gradient(circle at 20% 30%, rgba(59, 130, 246, 0.08) 0%, transparent 50%),
+            radial-gradient(circle at 80% 70%, rgba(168, 85, 247, 0.08) 0%, transparent 50%),
+            radial-gradient(circle at 50% 50%, rgba(236, 72, 153, 0.05) 0%, transparent 60%);
+        pointer-events: none;
+        animation: backgroundShift 20s ease-in-out infinite;
+    }
+    
+    @keyframes backgroundShift {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.8; transform: scale(1.05); }
+    }
+    
+    /* Profile Header */
+    .profile-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 28px;
+        padding: 2.5rem;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 25px 70px rgba(102, 126, 234, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .profile-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -20%;
+        width: 60%;
+        height: 200%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+        transform: rotate(30deg);
+        pointer-events: none;
+        animation: shimmer 8s ease-in-out infinite;
+    }
+    
+    @keyframes shimmer {
+        0% { right: -100%; }
+        50%, 100% { right: 100%; }
+    }
+    
+    .profile-header::after {
+        content: '';
+        position: absolute;
+        bottom: -100px;
+        left: -100px;
+        width: 300px;
+        height: 300px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        filter: blur(60px);
+    }
+    
+    .avatar-wrapper {
+        position: relative;
+        width: 110px;
+        height: 110px;
+    }
+    
+    .avatar-circle-advanced {
+        width: 110px;
+        height: 110px;
+        background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.8rem;
+        color: #3b82f6;
+        box-shadow: 0 15px 40px rgba(0,0,0,0.25), inset 0 -3px 10px rgba(59, 130, 246, 0.15);
+        border: 5px solid rgba(255,255,255,0.5);
+        transition: all 0.3s ease;
+    }
+    
+    .avatar-circle-advanced:hover {
+        transform: scale(1.05);
+        box-shadow: 0 20px 50px rgba(0,0,0,0.3), inset 0 -3px 10px rgba(102, 126, 234, 0.2);
+    }
+    
+    .online-indicator {
+        position: absolute;
+        bottom: 5px;
+        right: 5px;
+        width: 20px;
+        height: 20px;
+        background: linear-gradient(135deg, #10b981, #34d399);
+        border-radius: 50%;
+        border: 3px solid white;
+        animation: pulse-green 2s infinite;
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5);
+    }
+    
+    @keyframes pulse-green {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5); }
+        50% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+    }
+    
+    /* Stats Cards */
+    .stat-card-advanced {
+        background: white;
+        border-radius: 24px;
+        padding: 1.8rem;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.06);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(0,0,0,0.04);
+    }
+    
+    .stat-card-advanced:hover {
+        transform: translateY(-12px) scale(1.02);
+        box-shadow: 0 25px 60px rgba(0,0,0,0.12), 0 0 40px var(--stat-color-start);
+        border-color: var(--stat-color-start);
+        animation: cardGlow 1.5s ease-in-out infinite;
+    }
+    
+    @keyframes cardGlow {
+        0%, 100% { box-shadow: 0 25px 60px rgba(0,0,0,0.12), 0 0 20px var(--stat-color-start); }
+        50% { box-shadow: 0 25px 60px rgba(0,0,0,0.12), 0 0 40px var(--stat-color-start); }
+    }
+    
+    .stat-card-advanced::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 5px;
+        background: linear-gradient(90deg, var(--stat-color-start), var(--stat-color-end));
+    }
+    
+    .stat-card-advanced::after {
+        content: '';
+        position: absolute;
+        bottom: -100px;
+        right: -100px;
+        width: 200px;
+        height: 200px;
+        background: linear-gradient(135deg, var(--stat-color-start), var(--stat-color-end));
+        opacity: 0.03;
+        border-radius: 50%;
+        transition: all 0.6s ease;
+    }
+    
+    .stat-card-advanced:hover::after {
+        bottom: -50px;
+        right: -50px;
+        opacity: 0.08;
+    }
+    
+    .stat-card-advanced.destinations { --stat-color-start: #3b82f6; --stat-color-end: #8b5cf6; }
+    .stat-card-advanced.products { --stat-color-start: #10b981; --stat-color-end: #34d399; }
+    .stat-card-advanced.bookings { --stat-color-start: #f59e0b; --stat-color-end: #fbbf24; }
+    .stat-card-advanced.transport { --stat-color-start: #ec4899; --stat-color-end: #f472b6; }
+    
+    .stat-icon-wrapper {
+        width: 65px;
+        height: 65px;
+        border-radius: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.6rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    }
+    
+    .stat-card-advanced:hover .stat-icon-wrapper {
+        transform: scale(1.1) rotate(-5deg);
+        box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+    }
+    
+    .stat-icon-wrapper.destinations { background: linear-gradient(135deg, #3b82f6, #8b5cf6); box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3); }
+    .stat-icon-wrapper.products { background: linear-gradient(135deg, #10b981, #34d399); box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3); }
+    .stat-icon-wrapper.bookings { background: linear-gradient(135deg, #f59e0b, #fbbf24); box-shadow: 0 8px 20px rgba(245, 158, 11, 0.3); }
+    .stat-icon-wrapper.transport { background: linear-gradient(135deg, #ec4899, #f472b6); box-shadow: 0 8px 20px rgba(236, 72, 153, 0.3); }
+    
+    .stat-value {
+        font-size: 2.2rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #1a1a1a, #4a4a4a);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 0.3rem;
+        transition: all 0.3s ease;
+    }
+    
+    .stat-card-advanced:hover .stat-value {
+        transform: scale(1.1);
+        letter-spacing: 2px;
+    }
+    
+    .stat-trend {
+        font-size: 0.75rem;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-weight: 600;
+    }
+    
+    .stat-trend.up { 
+        background: rgba(16, 185, 129, 0.15); 
+        color: #10b981;
+        animation: trendPulse 2s ease-in-out infinite;
+    }
+    .stat-trend.down { 
+        background: rgba(239, 68, 68, 0.15); 
+        color: #ef4444;
+    }
+    
+    @keyframes trendPulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+    }
+    
+    .progress-bar {
+        transition: width 1.5s ease-out;
+        animation: progressShine 2s ease-in-out infinite;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    @keyframes progressShine {
+        0% { opacity: 0.8; }
+        50% { opacity: 1; }
+        100% { opacity: 0.8; }
+    }
+    
+    .progress-bar::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+        animation: progressGlide 2s ease-in-out infinite;
+    }
+    
+    @keyframes progressGlide {
+        0% { left: -100%; }
+        100% { left: 200%; }
+    }
+    
+    /* Quick Actions Grid */
+    .quick-action-card {
+        background: white;
+        border-radius: 24px;
+        padding: 1.8rem 1rem;
+        text-align: center;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        border: 2px solid #f0f0f0;
+        cursor: pointer;
+        text-decoration: none;
+        display: block;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.04);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .quick-action-card::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(59, 130, 246, 0.1);
+        transform: translate(-50%, -50%);
+        transition: width 0.6s ease, height 0.6s ease;
+    }
+    
+    .quick-action-card:hover::after {
+        width: 300px;
+        height: 300px;
+    }
+    
+    .quick-action-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .quick-action-card:hover::before {
+        opacity: 1;
+    }
+    
+    .quick-action-card:hover {
+        transform: translateY(-10px) scale(1.03);
+        border-color: #3b82f6;
+        box-shadow: 0 20px 50px rgba(59, 130, 246, 0.3);
+    }
+    
+    .quick-action-icon {
+        width: 75px;
+        height: 75px;
+        border-radius: 22px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.9rem;
+        color: white;
+        margin: 0 auto 1rem;
+        transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        position: relative;
+        z-index: 1;
+    }
+    
+    .quick-action-card:hover .quick-action-icon {
+        transform: scale(1.15) rotate(-8deg);
+        box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+    }
+    
+    .quick-action-icon.explore { background: linear-gradient(135deg, #3b82f6, #8b5cf6); box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3); }
+    .quick-action-icon.weather { background: linear-gradient(135deg, #06b6d4, #0ea5e9); box-shadow: 0 10px 30px rgba(6, 182, 212, 0.3); }
+    .quick-action-icon.shop { background: linear-gradient(135deg, #10b981, #34d399); box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3); }
+    .quick-action-icon.calculator { background: linear-gradient(135deg, #f59e0b, #fbbf24); box-shadow: 0 10px 30px rgba(245, 158, 11, 0.3); }
+    .quick-action-icon.booking { background: linear-gradient(135deg, #ec4899, #f472b6); box-shadow: 0 10px 30px rgba(236, 72, 153, 0.3); }
+    .quick-action-icon.chat { background: linear-gradient(135deg, #8b5cf6, #a78bfa); box-shadow: 0 10px 30px rgba(139, 92, 246, 0.3); }
+    
+    /* Content Cards */
+    .content-card {
+        background: white;
+        border-radius: 28px;
+        box-shadow: 0 10px 45px rgba(0,0,0,0.06);
+        overflow: hidden;
+        border: 1px solid rgba(0,0,0,0.04);
+        transition: all 0.3s ease;
+    }
+    
+    .content-card:hover {
+        box-shadow: 0 15px 60px rgba(0,0,0,0.10);
+        transform: translateY(-3px);
+    }
+    
+    .content-card-header {
+        padding: 1.8rem 2rem;
+        border-bottom: 2px solid #f5f5f5;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: linear-gradient(to right, rgba(59, 130, 246, 0.03), transparent);
+    }
+    
+    .content-card-header h4 {
+        margin: 0;
+        font-weight: 700;
+        color: #2d3748;
+        font-size: 1.3rem;
+    }
+    
+    .content-card-body {
+        padding: 2rem;
+    }
+    
+    /* Destination Grid */
+    .destination-grid-item {
+        position: relative;
+        border-radius: 20px;
+        overflow: hidden;
+        height: 200px;
+        cursor: pointer;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+    }
+    
+    .destination-grid-item:hover {
+        transform: scale(1.05);
+        box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+    }
+    
+    .destination-grid-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: all 0.5s ease;
+    }
+    
+    .destination-grid-item:hover img {
+        transform: scale(1.15);
+        filter: brightness(0.85);
+    }
+    
+    .destination-overlay {
+        position: absolute;
+        bottom: -100%;
+        left: 0;
+        right: 0;
+        padding: 1.5rem 1rem 1rem;
+        background: linear-gradient(to top, rgba(59, 130, 246, 0.95) 0%, rgba(139, 92, 246, 0.8) 100%);
+        color: white;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        backdrop-filter: blur(10px);
+    }
+    
+    .destination-grid-item:hover .destination-overlay {
+        bottom: 0;
+        padding-bottom: 1.8rem;
+    }
+    
+    .destination-name {
+        font-weight: 700;
+        font-size: 1.05rem;
+        margin-bottom: 0.3rem;
+        text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    }
+    
+    .destination-location {
+        font-size: 0.85rem;
+        opacity: 0.9;
+        text-shadow: 0 1px 5px rgba(0,0,0,0.5);
+    }
+    
+    /* Product List Item */
+    .product-list-item {
+        display: flex;
+        align-items: center;
+        padding: 1.2rem;
+        border-radius: 18px;
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        margin-bottom: 0.85rem;
+        background: #f8f9fb;
+        border: 1px solid #e8e9eb;
+        cursor: pointer;
+    }
+    
+    .product-list-item:hover {
+        background: white;
+        transform: translateX(8px);
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        border-color: #3b82f6;
+    }
+    
+    .product-image {
+        width: 65px;
+        height: 65px;
+        border-radius: 14px;
+        object-fit: cover;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    
+    .product-info {
+        flex: 1;
+        margin-left: 1.2rem;
+    }
+    
+    .product-name {
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 0.3rem;
+        font-size: 1.05rem;
+    }
+    
+    .product-price {
+        color: #3b82f6;
+        font-weight: 700;
+        font-size: 1.1rem;
+    }
+    
+    /* Recent Activity */
+    .activity-timeline {
+        position: relative;
+        padding-left: 2rem;
+    }
+    
+    .activity-timeline::before {
+        content: '';
+        position: absolute;
+        left: 8px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: linear-gradient(180deg, #3b82f6, #8b5cf6, #ec4899);
+    }
+    
+    .activity-item {
+        position: relative;
+        padding-bottom: 1.5rem;
+    }
+    
+    .activity-item::before {
+        content: '';
+        position: absolute;
+        left: -1.65rem;
+        top: 5px;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: white;
+        border: 3px solid #3b82f6;
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+    }
+    
+    .activity-item:last-child {
+        padding-bottom: 0;
+    }
+    
+    .activity-text {
+        font-weight: 500;
+        color: #333;
+    }
+    
+    .activity-time {
+        font-size: 0.8rem;
+        color: #999;
+    }
+    
+    /* View All Button */
+    .btn-view-all {
+        background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+        color: white;
+        border: none;
+        padding: 12px 32px;
+        border-radius: 50px;
+        font-weight: 600;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        text-decoration: none;
+        display: inline-block;
+        box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+    }
+    
+    .btn-view-all:hover {
+        transform: translateY(-4px) scale(1.05);
+        box-shadow: 0 15px 40px rgba(59, 130, 246, 0.6);
+        color: white;
+    }
+    
+    .btn-view-all:active {
+        transform: translateY(-2px) scale(1.03);
+        box-shadow: 0 10px 30px rgba(59, 130, 246, 0.5);
+    }
+    
+    /* Weather Widget */
+    .weather-widget {
+        background: linear-gradient(135deg, #06b6d4 0%, #0ea5e9 100%);
+        border-radius: 24px;
+        padding: 2rem;
+        color: white;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 15px 45px rgba(6, 182, 212, 0.4);
+        transition: all 0.3s ease;
+    }
+    
+    .weather-widget:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 60px rgba(6, 182, 212, 0.5);
+    }
+    
+    .weather-widget::before {
+        content: '🌤️';
+        position: absolute;
+        right: -30px;
+        top: -30px;
+        font-size: 120px;
+        opacity: 0.15;
+        animation: float 6s ease-in-out infinite;
+        filter: drop-shadow(0 10px 20px rgba(0,0,0,0.1));
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.15; }
+        50% { transform: translateY(-15px) rotate(10deg); opacity: 0.25; }
+    }
+    
+    .weather-temp {
+        font-size: 3.5rem;
+        font-weight: 800;
+        text-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    
+    /* Table Styling */
+    .table-hover tbody tr {
+        transition: all 0.3s ease;
+        animation: slideInRow 0.5s ease forwards;
+        opacity: 0;
+    }
+    
+    .table-hover tbody tr:nth-child(1) { animation-delay: 0.1s; }
+    .table-hover tbody tr:nth-child(2) { animation-delay: 0.2s; }
+    .table-hover tbody tr:nth-child(3) { animation-delay: 0.3s; }
+    .table-hover tbody tr:nth-child(4) { animation-delay: 0.4s; }
+    .table-hover tbody tr:nth-child(5) { animation-delay: 0.5s; }
+    
+    @keyframes slideInRow {
+        from {
+            opacity: 0;
+            transform: translateX(-30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    
+    .table-hover tbody tr:hover {
+        background-color: rgba(59, 130, 246, 0.05);
+        transform: scale(1.01);
+    }
+    
+    .badge {
+        padding: 0.5em 1em;
+        font-weight: 600;
+        font-size: 0.85rem;
+    }
+    
+    /* Section Heading */
+    .section-heading {
+        font-weight: 800;
+        color: #2d3748;
+        margin-bottom: 1.5rem;
+    }
+    
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+        .profile-header {
+            text-align: center;
+            padding: 2rem 1.5rem;
+        }
+        
+        .avatar-wrapper {
+            margin: 0 auto 1rem;
+        }
+        
+        .stat-card-advanced {
+            margin-bottom: 1rem;
+        }
+        
+        .quick-action-card {
+            margin-bottom: 1rem;
+        }
+        
+        .destination-grid-item {
+            height: 160px;
+        }
+        
+        .weather-temp {
+            font-size: 2.5rem;
+        }
+    }
+    
+    /* Animations */
+    .fade-in-up {
+        animation: fadeInUp 0.6s ease forwards;
+        opacity: 0;
+    }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.2s; }
+    .delay-3 { animation-delay: 0.3s; }
+    .delay-4 { animation-delay: 0.4s; }
+    .delay-5 { animation-delay: 0.5s; }
+    .delay-6 { animation-delay: 0.6s; }
+    
+    /* Floating Particles */
+    .particles {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 1;
+    }
+    
+    .particle {
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        background: radial-gradient(circle, rgba(59, 130, 246, 0.8), transparent);
+        border-radius: 50%;
+        animation: floatParticle 15s linear infinite;
+    }
+    
+    .particle:nth-child(1) { left: 10%; animation-delay: 0s; }
+    .particle:nth-child(2) { left: 20%; animation-delay: 2s; background: radial-gradient(circle, rgba(139, 92, 246, 0.8), transparent); }
+    .particle:nth-child(3) { left: 30%; animation-delay: 4s; }
+    .particle:nth-child(4) { left: 40%; animation-delay: 1s; background: radial-gradient(circle, rgba(236, 72, 153, 0.8), transparent); }
+    .particle:nth-child(5) { left: 50%; animation-delay: 3s; }
+    .particle:nth-child(6) { left: 60%; animation-delay: 5s; background: radial-gradient(circle, rgba(59, 130, 246, 0.8), transparent); }
+    .particle:nth-child(7) { left: 70%; animation-delay: 2.5s; }
+    .particle:nth-child(8) { left: 80%; animation-delay: 4.5s; background: radial-gradient(circle, rgba(139, 92, 246, 0.8), transparent); }
+    .particle:nth-child(9) { left: 90%; animation-delay: 1.5s; }
+    .particle:nth-child(10) { left: 15%; animation-delay: 3.5s; background: radial-gradient(circle, rgba(236, 72, 153, 0.8), transparent); }
+    
+    @keyframes floatParticle {
+        0% {
+            bottom: -10px;
+            opacity: 0;
+            transform: translateX(0) scale(0.5);
+        }
+        10% {
+            opacity: 1;
+        }
+        90% {
+            opacity: 1;
+        }
+        100% {
+            bottom: 100vh;
+            opacity: 0;
+            transform: translateX(50px) scale(1.5);
+        }
+    }
+    
+    /* Skeleton Loading */
+    .skeleton {
+        background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+        background-size: 200% 100%;
+        animation: loading 1.5s ease-in-out infinite;
+        border-radius: 8px;
+    }
+    
+    @keyframes loading {
+        0% { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+    }
+    
+    /* Tooltip Animation */
+    .quick-action-card:hover h6,
+    .quick-action-card:hover small {
+        animation: bounceText 0.5s ease;
+    }
+    
+    @keyframes bounceText {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-5px); }
+    }
+    
+    /* Badge Pulse */
+    .badge {
+        animation: badgePulse 2s ease-in-out infinite;
+    }
+    
+    @keyframes badgePulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+    }
+    
+    /* Waving Hand Animation */
+    @keyframes wave {
+        0%, 100% { transform: rotate(0deg); }
+        25% { transform: rotate(20deg); }
+        75% { transform: rotate(-15deg); }
+    }
+    
+    @keyframes slideInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    /* Loading Spinner */
+    .spinner {
+        border: 3px solid rgba(59, 130, 246, 0.2);
+        border-top: 3px solid #3b82f6;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    /* Smooth Page Transitions */
+    .page-transition {
+        animation: pageEnter 0.5s ease;
+    }
+    
+    @keyframes pageEnter {
+        from {
+            opacity: 0;
+            transform: scale(0.98);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+    
+    /* Content Card Entry Animation */
+    .content-card {
+        animation: slideInContent 0.6s ease forwards;
+    }
+    
+    @keyframes slideInContent {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    /* Icon Rotation on Hover */
+    .quick-action-card:hover .quick-action-icon i {
+        animation: iconRotate 0.6s ease;
+    }
+    
+    @keyframes iconRotate {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    /* Section Heading Underline */
+    .section-heading {
+        position: relative;
+        display: inline-block;
+    }
+    
+    .section-heading::after {
+        content: '';
+        position: absolute;
+        bottom: -8px;
+        left: 0;
+        width: 0;
+        height: 3px;
+        background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
+        transition: width 0.5s ease;
+        border-radius: 2px;
+    }
+    
+    .section-heading:hover::after {
+        width: 100%;
+    }
+</style>
+
+<div class="dashboard-container page-transition">
+    <!-- Floating Particles Background -->
+    <div class="particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+    
+    <div class="container" style="position: relative; z-index: 2;">
+        <!-- Profile Header with Tailwind Enhancement -->
+        <div class="profile-header mb-5 fade-in-up relative overflow-hidden">
+            <!-- Animated background particles -->
+            <div class="absolute inset-0 opacity-10">
+                <div class="absolute top-10 left-10 w-32 h-32 bg-white rounded-full blur-2xl animate-pulse"></div>
+                <div class="absolute bottom-10 right-10 w-40 h-40 bg-white rounded-full blur-3xl animate-pulse" style="animation-delay: 1s;"></div>
+            </div>
+            
+            <div class="row align-items-center relative z-10">
+                <div class="col-auto">
+                    <div class="avatar-wrapper group hover:scale-110 transition-transform duration-300">
+                        <div class="avatar-circle-advanced bg-gradient-to-br from-purple-400 to-pink-500 group-hover:from-purple-500 group-hover:to-pink-600 transition-all duration-300">
+                            <i class="fas fa-user group-hover:scale-110 transition-transform duration-300"></i>
+                        </div>
+                        <div class="online-indicator animate-pulse"></div>
+                    </div>
+                </div>
+                <div class="col text-white">
+                    <h2 class="mb-3 fw-bold text-4xl md:text-5xl drop-shadow-2xl animate-fade-in">
+                        Welcome, {{ user.full_name|default:user.username|title }}! 
+                        <span class="inline-block animate-bounce-slow">👋</span>
+                    </h2>
+                    <div class="flex flex-wrap gap-4 text-lg">
+                        <p class="mb-0 opacity-90 flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span>{% now "l, F j, Y" %}</span>
+                        </p>
+                        <p class="mb-0 opacity-90 flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>Ready to explore Pakistan's beauty?</span>
+                        </p>
+                    </div>
+                </div>
+                <div class="col-auto d-none d-md-block">
+                    <a href="{% url 'home' %}" class="group inline-flex items-center gap-3 bg-white hover:bg-gradient-to-r hover:from-purple-500 hover:to-pink-500 text-gray-900 hover:text-white font-bold py-4 px-8 rounded-full shadow-2xl hover:shadow-purple-500/50 transform hover:scale-105 transition-all duration-300">
+                        <i class="fas fa-compass text-2xl bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent group-hover:text-white transition-colors duration-300"></i>
+                        <span>Start Exploring</span>
+                        <i class="fas fa-arrow-right group-hover:translate-x-2 transition-transform duration-300"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Info Banner with Tailwind -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="alert alert-dismissible fade show relative overflow-hidden bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50 border-2 border-blue-300 rounded-3xl p-4 animate-slide-up shadow-lg hover:shadow-xl transition-shadow duration-300">
+                    <!-- Animated background -->
+                    <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full animate-[shimmer_2s_ease-in-out_infinite]"></div>
+                    
+                    <div class="d-flex align-items-center justify-content-between relative z-10">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg animate-bounce-slow">
+                                <i class="fas fa-info-circle text-2xl text-white"></i>
+                            </div>
+                            <div>
+                                <strong class="text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Explore Pakistan's Hidden Gems!</strong>
+                                <p class="mb-0 text-gray-600 text-sm mt-1">Discover amazing destinations with special packages this season.</p>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="row g-4 mb-4">
+            <div class="col-lg-3 col-md-6 fade-in-up delay-1">
+                <a href="{% url 'content:destination_list' %}" class="block no-underline group">
+                <div class="stat-card-advanced destinations relative overflow-hidden hover:scale-105 transform transition-all duration-300 cursor-pointer">
+                    <!-- Animated gradient overlay -->
+                    <div class="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    
+                    <div class="d-flex align-items-center justify-content-between mb-3 relative z-10">
+                        <div class="stat-icon-wrapper destinations text-white group-hover:scale-110 group-hover:rotate-12 transition-all duration-300 shadow-lg">
+                            <i class="fas fa-map-location-dot"></i>
+                        </div>
+                        <span class="stat-trend up animate-pulse">
+                            <i class="fas fa-arrow-up me-1"></i>12%
+                        </span>
+                    </div>
+                    <div class="stat-value group-hover:scale-110 transition-transform duration-300">{{ destinations.count|default:"15" }}+</div>
+                    <p class="text-muted mb-0 group-hover:text-blue-600 transition-colors duration-300 font-semibold">Destinations</p>
+                    <div class="progress mt-2" style="height: 4px;">
+                        <div class="progress-bar bg-gradient-to-r from-blue-500 to-purple-600 transition-all duration-1000" style="width: 75%;"></div>
+                    </div>
+                </div>
+                </a>
+            </div>
+            <div class="col-lg-3 col-md-6 fade-in-up delay-2">
+                <a href="{% url 'content:product_list' %}" style="text-decoration: none;">
+                <div class="stat-card-advanced products" style="cursor: pointer;">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <div class="stat-icon-wrapper products text-white">
+                            <i class="fas fa-bags-shopping"></i>
+                        </div>
+                        <span class="stat-trend up">
+                            <i class="fas fa-arrow-up me-1"></i>8%
+                        </span>
+                    </div>
+                    <div class="stat-value">{{ products.count|default:"50" }}+</div>
+                    <p class="text-muted mb-0">Local Products</p>
+                    <div class="progress mt-2" style="height: 4px;">
+                        <div class="progress-bar" style="width: 60%; background: linear-gradient(90deg, #10b981, #34d399);"></div>
+                    </div>
+                </div>
+                </a>
+            </div>
+            <div class="col-lg-3 col-md-6 fade-in-up delay-3">
+                <a href="{% url 'content:my_orders' %}" style="text-decoration: none;">
+                <div class="stat-card-advanced bookings" style="cursor: pointer;">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <div class="stat-icon-wrapper bookings text-white">
+                            <i class="fas fa-ticket"></i>
+                        </div>
+                        <span class="stat-trend up">
+                            <i class="fas fa-arrow-up me-1"></i>24%
+                        </span>
+                    </div>
+                    <div class="stat-value">{{ recent_bookings.count }}</div>
+                    <p class="text-muted mb-0">My Bookings</p>
+                    <div class="progress mt-2" style="height: 4px;">
+                        <div class="progress-bar" style="width: 40%; background: linear-gradient(90deg, #f59e0b, #fbbf24);"></div>
+                    </div>
+                </div>
+                </a>
+            </div>
+            <div class="col-lg-3 col-md-6 fade-in-up delay-4">
+                <a href="{% url 'packages:package_list' %}" style="text-decoration: none;">
+                <div class="stat-card-advanced transport" style="cursor: pointer;">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <div class="stat-icon-wrapper transport text-white">
+                            <i class="fas fa-van-shuttle"></i>
+                        </div>
+                        <span class="stat-trend up">
+                            <i class="fas fa-arrow-up me-1"></i>5%
+                        </span>
+                    </div>
+                    <div class="stat-value">20+</div>
+                    <p class="text-muted mb-0">Transport Options</p>
+                    <div class="progress mt-2" style="height: 4px;">
+                        <div class="progress-bar" style="width: 55%; background: linear-gradient(90deg, #ec4899, #f472b6);"></div>
+                    </div>
+                </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="row g-4 mb-5">
+            <div class="col-12">
+                <h4 class="fw-bold mb-4 fade-in-up delay-2 section-heading">
+                    <i class="fas fa-sparkles me-2" style="background: linear-gradient(135deg, #f59e0b, #fbbf24); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></i>Quick Actions
+                </h4>
+            </div>
+            <div class="col-lg-3 col-md-3 col-6 fade-in-up delay-2">
+                <a href="{% url 'content:destination_list' %}" class="quick-action-card">
+                    <div class="quick-action-icon explore">
+                        <i class="fas fa-route"></i>
+                    </div>
+                    <h6 class="mb-1 text-dark fw-bold">Explore</h6>
+                    <small class="text-muted">Find Tours</small>
+                </a>
+            </div>
+            <div class="col-lg-3 col-md-3 col-6 fade-in-up delay-3">
+                <a href="{% url 'content:check_weather' %}" class="quick-action-card">
+                    <div class="quick-action-icon weather">
+                        <i class="fas fa-cloud-sun-rain"></i>
+                    </div>
+                    <h6 class="mb-1 text-dark fw-bold">Weather</h6>
+                    <small class="text-muted">Check Now</small>
+                </a>
+            </div>
+            {% comment %}
+            <div class="col-lg-2 col-md-4 col-6 fade-in-up delay-4">
+                <a href="{% url 'content:product_list' %}" class="quick-action-card">
+                    <div class="quick-action-icon shop">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                    <h6 class="mb-1 text-dark fw-bold">Shop</h6>
+                    <small class="text-muted">Local Products</small>
+                </a>
+            </div>
+            {% endcomment %}
+            <div class="col-lg-3 col-md-3 col-6 fade-in-up delay-4">
+                <a href="{% url 'content:cost_calculator' %}" class="quick-action-card">
+                    <div class="quick-action-icon calculator">
+                        <i class="fas fa-sliders-h"></i>
+                    </div>
+                    <h6 class="mb-1 text-dark fw-bold">Customise</h6>
+                    <small class="text-muted">Your Package</small>
+                </a>
+            </div>
+            <div class="col-lg-3 col-md-3 col-6 fade-in-up delay-5">
+                <a href="{% url 'chatbot' %}" class="quick-action-card">
+                    <div class="quick-action-icon chat">
+                        <i class="fas fa-comment-dots"></i>
+                    </div>
+                    <h6 class="mb-1 text-dark fw-bold">AI Guide</h6>
+                    <small class="text-muted">Chat Now</small>
+                </a>
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="row g-4">
+            <!-- Featured Destinations -->
+            <div class="col-lg-8 fade-in-up delay-3">
+                <div class="content-card h-100">
+                    <div class="content-card-header">
+                        <h4><i class="fas fa-star me-2" style="background: linear-gradient(135deg, #f59e0b, #fbbf24); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></i>Featured Destinations</h4>
+                        <a href="{% url 'content:destination_list' %}" class="btn-view-all">
+                            View All <i class="fas fa-arrow-right ms-2"></i>
+                        </a>
+                    </div>
+                    <div class="content-card-body">
+                        <div class="row g-3">
+                            {% for destination in destinations|slice:":6" %}
+                            <div class="col-md-4 col-6">
+                                <div class="destination-grid-item">
+                                    {% if destination.image %}
+                                    <img src="{{ destination.image.url }}" alt="{{ destination.name }}">
+                                    {% else %}
+                                    <div class="bg-secondary w-100 h-100 d-flex align-items-center justify-content-center">
+                                        <i class="fas fa-mountain fa-3x text-white-50"></i>
+                                    </div>
+                                    {% endif %}
+                                    <div class="destination-overlay">
+                                        <div class="destination-name">{{ destination.name }}</div>
+                                        <div class="destination-location">
+                                            <i class="fas fa-map-marker-alt me-1"></i>{{ destination.city|default:"Pakistan" }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <div class="col-12 text-center py-4">
+                                <i class="fas fa-mountain fa-3x text-muted mb-3"></i>
+                                <p class="text-muted">No destinations available yet</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <!-- Weather Widget -->
+                <div class="weather-widget mb-4 fade-in-up delay-4">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div class="flex-grow-1">
+                            <div class="d-flex align-items-center mb-2">
+                                <h6 class="mb-0 opacity-90" style="font-size: 1rem;">Current Weather</h6>
+                                <span class="ms-auto weather-clock" style="font-size: 0.85rem; opacity: 0.8;"></span>
+                            </div>
+                            <div class="weather-temp">22°C</div>
+                            <p class="mb-0 mt-1" style="font-size: 1rem;">
+                                <i class="fas fa-map-marker-alt me-1"></i>Islamabad
+                            </p>
+                            <div class="mt-2 d-flex gap-3" style="font-size: 0.85rem; opacity: 0.9;">
+                                <span><i class="fas fa-wind me-1"></i>12 km/h</span>
+                                <span><i class="fas fa-droplet me-1"></i>65%</span>
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <div style="font-size: 3.5rem; animation: float 3s ease-in-out infinite;">☀️</div>
+                            <small style="font-size: 0.95rem; display: block; margin-top: 5px;">Sunny</small>
+                        </div>
+                    </div>
+                    <a href="{% url 'content:check_weather' %}" class="btn btn-light btn-sm w-100" style="font-weight: 600; transition: all 0.3s ease;">
+                        <i class="fas fa-search me-2"></i>Check Other Cities
+                    </a>
+                </div>
+
+                {% comment %}
+                <!-- Featured Products -->
+                <div class="content-card mb-4 fade-in-up delay-5">
+                    <div class="content-card-header">
+                        <h4><i class="fas fa-gem me-2" style="background: linear-gradient(135deg, #10b981, #34d399); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></i>Top Products</h4>
+                    </div>
+                    <div class="content-card-body">
+                        {% for product in products|slice:":4" %}
+                        <div class="product-list-item">
+                            {% if product.image %}
+                            <img src="{{ product.image.url }}" class="product-image" alt="{{ product.name }}">
+                            {% else %}
+                            <div class="product-image bg-light d-flex align-items-center justify-content-center">
+                                <i class="fas fa-box text-muted"></i>
+                            </div>
+                            {% endif %}
+                            <div class="product-info">
+                                <div class="product-name">{{ product.name }}</div>
+                                <div class="product-price">Rs. {{ product.price }}</div>
+                            </div>
+                            <i class="fas fa-chevron-right text-muted"></i>
+                        </div>
+                        {% empty %}
+                        <div class="text-center py-3">
+                            <i class="fas fa-box-open fa-2x text-muted mb-2"></i>
+                            <p class="text-muted mb-0">No products available</p>
+                        </div>
+                        {% endfor %}
+                        <a href="{% url 'content:product_list' %}" class="btn-view-all w-100 text-center mt-3">
+                            View All Products
+                        </a>
+                    </div>
+                </div>
+                {% endcomment %}
+
+                {% comment %}
+                <!-- Recent Activity -->
+                <div class="content-card fade-in-up delay-6">
+                    <div class="content-card-header">
+                        <h4><i class="fas fa-clock-rotate-left me-2" style="background: linear-gradient(135deg, #06b6d4, #0ea5e9); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></i>Recent Activity</h4>
+                    </div>
+                    <div class="content-card-body">
+                        <div class="activity-timeline">
+                            <div class="activity-item">
+                                <div class="activity-text">Logged into dashboard</div>
+                                <div class="activity-time">Just now</div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-text">Account created</div>
+                                <div class="activity-time">{{ user.date_joined|date:"M j, Y" }}</div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-text">Exploring destinations</div>
+                                <div class="activity-time">Recently</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endcomment %}
+            </div>
+        </div>
+
+        <!-- My Bookings Section -->
+        <div class="row mt-5 fade-in-up delay-6">
+            <div class="col-12">
+                <div class="content-card">
+                    <div class="content-card-header">
+                        <h4><i class="fas fa-suitcase-rolling me-2" style="background: linear-gradient(135deg, #3b82f6, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></i>My Recent Bookings</h4>
+                        <a href="{% url 'content:my_orders' %}" class="btn-view-all">
+                            View All <i class="fas fa-arrow-right ms-2"></i>
+                        </a>
+                    </div>
+                    <div class="content-card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead style="background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%) !important;">
+                                    <tr>
+                                        <th style="font-weight: 600; color: #ffffff !important; border: none;">Booking Ref</th>
+                                        <th style="font-weight: 600; color: #ffffff !important; border: none;">Destination</th>
+                                        <th style="font-weight: 600; color: #ffffff !important; border: none;">Travel Date</th>
+                                        <th style="font-weight: 600; color: #ffffff !important; border: none;">Travelers</th>
+                                        <th style="font-weight: 600; color: #ffffff !important; border: none;">Status</th>
+                                        <th style="font-weight: 600; color: #ffffff !important; border: none;">Total</th>
+                                        <th style="font-weight: 600; color: #ffffff !important; border: none;">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for booking in recent_bookings %}
+                                    <tr>
+                                        <td><strong style="color: #3b82f6;">{{ booking.booking_reference }}</strong></td>
+                                        <td>{{ booking.package.name }}</td>
+                                        <td>{{ booking.travel_date|date:"M j, Y" }}</td>
+                                        <td>{{ booking.num_adults }} Adult(s){% if booking.num_children > 0 %}, {{ booking.num_children }} Child(ren){% endif %}</td>
+                                        <td>
+                                            <span class="badge rounded-pill 
+                                                {% if booking.status == 'confirmed' %}bg-success
+                                                {% elif booking.status == 'pending' %}bg-warning text-dark
+                                                {% elif booking.status == 'cancelled' %}bg-danger
+                                                {% else %}bg-secondary{% endif %}">
+                                                {{ booking.get_status_display }}
+                                            </span>
+                                        </td>
+                                        <td class="fw-bold" style="color: #10b981;">PKR {{ booking.total_amount|floatformat:0 }}</td>
+                                        <td>
+                                            <a href="{% url 'packages:package_detail' booking.package.slug %}" 
+                                               class="btn btn-sm btn-outline-primary" 
+                                               title="View Package"
+                                               style="border-radius: 10px;">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="7" class="text-center py-5">
+                                            <div class="mb-3">
+                                                <i class="fas fa-suitcase fa-4x text-muted" style="opacity: 0.3;"></i>
+                                            </div>
+                                            <h5 class="text-muted mb-3" style="font-weight: 600;">You haven't made any bookings yet</h5>
+                                            <p class="text-muted mb-4">Start exploring Pakistan's beauty and book your first adventure!</p>
+                                            <a href="{% url 'packages:package_list' %}" class="btn btn-primary btn-lg rounded-pill px-5">
+                                                <i class="fas fa-plus me-2"></i>Book Your First Trip
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Counter Animation for Statistics
+function animateCounter(element, target, duration = 2000) {
+    const start = 0;
+    const increment = target / (duration / 16);
+    let current = start;
+    
+    const timer = setInterval(() => {
+        current += increment;
+        if (current >= target) {
+            element.textContent = target + (element.textContent.includes('+') ? '+' : '');
+            clearInterval(timer);
+        } else {
+            element.textContent = Math.floor(current) + (element.textContent.includes('+') ? '+' : '');
+        }
+    }, 16);
+}
+
+// Initialize counters on page load
+document.addEventListener('DOMContentLoaded', function() {
+    // Animate stat values
+    const statValues = document.querySelectorAll('.stat-value');
+    statValues.forEach(stat => {
+        const text = stat.textContent.trim();
+        const hasPlus = text.includes('+');
+        const number = parseInt(text.replace('+', ''));
+        if (!isNaN(number)) {
+            stat.textContent = '0' + (hasPlus ? '+' : '');
+            setTimeout(() => {
+                animateCounter(stat, number, 1500);
+            }, 500);
+        }
+    });
+    
+    // Add ripple effect on click
+    document.querySelectorAll('.quick-action-card, .stat-card-advanced').forEach(card => {
+        card.addEventListener('click', function(e) {
+            const ripple = document.createElement('span');
+            const rect = this.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            const x = e.clientX - rect.left - size / 2;
+            const y = e.clientY - rect.top - size / 2;
+            
+            ripple.style.width = ripple.style.height = size + 'px';
+            ripple.style.left = x + 'px';
+            ripple.style.top = y + 'px';
+            ripple.classList.add('ripple-effect');
+            
+            this.appendChild(ripple);
+            
+            setTimeout(() => ripple.remove(), 600);
+        });
+    });
+    
+    // Smooth scroll reveal for cards
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, observerOptions);
+    
+    document.querySelectorAll('.content-card, .destination-grid-item').forEach(el => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(30px)';
+        el.style.transition = 'all 0.6s ease';
+        observer.observe(el);
+    });
+    
+    // Add progress bar animation
+    setTimeout(() => {
+        document.querySelectorAll('.progress-bar').forEach(bar => {
+            const width = bar.style.width;
+            bar.style.width = '0%';
+            setTimeout(() => {
+                bar.style.width = width;
+            }, 100);
+        });
+    }, 500);
+    
+    // Parallax effect on scroll
+    let lastScrollTop = 0;
+    window.addEventListener('scroll', () => {
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        const particles = document.querySelector('.particles');
+        if (particles) {
+            particles.style.transform = `translateY(${scrollTop * 0.3}px)`;
+        }
+        lastScrollTop = scrollTop;
+    }, { passive: true });
+    
+    // Add tooltip functionality
+    const cards = document.querySelectorAll('.stat-card-advanced');
+    cards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.zIndex = '10';
+        });
+        card.addEventListener('mouseleave', function() {
+            this.style.zIndex = '1';
+        });
+    });
+    
+    // Weather widget clock
+    function updateTime() {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString('en-US', { 
+            hour: '2-digit', 
+            minute: '2-digit',
+            hour12: true 
+        });
+        const clockEl = document.querySelector('.weather-clock');
+        if (clockEl) {
+            clockEl.textContent = timeString;
+        }
+    }
+    updateTime();
+    setInterval(updateTime, 1000);
+    
+    // Add keyboard navigation
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Tab') {
+            document.body.classList.add('keyboard-nav');
+        }
+    });
+    
+    document.addEventListener('mousedown', () => {
+        document.body.classList.remove('keyboard-nav');
+    });
+});
+
+// Add CSS for ripple effect
+const style = document.createElement('style');
+style.textContent = `
+    .ripple-effect {
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.6);
+        transform: scale(0);
+        animation: ripple 0.6s ease-out;
+        pointer-events: none;
+    }
+    
+    @keyframes ripple {
+        to {
+            transform: scale(2);
+            opacity: 0;
+        }
+    }
+    
+    .keyboard-nav *:focus {
+        outline: 3px solid #3b82f6;
+        outline-offset: 2px;
+    }
+`;
+document.head.appendChild(style);
+</script>
+{% endblock %}

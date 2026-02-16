@@ -1,0 +1,2107 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Discover Pakistan | TouriPK{% endblock %}
+
+{% block content %}
+<style>
+    /* Hero Section with Slider */
+    .hero-home {
+        min-height: 85vh;
+        display: flex;
+        align-items: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* Image Slider Background */
+    .hero-slider-bg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+    }
+
+    .hero-slide-bg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        transition: opacity 2s ease-in-out, transform 20s ease-in-out;
+        background-size: cover;
+        background-position: center;
+        transform: scale(1);
+    }
+
+    .hero-slide-bg.active {
+        opacity: 1;
+        transform: scale(1.1);
+    }
+
+    .hero-slide-bg::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.5) 0%, rgba(118, 75, 162, 0.5) 100%);
+    }
+
+    .hero-content-wrapper {
+        position: relative;
+        z-index: 10;
+    }
+
+    /* Slider Navigation Dots */
+    .slider-dots {
+        position: absolute;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 12px;
+        z-index: 10;
+    }
+
+    .slider-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.4);
+        border: 2px solid white;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .slider-dot.active {
+        background: white;
+        transform: scale(1.3);
+    }
+
+    .slider-dot:hover {
+        background: rgba(255, 255, 255, 0.7);
+    }
+
+    /* Image Info Overlay */
+    .slide-info {
+        position: absolute;
+        bottom: 60px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 10;
+        text-align: center;
+        opacity: 0;
+        transition: opacity 0.8s ease 0.5s;
+        pointer-events: none;
+    }
+
+    .slide-info.active {
+        opacity: 1;
+    }
+
+    .slide-location {
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: white;
+        text-shadow: 2px 3px 10px rgba(0, 0, 0, 0.5);
+        margin-bottom: 5px;
+        letter-spacing: 1px;
+    }
+
+    .slide-description {
+        font-size: 1.1rem;
+        color: rgba(255, 255, 255, 0.95);
+        text-shadow: 1px 2px 6px rgba(0, 0, 0, 0.4);
+        font-weight: 400;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .hero-title-main {
+        font-size: 3.5rem;
+        font-weight: 900;
+        color: white;
+        text-shadow: 2px 4px 20px rgba(0, 0, 0, 0.3);
+        margin-bottom: 1rem;
+        line-height: 1.1;
+    }
+
+    .hero-subtitle-main {
+        font-size: 1.3rem;
+        color: rgba(255, 255, 255, 0.95);
+        text-shadow: 1px 2px 10px rgba(0, 0, 0, 0.2);
+        margin-bottom: 2rem;
+        font-weight: 300;
+    }
+
+    .hero-buttons {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .btn-hero-main {
+        padding: 14px 35px;
+        font-size: 1rem;
+        font-weight: 700;
+        border-radius: 50px;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .btn-primary-hero {
+        background: white;
+        color: #667eea;
+        border: none;
+    }
+
+    .btn-primary-hero:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px rgba(255, 255, 255, 0.3);
+    }
+
+    .btn-outline-hero {
+        background: transparent;
+        color: white;
+        border: 2px solid rgba(255, 255, 255, 0.8);
+    }
+
+    .btn-outline-hero:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: white;
+        transform: translateY(-5px);
+    }
+
+    /* Features Section */
+    .features-section {
+        padding: 80px 0;
+        background: white;
+    }
+
+    .feature-card {
+        text-align: center;
+        padding: 40px 30px;
+        border-radius: 24px;
+        transition: all 0.4s ease;
+        background: white;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+    }
+
+    .feature-card:hover {
+        transform: translateY(-15px);
+        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.15);
+    }
+
+    .feature-icon {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 25px;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+    }
+
+    .feature-icon.destinations {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+    }
+
+    .feature-icon.packages {
+        background: linear-gradient(135deg, #11998e, #38ef7d);
+        color: white;
+    }
+
+    .feature-icon.calculator {
+        background: linear-gradient(135deg, #f093fb, #f5576c);
+        color: white;
+    }
+
+    .feature-icon.chatbot {
+        background: linear-gradient(135deg, #4facfe, #00f2fe);
+        color: white;
+    }
+
+    .feature-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1a1a2e;
+        margin-bottom: 15px;
+    }
+
+    .feature-desc {
+        color: #666;
+        line-height: 1.7;
+        margin-bottom: 20px;
+    }
+
+    .feature-link {
+        color: #667eea;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .feature-link:hover {
+        gap: 12px;
+        color: #764ba2;
+    }
+
+    /* CTA Section */
+    .cta-section {
+        padding: 100px 0;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .cta-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7z' fill='%23ffffff' fill-opacity='0.05'/%3E%3C/svg%3E");
+    }
+
+    .cta-title {
+        font-size: 3rem;
+        font-weight: 800;
+        color: white;
+        margin-bottom: 25px;
+        text-shadow: 2px 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .cta-text {
+        font-size: 1.3rem;
+        color: rgba(255, 255, 255, 0.9);
+        margin-bottom: 40px;
+    }
+
+    @media (max-width: 768px) {
+        .hero-title-main {
+            font-size: 2.5rem;
+        }
+
+        .hero-subtitle-main {
+            font-size: 1.2rem;
+        }
+
+        .hero-buttons {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .btn-hero-main {
+            justify-content: center;
+        }
+
+        .cta-title {
+            font-size: 2rem;
+        }
+
+        .slide-location {
+            font-size: 1.5rem;
+        }
+
+        .slide-description {
+            font-size: 0.95rem;
+            padding: 0 20px;
+        }
+    }
+
+    /* Featured Destinations Section */
+    .featured-destinations {
+        padding: 40px 0 80px 0;
+        background: #f8f9fa;
+    }
+
+    .section-header {
+        text-align: center;
+        margin-bottom: 60px;
+    }
+
+    .section-title {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: #1a1a2e;
+        margin-bottom: 15px;
+    }
+
+    .section-subtitle {
+        font-size: 1.1rem;
+        color: #666;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .destination-card {
+        background: white;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .destination-card:hover {
+        transform: translateY(-15px);
+        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.15);
+    }
+
+    .destination-image {
+        position: relative;
+        height: 250px;
+        overflow: hidden;
+    }
+
+    .destination-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.6s ease;
+    }
+
+    .destination-card:hover .destination-image img {
+        transform: scale(1.15);
+    }
+
+    .destination-badge {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        padding: 8px 16px;
+        border-radius: 25px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .destination-overlay {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+        padding: 20px;
+        color: white;
+    }
+
+    .destination-name {
+        font-size: 1.5rem;
+        font-weight: 800;
+        margin: 0;
+        text-shadow: 1px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .destination-location {
+        font-size: 0.9rem;
+        opacity: 0.9;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        margin-top: 5px;
+    }
+
+    .destination-content {
+        padding: 25px;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .destination-description {
+        color: #666;
+        line-height: 1.7;
+        margin-bottom: 20px;
+        flex-grow: 1;
+    }
+
+    .destination-meta {
+        display: flex;
+        justify-content: space-between;
+        padding-top: 15px;
+        border-top: 1px solid #eee;
+        margin-bottom: 20px;
+    }
+
+    .meta-item {
+        text-align: center;
+    }
+
+    .meta-label {
+        font-size: 0.75rem;
+        color: #999;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 5px;
+    }
+
+    .meta-value {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #667eea;
+    }
+
+    .view-destination-btn {
+        display: block;
+        width: 100%;
+        padding: 12px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        text-align: center;
+        text-decoration: none;
+        border-radius: 12px;
+        font-weight: 700;
+        transition: all 0.3s ease;
+    }
+
+    .view-destination-btn:hover {
+        background: linear-gradient(135deg, #764ba2, #667eea);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    }
+
+    .no-destinations {
+        text-align: center;
+        padding: 60px 20px;
+        color: #999;
+    }
+
+    .no-destinations i {
+        font-size: 4rem;
+        margin-bottom: 20px;
+        color: #ddd;
+    }
+
+    /* Destinations Slider Styles */
+    .destinations-slider-container {
+        position: relative;
+        margin-top: 40px;
+    }
+
+    .destinations-slider-wrapper {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .destinations-slider {
+        display: flex;
+        gap: 20px;
+        transition: transform 0.5s ease;
+        padding: 10px 0;
+    }
+
+    .destination-slide {
+        min-width: 320px;
+        max-width: 320px;
+        flex-shrink: 0;
+    }
+
+    .destination-card {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .destination-image {
+        position: relative;
+        height: 280px;
+        overflow: hidden;
+    }
+
+    .destination-content {
+        padding: 15px;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .destination-description {
+        color: #666;
+        line-height: 1.6;
+        margin-bottom: 15px;
+        flex-grow: 1;
+        font-size: 0.9rem;
+    }
+
+    .destination-meta {
+        display: flex;
+        justify-content: space-between;
+        padding-top: 12px;
+        border-top: 1px solid #eee;
+        margin-bottom: 15px;
+    }
+
+    .meta-label {
+        font-size: 0.7rem;
+        color: #999;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 3px;
+    }
+
+    .meta-value {
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: #000000;
+    }
+
+    .view-destination-btn {
+        display: block;
+        width: 100%;
+        padding: 10px;
+        background: #000000;
+        color: white;
+        text-align: center;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        font-size: 0.9rem;
+    }
+
+    .view-destination-btn:hover {
+        background: #333333;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .slider-arrow {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: #000000;
+        color: white;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 1.2rem;
+        z-index: 10;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .slider-arrow-left {
+        left: -25px;
+    }
+
+    .slider-arrow-right {
+        right: -25px;
+    }
+
+    .slider-arrow:hover {
+        background: #333333;
+        transform: translateY(-50%) scale(1.1);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .slider-arrow:disabled {
+        background: #cccccc;
+        cursor: not-allowed;
+        opacity: 0.5;
+    }
+
+    @media (max-width: 1400px) {
+        .destination-slide {
+            min-width: 300px;
+            max-width: 300px;
+        }
+    }
+
+    @media (max-width: 1200px) {
+        .destination-slide {
+            min-width: 280px;
+            max-width: 280px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .destination-slide {
+            min-width: 260px;
+            max-width: 260px;
+        }
+
+        .section-header {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 20px;
+        }
+
+        .section-header>div:last-child {
+            align-self: flex-end;
+        }
+
+        .slider-arrow {
+            width: 40px;
+            height: 40px;
+            font-size: 1rem;
+        }
+
+        .slider-arrow-left {
+            left: 10px;
+        }
+
+        .slider-arrow-right {
+            right: 10px;
+        }
+    }
+
+    /* About Us Section */
+    .about-us-section {
+        background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+        padding: 120px 0;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .about-us-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background:
+            radial-gradient(circle at 20% 50%, rgba(0, 0, 0, 0.03) 0%, transparent 50%),
+            radial-gradient(circle at 80% 80%, rgba(0, 0, 0, 0.03) 0%, transparent 50%);
+        pointer-events: none;
+    }
+
+    .about-image-wrapper {
+        position: relative;
+        animation: fadeInLeft 1s ease-out;
+    }
+
+    @keyframes fadeInLeft {
+        from {
+            opacity: 0;
+            transform: translateX(-30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    .about-main-image {
+        width: 100%;
+        border-radius: 24px;
+        box-shadow:
+            0 20px 60px rgba(0, 0, 0, 0.12),
+            0 0 0 1px rgba(0, 0, 0, 0.05);
+        filter: grayscale(70%);
+        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        z-index: 1;
+    }
+
+    .about-main-image:hover {
+        filter: grayscale(0%);
+        transform: translateY(-8px) scale(1.02);
+        box-shadow:
+            0 30px 80px rgba(0, 0, 0, 0.18),
+            0 0 0 1px rgba(0, 0, 0, 0.08);
+    }
+
+    .about-badge {
+        position: absolute;
+        bottom: 40px;
+        right: -40px;
+        background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+        color: white;
+        padding: 30px 35px;
+        border-radius: 20px;
+        box-shadow:
+            0 15px 40px rgba(0, 0, 0, 0.3),
+            0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+        z-index: 2;
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+
+        0%,
+        100% {
+            transform: scale(1);
+        }
+
+        50% {
+            transform: scale(1.05);
+        }
+    }
+
+    .badge-content {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+    }
+
+    .badge-content i {
+        font-size: 2.5rem;
+        color: #ffffff;
+        filter: drop-shadow(0 2px 8px rgba(255, 255, 255, 0.3));
+    }
+
+    .badge-number {
+        display: block;
+        font-size: 2.3rem;
+        font-weight: 900;
+        line-height: 1;
+        background: linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .badge-label {
+        display: block;
+        font-size: 0.85rem;
+        opacity: 0.95;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+    }
+
+    .about-content {
+        padding-left: 50px;
+        animation: fadeInRight 1s ease-out;
+    }
+
+    @keyframes fadeInRight {
+        from {
+            opacity: 0;
+            transform: translateX(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    .about-label {
+        display: inline-block;
+        background: linear-gradient(135deg, #000000 0%, #333333 100%);
+        color: #ffffff;
+        padding: 10px 24px;
+        border-radius: 30px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
+    }
+
+    .about-label:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Companies Slider Section */
+    .companies-slider-section {
+        position: relative;
+    }
+
+    .companies-slider-wrapper {
+        width: 100%;
+        overflow: hidden;
+        padding: 20px 0;
+        mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+        -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+    }
+
+    .companies-slider {
+        display: flex;
+        gap: 30px;
+        animation: scroll 30s linear infinite;
+        width: fit-content;
+    }
+
+    @keyframes scroll {
+        0% {
+            transform: translateX(0);
+        }
+
+        100% {
+            transform: translateX(-50%);
+        }
+    }
+
+    .companies-slider:hover {
+        animation-play-state: paused;
+    }
+
+    .company-slide {
+        flex-shrink: 0;
+    }
+
+    .company-card-slider {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        padding: 20px 35px;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+        transition: all 0.3s ease;
+        white-space: nowrap;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .company-logo-slider {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        border-radius: 50%;
+        background: white;
+        padding: 5px;
+        border: 2px solid #f0f0f0;
+    }
+
+    .company-card-slider:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+        background: white;
+    }
+
+    .company-icon {
+        font-size: 1.8rem;
+        color: #667eea;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .company-name {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #1a1a2e;
+        letter-spacing: 0.5px;
+    }
+
+    .company-badge {
+        background: linear-gradient(135deg, #4ade80, #22c55e);
+        color: white;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .company-badge i {
+        font-size: 0.9rem;
+    }
+
+    /* Products Slider Section */
+    .products-slider-section {
+        position: relative;
+        padding: 60px 0;
+    }
+
+    .products-slider-wrapper {
+        width: 100%;
+        overflow: hidden;
+        padding: 20px 0;
+        mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+        -webkit-mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+    }
+
+    .products-slider {
+        display: flex;
+        gap: 25px;
+        animation: scrollProducts 40s linear infinite;
+        width: fit-content;
+    }
+
+    @keyframes scrollProducts {
+        0% {
+            transform: translateX(0);
+        }
+
+        100% {
+            transform: translateX(-50%);
+        }
+    }
+
+    .products-slider:hover {
+        animation-play-state: paused;
+    }
+
+    .product-slide {
+        flex-shrink: 0;
+    }
+
+    .product-card-slider {
+        background: white;
+        border-radius: 20px;
+        overflow: hidden;
+        width: 280px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        transition: all 0.4s ease;
+        display: block;
+        text-decoration: none;
+        border: 2px solid transparent;
+    }
+
+    .product-card-slider:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+        border-color: #667eea;
+    }
+
+    .product-image-box {
+        width: 100%;
+        height: 200px;
+        overflow: hidden;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        position: relative;
+    }
+
+    .product-image-box img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.6s ease;
+    }
+
+    .product-card-slider:hover .product-image-box img {
+        transform: scale(1.15);
+    }
+
+    .product-placeholder {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        color: rgba(102, 126, 234, 0.3);
+    }
+
+    .product-info {
+        padding: 20px;
+    }
+
+    .product-category-badge {
+        display: inline-block;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        padding: 5px 12px;
+        border-radius: 15px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 10px;
+    }
+
+    .product-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #1a1a2e;
+        margin: 10px 0 8px 0;
+        line-height: 1.4;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .product-price {
+        font-size: 1.4rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin: 8px 0;
+    }
+
+    .stock-indicator {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        padding: 6px 12px;
+        border-radius: 15px;
+        margin-top: 8px;
+    }
+
+    .stock-indicator.in-stock {
+        background: rgba(34, 197, 94, 0.1);
+        color: #22c55e;
+    }
+
+    .stock-indicator.out-of-stock {
+        background: rgba(239, 68, 68, 0.1);
+        color: #ef4444;
+    }
+
+    .stock-indicator i {
+        font-size: 0.9rem;
+    }
+
+    .about-title {
+        font-size: 3rem;
+        font-weight: 900;
+        color: #000000;
+        margin-bottom: 25px;
+        line-height: 1.15;
+        letter-spacing: -1px;
+        position: relative;
+        padding-bottom: 20px;
+    }
+
+    .about-title::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 80px;
+        height: 4px;
+        background: linear-gradient(90deg, #000000 0%, #666666 100%);
+        border-radius: 2px;
+    }
+
+    .about-description {
+        font-size: 1.15rem;
+        color: #4a4a4a;
+        line-height: 1.9;
+        margin-bottom: 40px;
+        font-weight: 400;
+    }
+
+    .about-features {
+        margin-bottom: 40px;
+    }
+
+    .feature-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 18px;
+        margin-bottom: 25px;
+        padding: 18px;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        background: rgba(255, 255, 255, 0.5);
+    }
+
+    .feature-item:hover {
+        background: rgba(255, 255, 255, 1);
+        transform: translateX(8px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    }
+
+    .feature-icon {
+        flex-shrink: 0;
+        width: 48px;
+        height: 48px;
+        background: linear-gradient(135deg, #000000 0%, #333333 100%);
+        color: white;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
+    }
+
+    .feature-item:hover .feature-icon {
+        transform: rotate(10deg) scale(1.1);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .feature-text h5 {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #000000;
+        margin-bottom: 6px;
+        letter-spacing: -0.3px;
+    }
+
+    .feature-text p {
+        color: #666666;
+        margin: 0;
+        font-size: 0.95rem;
+        line-height: 1.6;
+    }
+
+    .about-stats {
+        display: flex;
+        gap: 40px;
+        padding: 25px 0;
+    }
+
+    .stat-box {
+        text-align: center;
+        position: relative;
+        padding: 15px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.7);
+        transition: all 0.3s ease;
+    }
+
+    .stat-box:hover {
+        background: rgba(255, 255, 255, 1);
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .stat-box h3 {
+        font-size: 3rem;
+        font-weight: 900;
+        background: linear-gradient(135deg, #000000 0%, #333333 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 8px;
+        line-height: 1;
+        letter-spacing: -1px;
+    }
+
+    .stat-box p {
+        font-size: 0.95rem;
+        color: #666666;
+        margin: 0;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-size: 0.75rem;
+    }
+
+    /* Tour Packages Section */
+    .package-card-home {
+        background: white;
+        border-radius: 20px;
+        border: 2px solid #e2e8f0;
+        overflow: hidden;
+        transition: all 0.4s ease;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+    }
+
+    .package-card-home:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        border-color: #000000;
+    }
+
+    .featured-package {
+        border: 3px solid #000000;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    }
+
+    .featured-badge {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: #000000;
+        color: white;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        z-index: 10;
+    }
+
+    .package-header {
+        text-align: center;
+        padding: 40px 30px 30px;
+        background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+        border-bottom: 2px solid #e2e8f0;
+    }
+
+    .package-icon {
+        width: 80px;
+        height: 80px;
+        background: #000000;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        margin: 0 auto 20px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    .package-header h3 {
+        font-size: 1.8rem;
+        font-weight: 900;
+        color: #000000;
+        margin-bottom: 8px;
+    }
+
+    .package-subtitle {
+        color: #666;
+        font-size: 1rem;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .package-pricing {
+        padding: 30px;
+        flex: 1;
+    }
+
+    .package-pricing h4 {
+        font-size: 1.1rem;
+        font-weight: 800;
+        color: #000000;
+        margin: 25px 0 15px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #f0f0f0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .package-pricing h4:first-child {
+        margin-top: 0;
+    }
+
+    .pricing-item {
+        margin-bottom: 20px;
+    }
+
+    .pricing-item strong {
+        display: block;
+        color: #000000;
+        font-size: 0.95rem;
+        margin-bottom: 8px;
+    }
+
+    .pricing-item ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .pricing-item li {
+        padding: 8px 0;
+        color: #333;
+        font-size: 0.9rem;
+        border-bottom: 1px solid #f5f5f5;
+    }
+
+    .pricing-item li:last-child {
+        border-bottom: none;
+    }
+
+    .pricing-item li strong {
+        display: inline;
+        color: #000000;
+        font-weight: 700;
+        float: right;
+    }
+
+    .pricing-item small {
+        display: block;
+        color: #999;
+        font-size: 0.8rem;
+        margin-top: 3px;
+    }
+
+    .package-footer {
+        padding: 25px 30px;
+        background: #f8f9fa;
+        border-top: 2px solid #e2e8f0;
+    }
+
+    .btn-package {
+        display: block;
+        width: 100%;
+        padding: 15px 25px;
+        background: #000000;
+        color: white;
+        text-align: center;
+        border-radius: 10px;
+        font-weight: 700;
+        font-size: 1rem;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        border: 2px solid #000000;
+    }
+
+    .btn-package:hover {
+        background: white;
+        color: #000000;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .btn-package i {
+        margin-right: 8px;
+    }
+
+    @media (max-width: 992px) {
+        .package-card-home {
+            margin-bottom: 30px;
+        }
+    }
+
+    @media (max-width: 991px) {
+        .about-us-section {
+            padding: 80px 0;
+        }
+
+        .about-content {
+            padding-left: 0;
+            margin-top: 50px;
+        }
+
+        .about-badge {
+            right: 20px;
+            bottom: -20px;
+            padding: 20px 25px;
+        }
+
+        .badge-number {
+            font-size: 1.8rem;
+        }
+
+        .about-title {
+            font-size: 2.2rem;
+        }
+
+        .stat-box h3 {
+            font-size: 2.3rem;
+        }
+
+        .about-stats {
+            justify-content: space-around;
+        }
+    }
+
+    /* Section Slider Arrows (Products & Companies) */
+    .section-slider-container {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .section-slider-arrow {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 10;
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        border: 2px solid rgba(0, 0, 0, 0.15);
+        background: rgba(255, 255, 255, 0.95);
+        color: #1a1a2e;
+        font-size: 1.1rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .section-slider-arrow:hover {
+        background: #1a1a2e;
+        color: white;
+        border-color: #1a1a2e;
+        transform: translateY(-50%) scale(1.1);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .section-slider-arrow-left {
+        left: 10px;
+    }
+
+    .section-slider-arrow-right {
+        right: 10px;
+    }
+
+    @media (max-width: 768px) {
+        .section-slider-arrow {
+            width: 36px;
+            height: 36px;
+            font-size: 0.9rem;
+        }
+
+        .section-slider-arrow-left {
+            left: 5px;
+        }
+
+        .section-slider-arrow-right {
+            right: 5px;
+        }
+    }
+</style>
+
+<!-- Hero Section with Animated Slider -->
+<div class="hero-home">
+    <!-- Background Image Slider -->
+    <div class="hero-slider-bg">
+        <div class="hero-slide-bg active" style="background-image: url('/media/destinations/hunza-valley.jpg');"
+            data-location="Hunza Valley"
+            data-description="The crown jewel of Northern Pakistan with majestic peaks and ancient forts"></div>
+        <div class="hero-slide-bg" style="background-image: url('/media/destinations/fairy-meadows.jpg');"
+            data-location="Fairy Meadows"
+            data-description="A paradise on earth with breathtaking views of Nanga Parbat"></div>
+        <div class="hero-slide-bg" style="background-image: url('/media/destinations/swat-valley.jpg');"
+            data-location="Swat Valley"
+            data-description="The Switzerland of Pakistan with lush green landscapes and rich culture"></div>
+        <div class="hero-slide-bg" style="background-image: url('/media/destinations/kalash-valley.jpg');"
+            data-location="Kalash Valley"
+            data-description="Experience the unique culture and traditions of the Kalash people"></div>
+        <div class="hero-slide-bg" style="background-image: url('/media/destinations/k2-basecamp.jpg');"
+            data-location="K2 Base Camp" data-description="Trek to the base of the world's second highest mountain">
+        </div>
+    </div>
+
+    <!-- Image Info Overlay -->
+    <div class="slide-info active">
+        <h3 class="slide-location">Hunza Valley</h3>
+        <p class="slide-description">The crown jewel of Northern Pakistan with majestic peaks and ancient forts</p>
+    </div>
+
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-12 hero-content-wrapper text-center">
+                <h1 class="hero-title-main">Discover Pakistan's Hidden Gems</h1>
+                <p class="hero-subtitle-main">
+                    Explore breathtaking mountains, valleys, and cultural wonders of Northern Pakistan
+                </p>
+                <div class="hero-buttons">
+                    <a href="{% url 'content:destination_list' %}" class="btn-hero-main btn-primary-hero">
+                        <i class="fas fa-map-marked-alt"></i>
+                        Explore Destinations
+                    </a>
+                    {# Tour Packages feature coming soon #}
+                    {% comment %} <a href="{% url 'packages:package_list' %}" class="btn-hero-main btn-outline-hero">
+                        <i class="fas fa-suitcase"></i>
+                        View Packages
+                    </a> {% endcomment %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slider Navigation Dots -->
+    <div class="slider-dots">
+        <span class="slider-dot active" data-slide="0"></span>
+        <span class="slider-dot" data-slide="1"></span>
+        <span class="slider-dot" data-slide="2"></span>
+        <span class="slider-dot" data-slide="3"></span>
+        <span class="slider-dot" data-slide="4"></span>
+    </div>
+</div>
+
+<!-- About Us Section -->
+<section class="about-us-section py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 mb-4 mb-lg-0">
+                <div class="about-image-wrapper">
+                    <img src="{% static 'images/hero/hero-bg.jpg' %}" alt="About TouriPK"
+                        class="about-main-image img-fluid rounded-3 shadow-lg">
+                    <div class="about-badge">
+                        <div class="badge-content">
+                            <i class="fas fa-star"></i>
+                            <div class="badge-text">
+                                <span class="badge-number">500+</span>
+                                <span class="badge-label">Happy Travelers</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="about-content">
+                    <span class="about-label">🌟 ABOUT US</span>
+                    <h2 class="about-title">Discover the Soul of Pakistan with TouriPK</h2>
+                    <p class="about-description">
+                        TouriPK is your trusted companion for exploring the breathtaking beauty and rich cultural
+                        heritage of Pakistan.
+                        From the majestic peaks of the Notheran Pakistan, we bring you expertly curated travel
+                        experiences that showcase the very best of our nation. Join thousands of adventurers who've
+                        discovered Pakistan's
+                        hidden gems with us.
+                    </p>
+                    <div class="about-stats mt-4">
+                        <div class="stat-box">
+                            <h3>50+</h3>
+                            <p>Destinations</p>
+                        </div>
+                        <div class="stat-box">
+                            <h3>500+</h3>
+                            <p>Happy Clients</p>
+                        </div>
+                        <div class="stat-box">
+                            <h3>100+</h3>
+                            <p>Tour Packages</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Destinations Section -->
+<section class="featured-destinations">
+    <div class="container">
+        <div class="section-header">
+            <div>
+                <h2 class="section-title mb-0">Featured Destinations</h2>
+                <p class="section-subtitle mb-0">
+                    Explore our handpicked collection of Pakistan's most stunning locations
+                </p>
+            </div>
+        </div>
+
+        {% if featured_destinations %}
+        <div class="destinations-slider-container">
+            <button class="slider-arrow slider-arrow-left" id="prevDestination">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+
+            <div class="destinations-slider-wrapper">
+                <div class="destinations-slider" id="destinationsSlider">
+                    {% for destination in featured_destinations %}
+                    <div class="destination-slide">
+                        <article class="destination-card">
+                            <div class="destination-image">
+                                {% if destination.image %}
+                                <img src="{{ destination.image.url }}" alt="{{ destination.name }}">
+                                {% else %}
+                                <img src="{% static 'images/placeholder.jpg' %}" alt="{{ destination.name }}">
+                                {% endif %}
+                                <span class="destination-badge">
+                                    <i class="fas fa-star"></i> Featured
+                                </span>
+                                <div class="destination-overlay">
+                                    <h3 class="destination-name">{{ destination.name }}</h3>
+                                    <p class="destination-location">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        {{ destination.city }}{% if destination.city %}, {% endif %}{{
+                                        destination.country }}
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="destination-content">
+                                <p class="destination-description">
+                                    {{ destination.description|truncatewords:20 }}
+                                </p>
+                                <div class="destination-meta">
+                                    <div class="meta-item">
+                                        <div class="meta-label">Difficulty</div>
+                                        <div class="meta-value">{{ destination.difficulty_level|title }}</div>
+                                    </div>
+                                    <div class="meta-item">
+                                        <div class="meta-label">Min Days</div>
+                                        <div class="meta-value">{{ destination.min_days }} Days</div>
+                                    </div>
+                                    <div class="meta-item">
+                                        <div class="meta-label">Rating</div>
+                                        <div class="meta-value">
+                                            {% if destination.get_average_rating > 0 %}
+                                            {{ destination.get_average_rating|floatformat:1 }} <i class="fas fa-star"
+                                                style="font-size: 0.8rem;"></i>
+                                            {% else %}
+                                            New
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <a href="{% url 'content:destination_detail' destination.pk %}"
+                                    class="view-destination-btn">
+                                    View Details <i class="fas fa-arrow-right ms-2"></i>
+                                </a>
+                            </div>
+                        </article>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <button class="slider-arrow slider-arrow-right" id="nextDestination">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+        {% else %}
+        <div class="no-destinations">
+            <i class="fas fa-mountain"></i>
+            <h4>No Featured Destinations Yet</h4>
+            <p>Check back soon for amazing destinations!</p>
+        </div>
+        {% endif %}
+
+        <div class="text-center mt-5">
+            <a href="{% url 'content:destination_list' %}" class="btn-hero-main btn-primary-hero">
+                <i class="fas fa-compass"></i>
+                View All Destinations
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Products Slider Section -->
+<section class="products-slider-section py-5" style="background: #f8f9fa; overflow: hidden;">
+    <div class="container">
+        <div class="text-center mb-4">
+            <h2 class="mb-2" style="font-size: 2.5rem; font-weight: 800; color: #1a1a2e;">Authentic Local Products</h2>
+            <p style="color: #666; font-size: 1.1rem;">Discover handpicked Pakistani handicrafts, foods, and souvenirs
+            </p>
+        </div>
+    </div>
+
+    <div class="section-slider-container">
+        <button class="section-slider-arrow section-slider-arrow-left" data-target=".products-slider-wrapper">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <div class="products-slider-wrapper">
+            <div class="products-slider">
+                {% for product in products %}
+                <div class="product-slide">
+                    <a href="{% url 'content:product_list' %}" class="product-card-slider">
+                        <div class="product-image-box">
+                            {% if product.image %}
+                            <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                            {% else %}
+                            <div class="product-placeholder">
+                                <i class="fas fa-shopping-bag"></i>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="product-info">
+                            <span class="product-category-badge">{{ product.get_category_display }}</span>
+                            <h4 class="product-title">{{ product.name }}</h4>
+                            <p class="product-price">Rs. {{ product.price|floatformat:0 }}</p>
+                            {% if product.is_in_stock %}
+                            <span class="stock-indicator in-stock"><i class="fas fa-check-circle"></i> In Stock</span>
+                            {% else %}
+                            <span class="stock-indicator out-of-stock"><i class="fas fa-times-circle"></i> Out of
+                                Stock</span>
+                            {% endif %}
+                        </div>
+                    </a>
+                </div>
+                {% endfor %}
+                <!-- Duplicate for seamless loop -->
+                {% for product in products %}
+                <div class="product-slide">
+                    <a href="{% url 'content:product_list' %}" class="product-card-slider">
+                        <div class="product-image-box">
+                            {% if product.image %}
+                            <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                            {% else %}
+                            <div class="product-placeholder">
+                                <i class="fas fa-shopping-bag"></i>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="product-info">
+                            <span class="product-category-badge">{{ product.get_category_display }}</span>
+                            <h4 class="product-title">{{ product.name }}</h4>
+                            <p class="product-price">Rs. {{ product.price|floatformat:0 }}</p>
+                            {% if product.is_in_stock %}
+                            <span class="stock-indicator in-stock"><i class="fas fa-check-circle"></i> In Stock</span>
+                            {% else %}
+                            <span class="stock-indicator out-of-stock"><i class="fas fa-times-circle"></i> Out of
+                                Stock</span>
+                            {% endif %}
+                        </div>
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <button class="section-slider-arrow section-slider-arrow-right" data-target=".products-slider-wrapper">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+    </div>
+</section>
+
+<!-- Trusted Companies Slider Section -->
+<section class="companies-slider-section py-5"
+    style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); overflow: hidden;">
+    <div class="container">
+        <div class="text-center mb-4">
+            <h2 class="text-white mb-2" style="font-size: 2.5rem; font-weight: 800;">Our Trusted Travel Partners</h2>
+            <p class="text-white" style="opacity: 0.9; font-size: 1.1rem;">Verified tour operators bringing you the best
+                travel experiences</p>
+        </div>
+    </div>
+
+    <div class="section-slider-container">
+        <button class="section-slider-arrow section-slider-arrow-left" data-target=".companies-slider-wrapper"
+            style="color: #667eea; border-color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.95);">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <div class="companies-slider-wrapper">
+            <div class="companies-slider">
+                {% for company in companies %}
+                <div class="company-slide">
+                    <div class="company-card-slider">
+                        {% if company.logo %}
+                        <img src="{{ company.logo.url }}" alt="{{ company.name }}" class="company-logo-slider">
+                        {% else %}
+                        <i class="fas fa-building company-icon"></i>
+                        {% endif %}
+                        <span class="company-name">{{ company.name }}</span>
+                        <span class="company-badge"><i class="fas fa-check-circle"></i> Verified</span>
+                    </div>
+                </div>
+                {% endfor %}
+                <!-- Duplicate for seamless loop -->
+                {% for company in companies %}
+                <div class="company-slide">
+                    <div class="company-card-slider">
+                        {% if company.logo %}
+                        <img src="{{ company.logo.url }}" alt="{{ company.name }}" class="company-logo-slider">
+                        {% else %}
+                        <i class="fas fa-building company-icon"></i>
+                        {% endif %}
+                        <span class="company-name">{{ company.name }}</span>
+                        <span class="company-badge"><i class="fas fa-check-circle"></i> Verified</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <button class="section-slider-arrow section-slider-arrow-right" data-target=".companies-slider-wrapper"
+            style="color: #667eea; border-color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.95);">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+    </div>
+</section>
+
+<!-- Features Section with Tailwind Enhancements -->
+<section class="features-section relative overflow-hidden">
+    <!-- Animated Background Elements -->
+    <div class="absolute inset-0 bg-gradient-to-b from-white via-purple-50/30 to-white pointer-events-none"></div>
+    <div class="absolute top-20 left-10 w-72 h-72 bg-purple-300/20 rounded-full blur-3xl animate-pulse"></div>
+    <div class="absolute bottom-20 right-10 w-96 h-96 bg-blue-300/20 rounded-full blur-3xl animate-pulse" style="animation-delay: 1s;"></div>
+    
+    <div class="container relative z-10">
+        <div class="text-center mb-16 animate-fade-in">
+            <div class="inline-flex items-center gap-2 bg-gradient-to-r from-purple-100 to-blue-100 px-6 py-2 rounded-full mb-4">
+                <i class="fas fa-sparkles text-purple-600"></i>
+                <span class="text-sm font-bold text-purple-800">FEATURES</span>
+            </div>
+            <h2 class="text-5xl font-extrabold bg-gradient-to-r from-gray-900 via-purple-900 to-blue-900 bg-clip-text text-transparent mb-4">
+                Everything You Need for Your Journey
+            </h2>
+            <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+                Plan, book, and explore Pakistan with our comprehensive travel platform
+            </p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-card group relative overflow-hidden bg-white hover:bg-gradient-to-br hover:from-purple-500 hover:to-indigo-600 transition-all duration-500 transform hover:scale-105 hover:-translate-y-2">
+                    <!-- Animated shine effect -->
+                    <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                    
+                    <div class="feature-icon destinations bg-gradient-to-br from-purple-500 to-indigo-600 group-hover:from-white group-hover:to-gray-100 group-hover:scale-110 transition-all duration-300">
+                        <i class="fas fa-mountain group-hover:text-purple-600"></i>
+                    </div>
+                    <h3 class="feature-title group-hover:text-white transition-colors duration-300">Destinations</h3>
+                    <p class="feature-desc group-hover:text-white/90 transition-colors duration-300">
+                        Discover stunning locations across Northern Pakistan with detailed guides
+                    </p>
+                    <a href="{% url 'content:destination_list' %}" class="feature-link group-hover:text-white group-hover:font-bold transition-all duration-300">
+                        Explore Now <i class="fas fa-arrow-right group-hover:translate-x-2 transition-transform duration-300"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-card group relative overflow-hidden bg-white hover:bg-gradient-to-br hover:from-blue-500 hover:to-cyan-600 transition-all duration-500 transform hover:scale-105 hover:-translate-y-2">
+                    <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                    
+                    <div class="feature-icon packages bg-gradient-to-br from-blue-500 to-cyan-600 group-hover:from-white group-hover:to-gray-100 group-hover:scale-110 transition-all duration-300">
+                        <i class="fas fa-box-open group-hover:text-blue-600"></i>
+                    </div>
+                    <h3 class="feature-title group-hover:text-white transition-colors duration-300">Tour Packages</h3>
+                    <p class="feature-desc group-hover:text-white/90 transition-colors duration-300">
+                        Browse our all-inclusive packages with fixed pricing for Swat, Hunza & Skardu
+                    </p>
+                    <a href="{% url 'packages:package_list' %}" class="feature-link group-hover:text-white group-hover:font-bold transition-all duration-300">
+                        View Packages <i class="fas fa-arrow-right group-hover:translate-x-2 transition-transform duration-300"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-card group relative overflow-hidden bg-white hover:bg-gradient-to-br hover:from-amber-500 hover:to-orange-600 transition-all duration-500 transform hover:scale-105 hover:-translate-y-2">
+                    <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                    
+                    <div class="feature-icon calculator bg-gradient-to-br from-amber-500 to-orange-600 group-hover:from-white group-hover:to-gray-100 group-hover:scale-110 transition-all duration-300">
+                        <i class="fas fa-sliders-h group-hover:text-amber-600"></i>
+                    </div>
+                    <h3 class="feature-title group-hover:text-white transition-colors duration-300">Customise Package</h3>
+                    <p class="feature-desc group-hover:text-white/90 transition-colors duration-300">
+                        Plan your trip budget with our intelligent and advance trip cost calculator
+                    </p>
+                    <a href="{% url 'content:cost_calculator' %}" class="feature-link group-hover:text-white group-hover:font-bold transition-all duration-300">
+                        Calculate Now <i class="fas fa-arrow-right group-hover:translate-x-2 transition-transform duration-300"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-card group relative overflow-hidden bg-white hover:bg-gradient-to-br hover:from-pink-500 hover:to-rose-600 transition-all duration-500 transform hover:scale-105 hover:-translate-y-2">
+                    <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                    
+                    <div class="feature-icon chatbot bg-gradient-to-br from-pink-500 to-rose-600 group-hover:from-white group-hover:to-gray-100 group-hover:scale-110 group-hover:rotate-12 transition-all duration-300">
+                        <i class="fas fa-robot group-hover:text-pink-600"></i>
+                    </div>
+                    <h3 class="feature-title group-hover:text-white transition-colors duration-300">AI Assistant</h3>
+                    <p class="feature-desc group-hover:text-white/90 transition-colors duration-300">
+                        Get instant answers about destinations, packages, and travel tips
+                    </p>
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'chatbot' %}" class="feature-link group-hover:text-white group-hover:font-bold transition-all duration-300">
+                        Chat Now <i class="fas fa-arrow-right group-hover:translate-x-2 transition-transform duration-300"></i>
+                    </a>
+                    {% else %}
+                    <a href="{% url 'login' %}" class="feature-link group-hover:text-white group-hover:font-bold transition-all duration-300">
+                        Login to Chat <i class="fas fa-arrow-right group-hover:translate-x-2 transition-transform duration-300"></i>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    // Hero Image Slider with Ken Burns Effect and Info Display
+    document.addEventListener('DOMContentLoaded', function () {
+        const slides = document.querySelectorAll('.hero-slide-bg');
+        const dots = document.querySelectorAll('.slider-dot');
+        const slideInfo = document.querySelector('.slide-info');
+        const locationText = slideInfo.querySelector('.slide-location');
+        const descriptionText = slideInfo.querySelector('.slide-description');
+        let currentSlide = 0;
+        const totalSlides = slides.length;
+
+        function updateSlideInfo(index) {
+            const slide = slides[index];
+            const location = slide.getAttribute('data-location');
+            const description = slide.getAttribute('data-description');
+
+            // Fade out
+            slideInfo.classList.remove('active');
+
+            // Update text after fade out
+            setTimeout(() => {
+                locationText.textContent = location;
+                descriptionText.textContent = description;
+                // Fade in
+                slideInfo.classList.add('active');
+            }, 300);
+        }
+
+        function showSlide(index) {
+            // Remove active class from all slides and dots
+            slides.forEach((slide, i) => {
+                slide.classList.remove('active');
+                // Reset transform for non-active slides
+                if (i !== index) {
+                    setTimeout(() => {
+                        slide.style.transform = 'scale(1)';
+                    }, 2000);
+                }
+            });
+            dots.forEach(dot => dot.classList.remove('active'));
+
+            // Add active class to current slide and dot
+            slides[index].classList.add('active');
+            dots[index].classList.add('active');
+
+            // Update slide info
+            updateSlideInfo(index);
+        }
+
+        function nextSlide() {
+            currentSlide = (currentSlide + 1) % totalSlides;
+            showSlide(currentSlide);
+        }
+
+        // Auto-advance slides every 6 seconds
+        let slideInterval = setInterval(nextSlide, 6000);
+
+        // Dot navigation
+        dots.forEach((dot, index) => {
+            dot.addEventListener('click', () => {
+                currentSlide = index;
+                showSlide(currentSlide);
+                // Reset interval on manual navigation
+                clearInterval(slideInterval);
+                slideInterval = setInterval(nextSlide, 6000);
+            });
+        });
+
+        // Destinations Slider Navigation with Smooth Infinite Loop
+        const destinationsSlider = document.getElementById('destinationsSlider');
+        const prevBtn = document.getElementById('prevDestination');
+        const nextBtn = document.getElementById('nextDestination');
+
+        if (destinationsSlider && prevBtn && nextBtn) {
+            const originalSlides = Array.from(destinationsSlider.querySelectorAll('.destination-slide'));
+            const totalSlides = originalSlides.length;
+            const gap = 20;
+            let currentIndex = 0;
+            let isTransitioning = false;
+
+            // Clone slides for infinite effect
+            function initInfiniteSlider() {
+                // Clone all slides and append them
+                originalSlides.forEach(slide => {
+                    const clone = slide.cloneNode(true);
+                    destinationsSlider.appendChild(clone);
+                });
+
+                // Clone all slides and prepend them
+                originalSlides.slice().reverse().forEach(slide => {
+                    const clone = slide.cloneNode(true);
+                    destinationsSlider.insertBefore(clone, destinationsSlider.firstChild);
+                });
+
+                // Set initial position to show original slides
+                currentIndex = totalSlides;
+                updateSlider(false);
+            }
+
+            function getSlidesPerView() {
+                if (window.innerWidth <= 768) return 1;
+                if (window.innerWidth <= 1200) return 2;
+                if (window.innerWidth <= 1400) return 3;
+                return 4;
+            }
+
+            function getSlideWidth() {
+                const slides = destinationsSlider.querySelectorAll('.destination-slide');
+                return slides[0]?.offsetWidth || 0;
+            }
+
+            function updateSlider(withTransition = true) {
+                const slideWidth = getSlideWidth();
+                const offset = -currentIndex * (slideWidth + gap);
+
+                if (withTransition) {
+                    destinationsSlider.style.transition = 'transform 0.5s ease';
+                } else {
+                    destinationsSlider.style.transition = 'none';
+                }
+
+                destinationsSlider.style.transform = `translateX(${offset}px)`;
+            }
+
+            function handleTransitionEnd() {
+                const allSlides = destinationsSlider.querySelectorAll('.destination-slide');
+                const totalWithClones = allSlides.length;
+
+                // If we're at the cloned slides at the end, jump to the real start
+                if (currentIndex >= totalSlides * 2) {
+                    currentIndex = totalSlides;
+                    updateSlider(false);
+                }
+
+                // If we're at the cloned slides at the beginning, jump to the real end
+                if (currentIndex < totalSlides) {
+                    currentIndex = totalSlides * 2 - getSlidesPerView();
+                    updateSlider(false);
+                }
+
+                isTransitioning = false;
+            }
+
+            prevBtn.addEventListener('click', () => {
+                if (isTransitioning) return;
+                isTransitioning = true;
+                currentIndex--;
+                updateSlider(true);
+            });
+
+            nextBtn.addEventListener('click', () => {
+                if (isTransitioning) return;
+                isTransitioning = true;
+                currentIndex++;
+                updateSlider(true);
+            });
+
+            destinationsSlider.addEventListener('transitionend', handleTransitionEnd);
+
+            // Update on window resize
+            let resizeTimer;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(() => {
+                    currentIndex = totalSlides;
+                    updateSlider(false);
+                }, 250);
+            });
+
+            // Initialize
+            initInfiniteSlider();
+        }
+
+        // Section Slider Arrows (Products & Companies)
+        document.querySelectorAll('.section-slider-arrow').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var targetSelector = this.getAttribute('data-target');
+                var wrapper = document.querySelector(targetSelector);
+                if (!wrapper) return;
+                var scrollAmount = 300;
+                if (this.classList.contains('section-slider-arrow-left')) {
+                    wrapper.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+                } else {
+                    wrapper.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,47 @@
+# Core Django
+Django>=5.1.0
+
+# Image handling
+Pillow>=10.0.0
+
+# HTTP requests
+requests>=2.31.0
+
+# Environment variables
+python-decouple>=3.8
+
+# Social Authentication (Google/Facebook OAuth)
+django-allauth>=0.57.0
+
+# REST API
+djangorestframework>=3.14.0
+djangorestframework-simplejwt>=5.3.0
+
+# CORS handling
+django-cors-headers>=4.3.0
+
+# WebSocket support (for Channels/Chatbot)
+channels>=4.0.0
+channels-redis>=4.1.0
+
+# Tagging
+django-taggit>=4.0.0
+
+# Filtering
+django-filter>=23.0
+
+# Payments
+stripe>=14.0.0
+
+# Security (CRITICAL FOR PRODUCTION)
+argon2-cffi>=23.1.0
+django-ratelimit>=4.1.0
+
+# Development tools (optional - comment out in production)
+# django-extensions>=3.2.0
+# django-debug-toolbar>=4.2.0
+
+# Production tools (uncomment for production)
+# gunicorn>=21.0.0
+# whitenoise>=6.6.0
+# psycopg2-binary>=2.9.0  # For PostgreSQL database

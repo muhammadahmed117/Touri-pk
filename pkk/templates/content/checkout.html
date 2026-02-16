@@ -1,0 +1,400 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Checkout | TouriPK{% endblock %}
+
+{% block content %}
+<style>
+    .checkout-page {
+        background: #f8f9fa;
+        min-height: 100vh;
+        padding: 120px 0 80px;
+    }
+
+    .checkout-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .checkout-grid {
+        display: grid;
+        grid-template-columns: 1fr 400px;
+        gap: 30px;
+    }
+
+    .checkout-form {
+        background: white;
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+
+    .section-title {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: #1a1a2e;
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #f0f0f0;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-label {
+        display: block;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 8px;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 12px 15px;
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    .payment-methods {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .payment-option {
+        display: flex;
+        align-items: center;
+        padding: 15px;
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .payment-option:hover {
+        border-color: #667eea;
+        background: #f8f9ff;
+    }
+
+    .payment-option input[type="radio"] {
+        margin-right: 12px;
+        width: 20px;
+        height: 20px;
+    }
+
+    .payment-option.selected {
+        border-color: #667eea;
+        background: #f8f9ff;
+    }
+
+    .order-summary {
+        background: white;
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        height: fit-content;
+        position: sticky;
+        top: 100px;
+    }
+
+    .summary-item {
+        display: flex;
+        gap: 15px;
+        padding: 15px 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .summary-item-image {
+        width: 60px;
+        height: 60px;
+        border-radius: 8px;
+        overflow: hidden;
+        flex-shrink: 0;
+    }
+
+    .summary-item-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .summary-item-details {
+        flex: 1;
+    }
+
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 0;
+    }
+
+    .summary-row.total {
+        font-size: 1.3rem;
+        font-weight: 800;
+        padding-top: 20px;
+        border-top: 2px solid #f0f0f0;
+        margin-top: 10px;
+    }
+
+    .place-order-btn {
+        width: 100%;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        padding: 15px;
+        border-radius: 12px;
+        border: none;
+        font-weight: 700;
+        font-size: 1.1rem;
+        cursor: pointer;
+        margin-top: 20px;
+        transition: all 0.3s ease;
+    }
+
+    .place-order-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+    }
+
+    @media (max-width: 968px) {
+        .checkout-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+        
+        .order-summary {
+            position: static;
+        }
+    }
+</style>
+
+<div class="checkout-page">
+    <div class="container checkout-container">
+        <h1 class="page-title" style="font-size: 2.5rem; font-weight: 800; color: #1a1a2e; margin-bottom: 40px;">Checkout</h1>
+
+        <form method="post" action="{% url 'content:place_order' %}" class="checkout-grid">
+            {% csrf_token %}
+            
+            <div>
+                <div class="checkout-form">
+                    <h2 class="section-title">Shipping Information</h2>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Full Name *</label>
+                        <input type="text" name="full_name" class="form-control" required value="{{ user.get_full_name }}">
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Email *</label>
+                            <input type="email" name="email" class="form-control" required value="{{ user.email }}">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Phone *</label>
+                            <input type="tel" name="phone" class="form-control" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Address *</label>
+                        <textarea name="address" class="form-control" rows="3" required></textarea>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">City *</label>
+                            <input type="text" name="city" class="form-control" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Postal Code *</label>
+                            <input type="text" name="postal_code" class="form-control" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Order Notes (Optional)</label>
+                        <textarea name="notes" class="form-control" rows="3" placeholder="Special instructions for delivery..."></textarea>
+                    </div>
+                </div>
+                
+                <div class="checkout-form" style="margin-top: 30px;">
+                    <h2 class="section-title">Payment Method</h2>
+                    
+                    <div class="payment-methods">
+                        <label class="payment-option">
+                            <input type="radio" name="payment_method" value="cod" checked>
+                            <div>
+                                <strong>Cash on Delivery</strong>
+                                <p style="margin: 5px 0 0; color: #666; font-size: 0.9rem;">Pay when you receive your order</p>
+                            </div>
+                        </label>
+                        
+                        <label class="payment-option">
+                            <input type="radio" name="payment_method" value="bank_transfer">
+                            <div>
+                                <strong>Bank Transfer</strong>
+                                <p style="margin: 5px 0 0; color: #666; font-size: 0.9rem;">Transfer to our bank account</p>
+                            </div>
+                        </label>
+                        
+                        <label class="payment-option">
+                            <input type="radio" name="payment_method" value="online">
+                            <div>
+                                <strong>Online Payment</strong>
+                                <p style="margin: 5px 0 0; color: #666; font-size: 0.9rem;">Pay securely online</p>
+                            </div>
+                        </label>
+                    </div>
+
+                    <!-- Bank Transfer Details (shown when bank_transfer selected) -->
+                    <div id="bankTransferDetails" style="display:none; margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 12px; border: 2px solid #e0e0e0;">
+                        <h5 style="color: #1a1a2e; margin-bottom: 15px;"><i class="fas fa-university"></i> Bank Transfer Details</h5>
+                        <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                            <p style="margin: 5px 0;"><strong>Bank:</strong> Meezan Bank</p>
+                            <p style="margin: 5px 0;"><strong>Account Title:</strong> TouriPK Services</p>
+                            <p style="margin: 5px 0;"><strong>Account Number:</strong> 01234567890</p>
+                            <p style="margin: 5px 0;"><strong>IBAN:</strong> PK12MEZN0001234567890</p>
+                        </div>
+                        <div style="background: #fff3cd; padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 0.9rem;">
+                            <strong><i class="fas fa-info-circle"></i> What to enter as Transaction ID?</strong>
+                            <ul style="margin: 8px 0 0; padding-left: 18px;">
+                                <li><strong>Online banking</strong> — enter the Transaction Reference Number from your receipt</li>
+                                <li><strong>ATM transfer</strong> — enter the Transaction ID printed on the ATM slip</li>
+                                <li><strong>Bank branch</strong> — enter the Deposit Slip Number</li>
+                                <li>Example: <code>TRX20260215001234</code> or <code>FT26021512345678</code></li>
+                            </ul>
+                        </div>
+                        <div>
+                            <label style="font-weight: 600; margin-bottom: 5px; display: block;">Transaction ID/Reference <span style="color: red;">*</span></label>
+                            <input type="text" name="transaction_id" id="checkoutTxnId" class="form-control" placeholder="e.g. TRX20260215001234" minlength="5" maxlength="50" style="border-radius: 8px; padding: 12px;">
+                            <small style="color: #666;">5-50 characters, letters, numbers & hyphens only</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="order-summary">
+                <h2 class="section-title">Order Summary</h2>
+                
+                {% for item in cart_items %}
+                <div class="summary-item">
+                    <div class="summary-item-image">
+                        {% if item.product.image %}
+                        <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+                        {% endif %}
+                    </div>
+                    <div class="summary-item-details">
+                        <strong>{{ item.product.name }}</strong>
+                        <p style="color: #666; font-size: 0.9rem;">Qty: {{ item.quantity }} × Rs. {{ item.product.price|floatformat:0 }}</p>
+                    </div>
+                    <strong>Rs. {{ item.get_subtotal|floatformat:0 }}</strong>
+                </div>
+                {% endfor %}
+                
+                <div style="margin-top: 20px;">
+                    <div class="summary-row">
+                        <span>Subtotal</span>
+                        <strong>Rs. {{ subtotal|floatformat:0 }}</strong>
+                    </div>
+                    
+                    <div class="summary-row">
+                        <span>Total Weight</span>
+                        <strong>{{ total_weight|floatformat:2 }} kg</strong>
+                    </div>
+                    
+                    <div class="summary-row">
+                        <span>Shipping Fee</span>
+                        <strong>Rs. {{ shipping_fee|floatformat:0 }}</strong>
+                    </div>
+                    {% if total_weight <= 2 %}
+                    <div style="font-size: 0.85rem; color: #666; margin: -5px 0 10px 0; padding-left: 10px;">
+                        <i class="fas fa-info-circle"></i> Base shipping up to 2kg
+                    </div>
+                    {% else %}
+                    <div style="font-size: 0.85rem; color: #666; margin: -5px 0 10px 0; padding-left: 10px;">
+                        <i class="fas fa-info-circle"></i> Base 200 + extra weight @ Rs.50/kg
+                    </div>
+                    {% endif %}
+                    
+                    <div class="summary-row total">
+                        <span>Total</span>
+                        <strong>Rs. {{ total|floatformat:0 }}</strong>
+                    </div>
+                </div>
+                
+                <button type="submit" class="place-order-btn">
+                    <i class="fas fa-check-circle"></i> Place Order
+                </button>
+                
+                <p style="text-align: center; margin-top: 15px; color: #666; font-size: 0.85rem;">
+                    <i class="fas fa-lock"></i> Your payment information is secure
+                </p>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.querySelectorAll('.payment-option').forEach(option => {
+    option.addEventListener('click', function() {
+        document.querySelectorAll('.payment-option').forEach(opt => opt.classList.remove('selected'));
+        this.classList.add('selected');
+        this.querySelector('input[type="radio"]').checked = true;
+
+        // Toggle bank transfer details
+        const val = this.querySelector('input[type="radio"]').value;
+        const bankDiv = document.getElementById('bankTransferDetails');
+        if (bankDiv) bankDiv.style.display = val === 'bank_transfer' ? 'block' : 'none';
+    });
+});
+
+// Also handle direct radio click
+document.querySelectorAll('input[name="payment_method"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+        const bankDiv = document.getElementById('bankTransferDetails');
+        if (bankDiv) bankDiv.style.display = this.value === 'bank_transfer' ? 'block' : 'none';
+    });
+});
+
+// Validate on form submit
+document.querySelector('form').addEventListener('submit', function(e) {
+    const method = document.querySelector('input[name="payment_method"]:checked');
+    if (method && method.value === 'bank_transfer') {
+        const txnInput = document.getElementById('checkoutTxnId');
+        const txnVal = txnInput.value.trim();
+        const pattern = /^[A-Za-z0-9\-]{5,50}$/;
+        if (!txnVal) {
+            e.preventDefault();
+            alert('Please enter the Transaction ID/Reference from your bank receipt.');
+            txnInput.focus();
+            return;
+        }
+        if (!pattern.test(txnVal)) {
+            e.preventDefault();
+            alert('Transaction ID must be 5-50 characters (letters, numbers, hyphens only).');
+            txnInput.focus();
+            return;
+        }
+    }
+});
+</script>
+{% endblock %}

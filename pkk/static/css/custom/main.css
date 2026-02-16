@@ -1,0 +1,431 @@
+/* Custom styles for Touri.pk - Black & White Theme */
+
+/* Root color variables */
+:root {
+    --primary-black: #000000;
+    --primary-white: #ffffff;
+    --soft-black: #1a1a1a;
+    --light-gray: #f5f5f5;
+    --medium-gray: #cccccc;
+    --dark-gray: #333333;
+}
+
+/* Global background and text colors */
+body {
+    background-color: var(--primary-white);
+    color: var(--primary-black);
+}
+
+/* Smooth animations - scoped to interactive elements */
+a, button, .btn, .card, .nav-link, .form-control {
+    transition: all 0.3s ease;
+}
+
+/* Enhanced card hover effects */
+.card {
+    border-radius: 12px;
+    overflow: hidden;
+    background-color: var(--primary-white);
+    border: 2px solid var(--primary-black);
+}
+
+.card-img-top {
+    height: 200px;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+    filter: grayscale(100%);
+}
+
+.card:hover .card-img-top {
+    transform: scale(1.05);
+    filter: grayscale(0%);
+}
+
+/* Button enhancements */
+.btn {
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    border-radius: 8px;
+    padding: 12px 24px;
+}
+
+.btn-primary {
+    background-color: var(--primary-black);
+    border-color: var(--primary-black);
+    color: var(--primary-white);
+}
+
+.btn-primary:hover {
+    background-color: var(--dark-gray);
+    border-color: var(--dark-gray);
+}
+
+.btn-outline-primary {
+    border-color: var(--primary-black);
+    color: var(--primary-black);
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--primary-black);
+    color: var(--primary-white);
+}
+
+.btn-secondary {
+    background-color: var(--dark-gray);
+    border-color: var(--dark-gray);
+    color: var(--primary-white);
+}
+
+.btn-secondary:hover {
+    background-color: var(--primary-black);
+}
+
+/* Search box styling */
+.search-box {
+    border-radius: 15px;
+    backdrop-filter: blur(10px);
+    background-color: rgba(255, 255, 255, 0.9);
+    border: 2px solid var(--primary-black);
+}
+
+/* Hero section improvements */
+.hero-section {
+    position: relative;
+    overflow: hidden;
+    background-color: var(--soft-black);
+}
+
+.hero-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.8), rgba(26, 26, 26, 0.6));
+    z-index: 1;
+}
+
+.hero-section h1,
+.hero-section p,
+.hero-section .text-white {
+    color: var(--primary-white) !important;
+}
+
+.hero-section .container {
+    position: relative;
+    z-index: 2;
+}
+
+/* Navbar styling */
+.navbar {
+    background-color: var(--primary-white) !important;
+    border-bottom: 2px solid var(--primary-black);
+}
+
+.navbar-brand,
+.nav-link {
+    color: var(--primary-black) !important;
+}
+
+.nav-link:hover {
+    color: var(--dark-gray) !important;
+}
+
+/* Service cards */
+.services-section {
+    background-color: var(--light-gray);
+}
+
+.services-section .card {
+    transition: all 0.3s ease;
+    border: 2px solid var(--primary-black);
+    background-color: var(--primary-white);
+}
+
+.services-section .card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+    background-color: var(--primary-black);
+    color: var(--primary-white);
+}
+
+.services-section .card:hover h5,
+.services-section .card:hover p,
+.services-section .card:hover i {
+    color: var(--primary-white);
+}
+
+/* Featured destinations */
+.featured-destinations .card-img-top {
+    height: 180px;
+}
+
+/* Footer styling */
+footer {
+    background-color: var(--primary-black);
+    color: var(--primary-white);
+}
+
+footer a {
+    color: var(--medium-gray);
+}
+
+footer a:hover {
+    color: var(--primary-white);
+}
+
+/* Badges and labels */
+.badge {
+    background-color: var(--primary-black);
+    color: var(--primary-white);
+}
+
+.badge-primary {
+    background-color: var(--primary-black);
+}
+
+.badge-secondary {
+    background-color: var(--dark-gray);
+}
+
+/* Alerts */
+.alert-success {
+    background-color: var(--primary-black);
+    color: var(--primary-white);
+    border-color: var(--primary-black);
+}
+
+.alert-danger {
+    background-color: var(--dark-gray);
+    color: var(--primary-white);
+    border-color: var(--primary-black);
+}
+
+.alert-info {
+    background-color: var(--light-gray);
+    color: var(--primary-black);
+    border-color: var(--primary-black);
+}
+
+/* Forms */
+.form-control {
+    border: 2px solid var(--primary-black);
+    border-radius: 8px;
+    background-color: var(--primary-white);
+    color: var(--primary-black);
+}
+
+.form-control:focus {
+    border-color: var(--dark-gray);
+    box-shadow: 0 0 0 0.2rem rgba(0, 0, 0, 0.25);
+}
+
+.form-label {
+    color: var(--primary-black);
+    font-weight: 600;
+}
+
+/* Tables */
+.table {
+    color: var(--primary-black);
+    border-color: var(--primary-black);
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: var(--light-gray);
+}
+
+.table thead th {
+    background-color: var(--primary-black);
+    color: var(--primary-white);
+    border-color: var(--primary-black);
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+    .hero-section {
+        min-height: 400px;
+    }
+    
+    .display-4 {
+        font-size: 2rem;
+    }
+    
+    .search-box {
+        margin: 0 15px;
+    }
+}
+
+/* Loading states */
+.loading {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+/* Smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--light-gray);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--primary-black);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--dark-gray);
+}
+
+/* Text colors */
+.text-primary {
+    color: var(--primary-black) !important;
+}
+
+.text-muted {
+    color: var(--dark-gray) !important;
+}
+
+.text-dark {
+    color: var(--primary-black) !important;
+}
+
+/* Background colors */
+.bg-primary {
+    background-color: var(--primary-black) !important;
+}
+
+.bg-light {
+    background-color: var(--light-gray) !important;
+}
+
+.bg-dark {
+    background-color: var(--primary-black) !important;
+}
+
+.bg-white {
+    background-color: var(--primary-white) !important;
+}
+
+/* Borders */
+.border {
+    border-color: var(--primary-black) !important;
+}
+
+.border-primary {
+    border-color: var(--primary-black) !important;
+}
+
+/* Links */
+a {
+    color: var(--primary-black);
+    text-decoration: none;
+}
+
+a:hover {
+    color: var(--dark-gray);
+    text-decoration: underline;
+}
+
+/* Social media icons */
+.social-icons a {
+    color: var(--primary-black);
+    border: 2px solid var(--primary-black);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 5px;
+    text-decoration: none;
+}
+
+.social-icons a:hover {
+    background-color: var(--primary-black);
+    color: var(--primary-white);
+    text-decoration: none;
+}
+
+/* Pagination */
+.pagination .page-link {
+    color: var(--primary-black);
+    border-color: var(--primary-black);
+}
+
+.pagination .page-item.active .page-link {
+    background-color: var(--primary-black);
+    border-color: var(--primary-black);
+    color: var(--primary-white);
+}
+
+.pagination .page-link:hover {
+    background-color: var(--light-gray);
+    border-color: var(--primary-black);
+}
+
+/* Modal */
+.modal-content {
+    border: 2px solid var(--primary-black);
+}
+
+.modal-header {
+    border-bottom: 2px solid var(--primary-black);
+}
+
+.modal-footer {
+    border-top: 2px solid var(--primary-black);
+}
+
+/* Dropdown */
+.dropdown-menu {
+    border: 2px solid var(--primary-black);
+}
+
+.dropdown-item:hover {
+    background-color: var(--primary-black);
+    color: var(--primary-white);
+}
+
+/* List group */
+.list-group-item {
+    border: 2px solid var(--primary-black);
+    background-color: var(--primary-white);
+}
+
+.list-group-item:hover {
+    background-color: var(--light-gray);
+}
+
+.list-group-item.active {
+    background-color: var(--primary-black);
+    border-color: var(--primary-black);
+}
+
+/* Progress bars */
+.progress {
+    background-color: var(--light-gray);
+    border: 1px solid var(--primary-black);
+}
+
+.progress-bar {
+    background-color: var(--primary-black);
+}
+
+/* Breadcrumb */
+.breadcrumb {
+    background-color: var(--light-gray);
+}
+
+.breadcrumb-item.active {
+    color: var(--primary-black);
+}

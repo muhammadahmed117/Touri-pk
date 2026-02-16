@@ -1,0 +1,577 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Customise Your Package | TouriPK{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    }
+
+    .calculator-page {
+        min-height: 100vh;
+        padding: 40px 0;
+    }
+
+    .calculator-header {
+        text-align: center;
+        color: #000000;
+        margin-bottom: 50px;
+        animation: fadeInDown 0.8s ease;
+    }
+
+    .calculator-header h1 {
+        font-size: 3.5rem;
+        font-weight: 900;
+        margin-bottom: 15px;
+        text-shadow: 2px 4px 15px rgba(0,0,0,0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 20px;
+        letter-spacing: -1px;
+    }
+
+    .calculator-header p {
+        font-size: 1.3rem;
+        color: #666666;
+        max-width: 700px;
+        margin: 0 auto;
+    }
+
+    .calculator-header .btn:hover {
+        background: #333333 !important;
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    .calculator-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 1fr 400px;
+        gap: 30px;
+        padding: 0 20px;
+    }
+
+    @media (max-width: 1200px) {
+        .calculator-container {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* Main Calculator Card */
+    .calculator-card {
+        background: white;
+        border-radius: 24px;
+        padding: 40px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+        animation: fadeInLeft 0.8s ease;
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .calculator-section {
+        margin-bottom: 35px;
+    }
+
+    .section-header {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: #000000;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding-bottom: 12px;
+        border-bottom: 3px solid #f0f0f0;
+    }
+
+    .section-header i {
+        color: #000000;
+        font-size: 1.3rem;
+    }
+
+    /* Form Controls */
+    .form-group {
+        margin-bottom: 25px;
+    }
+
+    .form-label {
+        display: block;
+        font-weight: 700;
+        color: #000000;
+        margin-bottom: 8px;
+        font-size: 0.95rem;
+    }
+
+    .form-control, .form-select {
+        width: 100%;
+        padding: 14px 18px;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: #f8fafc;
+    }
+
+    .form-control:focus, .form-select:focus {
+        outline: none;
+        border-color: #000000;
+        background: white;
+        box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .input-group {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    /* Summary Card */
+    .summary-card {
+        background: white;
+        border-radius: 24px;
+        padding: 30px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+        position: sticky;
+        top: 20px;
+        animation: fadeInRight 0.8s ease;
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .summary-header {
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: #000000;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .summary-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 15px 0;
+        border-bottom: 2px solid #f0f0f0;
+        font-size: 1rem;
+    }
+
+    .summary-item:last-child {
+        border-bottom: none;
+    }
+
+    .summary-label {
+        color: #666666;
+        font-weight: 600;
+    }
+
+    .summary-value {
+        font-weight: 800;
+        color: #000000;
+    }
+
+    .summary-total {
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 3px solid #000000;
+    }
+
+    .total-label {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: #000000;
+    }
+
+    .total-value {
+        font-size: 2rem;
+        font-weight: 900;
+        color: #000000;
+    }
+
+    .per-person-note {
+        text-align: center;
+        margin-top: 15px;
+        padding: 12px;
+        background: #f8fafc;
+        border-radius: 10px;
+        font-size: 0.9rem;
+        color: #666666;
+        border: 1px solid #e2e8f0;
+    }
+
+    .action-buttons {
+        margin-top: 25px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .btn-primary, .btn-secondary {
+        width: 100%;
+        padding: 15px;
+        border: none;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .btn-primary {
+        background: #000000;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        background: #1a1a1a;
+    }
+
+    .btn-secondary {
+        background: #f8fafc;
+        color: #000000;
+        border: 2px solid #e2e8f0;
+    }
+
+    .btn-secondary:hover {
+        background: #e2e8f0;
+        transform: translateY(-2px);
+        border-color: #000000;
+    }
+
+    .quick-tips {
+        margin-top: 30px;
+        padding: 20px;
+        background: #f8fafc;
+        border-radius: 16px;
+        border-left: 4px solid #000000;
+        border: 2px solid #e2e8f0;
+    }
+
+    .quick-tips-title {
+        font-weight: 800;
+        color: #000000;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .quick-tips ul {
+        margin: 0;
+        padding-left: 20px;
+        color: #333333;
+    }
+
+    .quick-tips li {
+        margin-bottom: 8px;
+        line-height: 1.6;
+    }
+
+    /* Animations */
+    @keyframes fadeInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes fadeInLeft {
+        from {
+            opacity: 0;
+            transform: translateX(-30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @keyframes fadeInRight {
+        from {
+            opacity: 0;
+            transform: translateX(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+
+    /* Loading State */
+    .loading-spinner {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid rgba(255,255,255,0.3);
+        border-radius: 50%;
+        border-top-color: white;
+        animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+</style>
+
+<div class="calculator-page">
+    <div class="calculator-header">
+        <h1>
+            <i class="fas fa-sliders-h"></i>
+            Customise Your Package
+        </h1>
+        <p>Plan your perfect trip to Northern Pakistan with accurate cost estimates</p>
+    </div>
+
+    <div class="calculator-container">
+        <!-- Main Calculator Form -->
+        <div class="calculator-card">
+            <!-- Trip Details Section -->
+            <div class="calculator-section">
+                <div class="section-header">
+                    <i class="fas fa-map-marked-alt"></i>
+                    Trip Details
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Select Destination</label>
+                    <select id="destination" class="form-select">
+                        <option value="">Choose a destination...</option>
+                        {% for destination in destinations %}
+                        <option value="{{ destination.id }}"
+                                data-city="{{ destination.city }}"
+                                data-min-days="{{ destination.min_days }}">
+                            {{ destination.name }} - {{ destination.city }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <div class="form-group">
+                        <label class="form-label">Number of People <small style="color:#888;">(7-27)</small></label>
+                        <input type="number" id="numPeople" class="form-control" value="7" min="7" max="27">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Number of Days</label>
+                        <input type="number" id="numDays" class="form-control" value="3" min="3" max="10">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Travel Date (Optional)</label>
+                    <input type="date" id="travelDate" class="form-control" min="{{ today }}">
+                </div>
+            </div>
+
+            <!-- Quick Tips -->
+            <div class="quick-tips">
+                <div class="quick-tips-title">
+                    <i class="fas fa-lightbulb"></i>
+                    Planning Tips
+                </div>
+                <ul>
+                    <li>Book accommodations at least 2-3 weeks in advance for better rates</li>
+                    <li>Consider visiting during off-season for lower prices</li>
+                    <li>Hire local guides for authentic experiences and better pricing</li>
+                    <li>Pack light to avoid extra baggage costs</li>
+                    <li>Always keep emergency funds for unexpected expenses</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Summary Card -->
+        <div class="summary-card">
+            <div class="summary-header">
+                <i class="fas fa-receipt"></i>
+                Cost Summary
+            </div>
+
+            <div class="summary-item">
+                <span class="summary-label">Destination</span>
+                <span class="summary-value" id="summaryDestination">-</span>
+            </div>
+
+            <div class="summary-item">
+                <span class="summary-label">Number of People</span>
+                <span class="summary-value" id="summaryPeople">7</span>
+            </div>
+
+            <div class="summary-item">
+                <span class="summary-label">Number of Days</span>
+                <span class="summary-value" id="summaryDays">3</span>
+            </div>
+
+            <div class="summary-total">
+                <div class="summary-item">
+                    <span class="total-label">Total Cost</span>
+                    <span class="total-value" id="totalCost">Rs. 0</span>
+                </div>
+            </div>
+
+            <div class="per-person-note">
+                <strong id="perPersonCost">Rs. 0</strong> per person
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn-primary" onclick="generatePDF()">
+                    <i class="fas fa-download"></i>
+                    Download Estimate
+                </button>
+                <button class="btn-secondary" onclick="resetCalculator()">
+                    <i class="fas fa-refresh"></i>
+                    Reset
+                </button>
+                <a href="{% url 'packages:package_list' %}" class="btn-secondary" style="text-decoration: none;">
+                    <i class="fas fa-box"></i>
+                    Browse Packages
+                </a>
+                <a href="{% url 'content:custom_package' %}" class="btn-primary" style="text-decoration: none; background: #000000;">
+                    <i class="fas fa-plus-circle"></i>
+                    Make Custom Package
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('travelDate').value = today;
+
+        // Add event listeners
+        document.getElementById('destination').addEventListener('change', updateSummary);
+        document.getElementById('numPeople').addEventListener('input', function() {
+            let val = parseInt(this.value);
+            if (val < 7) this.value = 7;
+            if (val > 27) this.value = 27;
+            updateSummary();
+        });
+        document.getElementById('numPeople').addEventListener('blur', function() {
+            let val = parseInt(this.value);
+            if (!val || val < 7) this.value = 7;
+            if (val > 27) this.value = 27;
+        });
+        document.getElementById('numDays').addEventListener('input', function() {
+            let val = parseInt(this.value);
+            if (val < 3) this.value = 3;
+            if (val > 10) this.value = 10;
+            updateSummary();
+        });
+        document.getElementById('numDays').addEventListener('blur', function() {
+            let val = parseInt(this.value);
+            if (!val || val < 3) this.value = 3;
+            if (val > 10) this.value = 10;
+        });
+    });
+
+    // Estimated costs per person per day for different destinations
+    const destinationCosts = {
+        // Destination ID : {base cost per person per day, accommodation multiplier}
+        1: { daily: 4500, name: 'Neelum Valley' },
+        2: { daily: 5500, name: 'Fairy Meadows' },
+        3: { daily: 6000, name: 'Hunza Valley' },
+        4: { daily: 5000, name: 'Skardu' },
+        5: { daily: 5200, name: 'Baltit Fort' },
+        6: { daily: 5800, name: 'Deosai Plains' },
+        7: { daily: 4800, name: 'Naran & Kaghan' },
+        8: { daily: 7000, name: 'K2 Base Camp' },
+        9: { daily: 4200, name: 'Swat Valley' },
+        10: { daily: 3800, name: 'Murree' },
+        11: { daily: 5500, name: 'Naltar Valley' },
+        12: { daily: 4000, name: 'Chitral' }
+    };
+
+    // Update summary
+    function updateSummary() {
+        const destinationSelect = document.getElementById('destination');
+        const destinationId = destinationSelect.value;
+        const numPeople = parseInt(document.getElementById('numPeople').value) || 7;
+        const numDays = parseInt(document.getElementById('numDays').value) || 3;
+
+        // Update basic info
+        document.getElementById('summaryPeople').textContent = numPeople;
+        document.getElementById('summaryDays').textContent = numDays;
+
+        let totalCost = 0;
+
+        // Update destination name and calculate cost
+        if (destinationId) {
+            const selectedOption = destinationSelect.options[destinationSelect.selectedIndex];
+            document.getElementById('summaryDestination').textContent = selectedOption.text;
+
+            // Calculate estimated cost
+            const destCost = destinationCosts[destinationId] || { daily: 4500 };
+
+            // Base formula: (Daily rate × People × Days) + Fixed transport cost
+            const accommodationCost = destCost.daily * numPeople * numDays;
+            const transportCost = 8000 + (numPeople * 1000); // Base transport + per person
+            const activityCost = 3000 * numPeople; // Activities per person
+
+            totalCost = accommodationCost + transportCost + activityCost;
+        } else {
+            document.getElementById('summaryDestination').textContent = '-';
+        }
+
+        // Update total cost display
+        document.getElementById('totalCost').textContent = `Rs. ${totalCost.toLocaleString()}`;
+        document.getElementById('perPersonCost').textContent = `Rs. ${Math.round(totalCost / numPeople).toLocaleString()}`;
+    }
+
+    // Reset calculator
+    function resetCalculator() {
+        document.getElementById('destination').value = '';
+        document.getElementById('numPeople').value = '7';
+        document.getElementById('numDays').value = '3';
+
+        document.getElementById('summaryDestination').textContent = '-';
+        document.getElementById('totalCost').textContent = 'Rs. 0';
+        document.getElementById('perPersonCost').textContent = 'Rs. 0';
+
+        updateSummary();
+    }
+
+    // Generate PDF (placeholder - would need backend implementation)
+    function generatePDF() {
+        const destinationSelect = document.getElementById('destination');
+        const destination = destinationSelect.options[destinationSelect.selectedIndex].text;
+        const numPeople = document.getElementById('numPeople').value;
+        const numDays = document.getElementById('numDays').value;
+        const totalCost = document.getElementById('totalCost').textContent;
+        const perPersonCost = document.getElementById('perPersonCost').textContent;
+
+        if (!destinationSelect.value || destination === 'Choose a destination...') {
+            alert('Please select a destination first!');
+            return;
+        }
+
+        alert(`PDF Download Feature Coming Soon!\n\nYour trip estimate:\n📍 ${destination}\n👥 ${numPeople} people, ${numDays} days\n💰 Total: ${totalCost}\n💵 Per Person: ${perPersonCost}`);
+
+        // In production, this would call a backend API to generate PDF
+        // window.location.href = '/content/calculator/download-pdf/?destination=' + ...
+    }
+</script>
+{% endblock %}

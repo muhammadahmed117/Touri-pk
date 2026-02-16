@@ -1,0 +1,418 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Tour Packages | TouriPK{% endblock %}
+
+{% block content %}
+<style>
+    .packages-hero {
+        background: linear-gradient(135deg, #000000 0%, #333333 100%);
+        color: white;
+        padding: 100px 0 80px;
+        text-align: center;
+    }
+
+    .packages-hero h1 {
+        font-size: 3.5rem;
+        font-weight: 900;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 20px;
+    }
+
+    .packages-hero p {
+        font-size: 1.3rem;
+        max-width: 800px;
+        margin: 0 auto;
+        opacity: 0.9;
+    }
+
+    .breadcrumb-nav {
+        background: #f8f9fa;
+        padding: 15px 0;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .breadcrumb-nav a {
+        color: #666;
+        text-decoration: none;
+        transition: color 0.3s;
+    }
+
+    .breadcrumb-nav a:hover {
+        color: #000000;
+    }
+
+    .breadcrumb-nav .active {
+        color: #000000;
+        font-weight: 600;
+    }
+
+    /* Tour Packages Section */
+    .tour-packages-section {
+        background: #ffffff;
+        padding: 80px 0;
+    }
+
+    .package-card-home {
+        background: white;
+        border-radius: 20px;
+        border: 2px solid #e2e8f0;
+        overflow: hidden;
+        transition: all 0.4s ease;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+    }
+
+    .package-card-home:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        border-color: #000000;
+    }
+
+    .featured-package {
+        border: 3px solid #000000;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    }
+
+    .featured-badge {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: #000000;
+        color: white;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        z-index: 10;
+    }
+
+    .package-header {
+        text-align: center;
+        padding: 40px 30px 30px;
+        background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+        border-bottom: 2px solid #e2e8f0;
+    }
+
+    .package-icon {
+        width: 80px;
+        height: 80px;
+        background: #000000;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        margin: 0 auto 20px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    .package-header h3 {
+        font-size: 1.8rem;
+        font-weight: 900;
+        color: #000000;
+        margin-bottom: 8px;
+    }
+
+    .package-subtitle {
+        color: #666;
+        font-size: 1rem;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .package-pricing {
+        padding: 30px;
+        flex: 1;
+    }
+
+    .package-pricing h4 {
+        font-size: 1.1rem;
+        font-weight: 800;
+        color: #000000;
+        margin: 25px 0 15px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #f0f0f0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .package-pricing h4:first-child {
+        margin-top: 0;
+    }
+
+    .pricing-item {
+        margin-bottom: 20px;
+    }
+
+    .pricing-item strong {
+        display: block;
+        color: #000000;
+        font-size: 0.95rem;
+        margin-bottom: 8px;
+    }
+
+    .pricing-item ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .pricing-item li {
+        padding: 8px 0;
+        color: #333;
+        font-size: 0.9rem;
+        border-bottom: 1px solid #f5f5f5;
+    }
+
+    .pricing-item li:last-child {
+        border-bottom: none;
+    }
+
+    .pricing-item li strong {
+        display: inline;
+        color: #000000;
+        font-weight: 700;
+        float: right;
+    }
+
+    .pricing-item small {
+        display: block;
+        color: #999;
+        font-size: 0.8rem;
+        margin-top: 3px;
+    }
+
+    .package-footer {
+        padding: 25px 30px;
+        background: #f8f9fa;
+        border-top: 2px solid #e2e8f0;
+    }
+
+    .btn-package {
+        display: block;
+        width: 100%;
+        padding: 15px 25px;
+        background: #000000;
+        color: white;
+        text-align: center;
+        border-radius: 10px;
+        font-weight: 700;
+        font-size: 1rem;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        border: 2px solid #000000;
+    }
+
+    .btn-package:hover {
+        background: white;
+        color: #000000;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .btn-package i {
+        margin-right: 8px;
+    }
+
+    @media (max-width: 992px) {
+        .package-card-home {
+            margin-bottom: 30px;
+        }
+        
+        .packages-hero h1 {
+            font-size: 2.5rem;
+        }
+    }
+</style>
+
+<!-- Hero Section -->
+<div class="packages-hero">
+    <div class="container">
+        <h1>
+            <i class="fas fa-suitcase-rolling"></i>
+            Tour Packages
+        </h1>
+        <p>Explore Pakistan with our all-inclusive tour packages featuring fixed pricing and premium services</p>
+    </div>
+</div>
+
+<!-- Breadcrumb -->
+<nav class="breadcrumb-nav">
+    <div class="container">
+        <a href="{% url 'home' %}">Home</a>
+        <span class="mx-2">/</span>
+        <a href="{% url 'content:destination_list' %}">Destinations</a>
+        <span class="mx-2">/</span>
+        <span class="active">Tour Packages</span>
+    </div>
+</nav>
+
+<!-- Tour Packages Section -->
+<section class="tour-packages-section">
+    <div class="container">
+        <div class="row g-4">
+            <!-- Swat - Naran - Kashmir Package -->
+            <div class="col-lg-4 col-md-6">
+                <div class="package-card-home">
+                    <div class="package-header">
+                        <div class="package-icon">
+                            <i class="fas fa-mountain"></i>
+                        </div>
+                        <h3>Swat - Naran - Kashmir</h3>
+                        <p class="package-subtitle">Valley of Mountains & Lakes</p>
+                    </div>
+                    
+                    <div class="package-pricing">
+                        <h4><i class="fas fa-car"></i> Transport (Fixed Cost)</h4>
+                        <div class="pricing-item">
+                            <strong>Coaster (15-27 people)</strong>
+                            <ul>
+                                <li>Rent: <strong>Rs. 26,000</strong>/day</li>
+                                <li>Fuel: <strong>Rs. 85,000</strong></li>
+                                <li>Toll/Challan: <strong>Rs. 15,000</strong></li>
+                                <li>First Aid: <strong>Rs. 1,000</strong> (Compulsory)</li>
+                            </ul>
+                        </div>
+                        <div class="pricing-item">
+                            <strong>Grand Cabin (7-13 people)</strong>
+                            <ul>
+                                <li>Rent: <strong>Rs. 20,000</strong>/day</li>
+                                <li>Fuel: <strong>Rs. 70,000</strong></li>
+                                <li>Toll/Challan: <strong>Rs. 15,000</strong></li>
+                                <li>First Aid: <strong>Rs. 1,000</strong> (Compulsory)</li>
+                            </ul>
+                        </div>
+                        
+                        <h4><i class="fas fa-hotel"></i> Accommodation</h4>
+                        <div class="pricing-item">
+                            <p>Per Room Per Night:</p>
+                            <ul>
+                                <li>Luxury: <strong>Rs. 15,000</strong></li>
+                                <li>Delux: <strong>Rs. 10,000</strong></li>
+                                <li>Standard: <strong>Rs. 5,000</strong></li>
+                            </ul>
+                        </div>
+                        
+                        <h4><i class="fas fa-utensils"></i> Food</h4>
+                        <div class="pricing-item">
+                            <p>Per Person Per Day:</p>
+                            <ul>
+                                <li>Breakfast: <strong>Rs. 500</strong><br><small>Egg, Pratha, Tea, Chanay, Bread, Jam</small></li>
+                                <li>Dinner: <strong>Rs. 1,050</strong><br><small>Chicken, Daal, Rotti, Salad, Raita, Cold Drink</small></li>
+                            </ul>
+                        </div>
+                        
+                        <h4><i class="fas fa-hiking"></i> Activities</h4>
+                        <div class="pricing-item">
+                            <ul>
+                                <li>Bonfire + Musical Night: <strong>Rs. 7,000</strong></li>
+                                <li>Guide: <strong>Rs. 2,500</strong>/day</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+            
+            <!-- Hunza Package -->
+            <div class="col-lg-4 col-md-6">
+                <div class="package-card-home featured-package">
+                    <div class="featured-badge">
+                        <i class="fas fa-star"></i> Popular
+                    </div>
+                    <div class="package-header">
+                        <div class="package-icon">
+                            <i class="fas fa-mountain-sun"></i>
+                        </div>
+                        <h3>Hunza</h3>
+                        <p class="package-subtitle">Land of Legends</p>
+                    </div>
+                    
+                    <div class="package-pricing">
+                        <h4><i class="fas fa-car"></i> Transport (Fixed Cost)</h4>
+                        <div class="pricing-item">
+                            <strong>Coaster (15-27 people)</strong>
+                            <ul>
+                                <li>Rent: <strong>Rs. 26,000</strong>/day</li>
+                                <li>Fuel: <strong>Rs. 130,000</strong></li>
+                                <li>Toll/Challan: <strong>Rs. 20,000</strong></li>
+                                <li>First Aid: <strong>Rs. 1,000</strong> (Compulsory)</li>
+                            </ul>
+                        </div>
+                        <div class="pricing-item">
+                            <strong>Grand Cabin (7-13 people)</strong>
+                            <ul>
+                                <li>Rent: <strong>Rs. 20,000</strong>/day</li>
+                                <li>Fuel: <strong>Rs. 100,000</strong></li>
+                                <li>Toll/Challan: <strong>Rs. 20,000</strong></li>
+                                <li>First Aid: <strong>Rs. 1,000</strong> (Compulsory)</li>
+                            </ul>
+                        </div>
+                        
+                        <h4><i class="fas fa-hotel"></i> Accommodation - Food - Activities</h4>
+                        <div class="pricing-item">
+                            <p style="text-align: center; padding: 20px; background: #f8f9fa; border-radius: 8px; margin: 10px 0;">
+                                <strong>Same as Swat - Naran - Kashmir</strong>
+                            </p>
+                        </div>
+                    </div>
+                    
+
+                </div>
+            </div>
+            
+            <!-- Skardu Package -->
+            <div class="col-lg-4 col-md-6">
+                <div class="package-card-home">
+                    <div class="package-header">
+                        <div class="package-icon">
+                            <i class="fas fa-mountain-city"></i>
+                        </div>
+                        <h3>Skardu</h3>
+                        <p class="package-subtitle">Gateway to Heaven</p>
+                    </div>
+                    
+                    <div class="package-pricing">
+                        <h4><i class="fas fa-car"></i> Transport (Fixed Cost)</h4>
+                        <div class="pricing-item">
+                            <strong>Coaster (15-27 people)</strong>
+                            <ul>
+                                <li>Rent: <strong>Rs. 26,000</strong>/day</li>
+                                <li>Fuel: <strong>Rs. 150,000</strong></li>
+                                <li>Toll/Challan: <strong>Rs. 20,000</strong></li>
+                                <li>First Aid: <strong>Rs. 1,000</strong> (Compulsory)</li>
+                            </ul>
+                        </div>
+                        <div class="pricing-item">
+                            <strong>Grand Cabin (7-13 people)</strong>
+                            <ul>
+                                <li>Rent: <strong>Rs. 20,000</strong>/day</li>
+                                <li>Fuel: <strong>Rs. 130,000</strong></li>
+                                <li>Toll/Challan: <strong>Rs. 20,000</strong></li>
+                                <li>First Aid: <strong>Rs. 1,000</strong> (Compulsory)</li>
+                            </ul>
+                        </div>
+                        
+                        <h4><i class="fas fa-hotel"></i> Accommodation - Food - Activities</h4>
+                        <div class="pricing-item">
+                            <p style="text-align: center; padding: 20px; background: #f8f9fa; border-radius: 8px; margin: 10px 0;">
+                                <strong>Same as Swat - Naran - Kashmir</strong>
+                            </p>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</section>
+{% endblock %}

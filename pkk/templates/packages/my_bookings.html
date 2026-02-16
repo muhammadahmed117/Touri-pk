@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% block title %}My Bookings{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h2><i class="fas fa-suitcase me-2"></i>My Bookings</h2>
+    
+    {% if bookings %}
+    <div class="row g-4 mt-2">
+        {% for booking in bookings %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 shadow-sm">
+                {% if booking.package.image %}
+                <img src="{{ booking.package.image.url }}" class="card-img-top" alt="{{ booking.package.name }}" style="height:180px;object-fit:cover;">
+                {% else %}
+                <div class="card-img-top" style="height:180px;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;">
+                    <i class="fas fa-mountain fa-3x text-white"></i>
+                </div>
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ booking.package.name }}</h5>
+                    <p class="text-muted mb-1">
+                        <i class="fas fa-building"></i> {{ booking.package.company.name }}
+                    </p>
+                    <p class="mb-1">
+                        <i class="fas fa-calendar"></i> {{ booking.travel_date|date:"M d, Y" }}
+                    </p>
+                    <p class="mb-1">
+                        <i class="fas fa-users"></i> {{ booking.num_adults }} adults, {{ booking.num_children }} children
+                    </p>
+                    <p class="mb-2">
+                        <strong>PKR {{ booking.total_amount|floatformat:0 }}</strong>
+                    </p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        {% if booking.status == 'confirmed' %}
+                        <span class="badge bg-success">Confirmed</span>
+                        {% elif booking.status == 'pending' %}
+                        <span class="badge bg-warning">Pending</span>
+                        {% elif booking.status == 'completed' %}
+                        <span class="badge bg-info">Completed</span>
+                        {% elif booking.status == 'cancelled' %}
+                        <span class="badge bg-danger">Cancelled</span>
+                        {% endif %}
+                        
+                        <small class="text-muted">{{ booking.booking_reference }}</small>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    {% if booking.status == 'completed' and booking.id not in reviewed_booking_ids %}
+                    <a href="{% url 'packages:add_package_review' booking.package.slug booking.id %}" class="btn btn-sm btn-outline-warning w-100">
+                        <i class="fas fa-star"></i> Write Review
+                    </a>
+                    {% elif booking.id in reviewed_booking_ids %}
+                    <span class="text-success"><i class="fas fa-check-circle"></i> Reviewed</span>
+                    {% else %}
+                    <a href="{% url 'packages:package_detail' booking.package.slug %}" class="btn btn-sm btn-outline-primary w-100">
+                        View Package
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="alert alert-info mt-4">
+        <i class="fas fa-info-circle"></i> You don't have any bookings yet.
+        <a href="{% url 'packages:package_list' %}" class="alert-link">Browse tour packages</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

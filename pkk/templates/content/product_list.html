@@ -1,0 +1,527 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Products | TouriPK{% endblock %}
+
+{% block content %}
+<style>
+    /* Hero Section */
+    .products-hero {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 100px 0 80px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .products-hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        opacity: 0.3;
+    }
+
+    .hero-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.2);
+    }
+
+    .stats-badge {
+        background: rgba(255,255,255,0.2);
+        backdrop-filter: blur(10px);
+        padding: 12px 24px;
+        border-radius: 50px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid rgba(255,255,255,0.3);
+    }
+
+    .stats-badge i {
+        font-size: 1.2rem;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .animate-fade-in { animation: fadeIn 0.6s ease-out; }
+    .animate-fade-in-delay { animation: fadeIn 0.6s ease-out 0.2s backwards; }
+    .animate-fade-in-delay-2 { animation: fadeIn 0.6s ease-out 0.4s backwards; }
+
+    /* Products Grid */
+    .products-container {
+        padding: 40px 0 80px;
+        background: #f8f9fa;
+    }
+
+    .products-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 30px;
+        margin-top: 30px;
+    }
+
+    /* Product Card */
+    .product-card {
+        background: white;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        transition: all 0.4s ease;
+        cursor: pointer;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    .product-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+    }
+
+    .product-image-wrapper {
+        position: relative;
+        height: 280px;
+        overflow: hidden;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    }
+
+    .product-image-wrapper img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.6s ease;
+    }
+
+    .product-card:hover .product-image-wrapper img {
+        transform: scale(1.1);
+    }
+
+    .product-badge {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        background: linear-gradient(135deg, #ffd700, #ff9500);
+        color: #1a1a1a;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+    }
+
+    .stock-badge {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        backdrop-filter: blur(10px);
+    }
+
+    .in-stock {
+        background: rgba(34, 197, 94, 0.9);
+        color: white;
+    }
+
+    .out-of-stock {
+        background: rgba(239, 68, 68, 0.9);
+        color: white;
+    }
+
+    .product-content {
+        padding: 25px;
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+    }
+
+    .product-category {
+        color: #667eea;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 10px;
+    }
+
+    .product-weight {
+        color: #888;
+        font-size: 0.85rem;
+        margin-bottom: 8px;
+        min-height: 24px;
+    }
+
+    .product-name {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #1a1a2e;
+        margin-bottom: 12px;
+        line-height: 1.4;
+    }
+
+    .product-description {
+        color: #666;
+        font-size: 0.95rem;
+        line-height: 1.6;
+        margin-bottom: auto;
+        padding-bottom: 20px;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .product-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 20px;
+        border-top: 2px solid #f0f0f0;
+        gap: 15px;
+        min-height: 60px;
+    }
+
+    .product-price {
+        font-size: 2rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        flex-shrink: 0;
+        line-height: 1.2;
+    }
+
+    .btn-buy {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        padding: 12px 28px;
+        border-radius: 30px;
+        font-weight: 700;
+        font-size: 0.95rem;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        white-space: nowrap;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        flex-shrink: 0;
+        height: 45px;
+    }
+
+    .btn-buy:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+        color: white;
+    }
+
+    .btn-buy:active {
+        transform: translateY(-1px);
+    }
+
+    .btn-buy:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none !important;
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 80px 20px;
+    }
+
+    .empty-icon {
+        font-size: 5rem;
+        color: #e9ecef;
+        margin-bottom: 20px;
+    }
+
+    .empty-icon i {
+        animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-20px); }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .products-hero { padding: 60px 0 40px; }
+        .display-3 { font-size: 2.2rem; }
+        .lead { font-size: 1.1rem; }
+        .products-grid {
+            grid-template-columns: 1fr;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .product-price {
+            font-size: 1.75rem;
+        }
+        
+        .btn-buy {
+            padding: 11px 24px;
+            font-size: 0.9rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .product-footer {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 15px;
+            min-height: auto;
+        }
+        
+        .product-price {
+            text-align: center;
+            font-size: 1.8rem;
+        }
+        
+        .btn-buy {
+            width: 100%;
+            padding: 14px 30px;
+            font-size: 1rem;
+        }
+    }
+</style>
+
+<!-- Hero Section -->
+<section class="products-hero position-relative">
+    <div class="hero-overlay"></div>
+    <div class="container position-relative" style="z-index: 2;">
+        <div class="text-center text-white py-5">
+            <h1 class="display-3 fw-bold mb-3 animate-fade-in">Discover Local Products</h1>
+            <p class="lead mb-4 animate-fade-in-delay">Authentic Pakistani handicrafts, foods, and souvenirs</p>
+            <div class="d-flex justify-content-center gap-3 flex-wrap animate-fade-in-delay-2">
+                <div class="stats-badge">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span>{{ products.count }} Products</span>
+                </div>
+                <div class="stats-badge">
+                    <i class="fas fa-handshake"></i>
+                    <span>Local Artisans</span>
+                </div>
+                <div class="stats-badge">
+                    <i class="fas fa-certificate"></i>
+                    <span>100% Authentic</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- Search and Filter Section -->
+<section class="bg-light py-3 sticky-top shadow-sm" style="top: 80px; z-index: 1020;">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 mb-2 mb-md-0">
+                <form method="get" class="d-flex gap-2">
+                    {% if selected_category %}
+                    <input type="hidden" name="category" value="{{ selected_category }}">
+                    {% endif %}
+                    <input type="text" name="search" class="form-control" placeholder="Search products..." value="{{ search_query }}" style="border-radius: 25px;">
+                    <button type="submit" class="btn btn-primary" style="border-radius: 25px; padding: 0 25px;">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                    {% if search_query or selected_category %}
+                    <a href="{% url 'content:product_list' %}" class="btn btn-outline-secondary" style="border-radius: 25px;">
+                        <i class="fas fa-times"></i> Clear
+                    </a>
+                    {% endif %}
+                </form>
+            </div>
+            <div class="col-md-6">
+                <form method="get" class="d-flex gap-2">
+                    {% if search_query %}
+                    <input type="hidden" name="search" value="{{ search_query }}">
+                    {% endif %}
+                    <select name="category" class="form-select" style="border-radius: 25px;" onchange="this.form.submit()">
+                        <option value="">All Categories</option>
+                        {% for cat_value, cat_name in categories %}
+                        <option value="{{ cat_value }}" {% if selected_category == cat_value %}selected{% endif %}>
+                            {{ cat_name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Products Grid -->
+<section class="products-container">
+    <div class="container">
+        {% if products %}
+        <div class="products-grid">
+            {% for product in products %}
+            <div class="product-card">
+                <div class="product-image-wrapper">
+                    {% if product.image %}
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                    {% else %}
+                    <img src="{% static 'images/products/default.jpg' %}" alt="{{ product.name }}">
+                    {% endif %}
+                    
+                    {% if product.is_featured %}
+                    <span class="product-badge">
+                        <i class="fas fa-star"></i> Featured
+                    </span>
+                    {% endif %}
+                    
+                    <span class="stock-badge {% if product.is_in_stock %}in-stock{% else %}out-of-stock{% endif %}">
+                        {% if product.is_in_stock %}
+                            <i class="fas fa-check-circle"></i> In Stock
+                        {% else %}
+                            <i class="fas fa-times-circle"></i> Out of Stock
+                        {% endif %}
+                    </span>
+                </div>
+                
+                <div class="product-content">
+                    <div class="product-category">{{ product.get_category_display }}</div>
+                    <div class="product-weight">
+                        {% if "Shilajit" not in product.name %}
+                        <i class="fas fa-weight-hanging"></i> {{ product.weight_kg }} KG
+                        {% endif %}
+                    </div>
+                    <h3 class="product-name">{{ product.name }}</h3>
+                    <p class="product-description">{{ product.description }}</p>
+                    
+                    <div class="product-footer">
+                        <div class="product-price">Rs. {{ product.price|floatformat:0 }}</div>
+                        {% if user.is_authenticated %}
+                            <button type="button" class="btn-buy ajax-add-cart" data-url="{% url 'content:add_to_cart' product.id %}" {% if not product.is_in_stock %}disabled style="opacity: 0.5; cursor: not-allowed;"{% endif %}>
+                                <i class="fas fa-shopping-cart"></i> Add to Cart
+                            </button>
+                        {% else %}
+                            <a href="{% url 'login' %}?next={{ request.path }}" class="btn-buy">
+                                <i class="fas fa-sign-in-alt"></i> Login to Buy
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">
+                <i class="fas fa-shopping-bag"></i>
+            </div>
+            <h3 class="text-muted mb-3">No Products Found</h3>
+            <p class="text-muted">
+                {% if search_query %}
+                    No products match your search "{{ search_query }}". Try different keywords.
+                {% elif selected_category %}
+                    No products in this category yet.
+                {% else %}
+                    Check back soon for our collection of authentic Pakistani products.
+                {% endif %}
+            </p>
+            {% if search_query or selected_category %}
+            <a href="{% url 'content:product_list' %}" class="btn btn-primary mt-3" style="border-radius: 25px;">
+                <i class="fas fa-arrow-left"></i> View All Products
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const csrfToken = '{{ csrf_token }}';
+
+    function showToast(msg, type) {
+        let toast = document.getElementById('product-toast');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.id = 'product-toast';
+            toast.style.cssText = 'position:fixed;top:90px;right:20px;z-index:9999;padding:14px 24px;border-radius:12px;color:#fff;font-weight:600;font-size:0.95rem;box-shadow:0 6px 20px rgba(0,0,0,0.2);transition:opacity 0.4s;opacity:0;max-width:350px;';
+            document.body.appendChild(toast);
+        }
+        toast.textContent = msg;
+        toast.style.background = type === 'error' ? '#ef4444' : 'linear-gradient(135deg,#667eea,#764ba2)';
+        toast.style.opacity = '1';
+        clearTimeout(toast._timer);
+        toast._timer = setTimeout(() => { toast.style.opacity = '0'; }, 2500);
+    }
+
+    document.querySelectorAll('.ajax-add-cart').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (this.disabled) return;
+            const url = this.dataset.url;
+            const button = this;
+            const origHTML = button.innerHTML;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
+            button.disabled = true;
+
+            fetch(url, {
+                method: 'GET',
+                headers: { 
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': csrfToken 
+                },
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    showToast(data.message, 'success');
+                    // Update all cart badge elements
+                    const badges = document.querySelectorAll('.cart-count, .cart-count-mobile');
+                    badges.forEach(badge => {
+                        badge.textContent = data.cart_count;
+                        if (data.cart_count > 0) {
+                            badge.style.display = 'flex';
+                        }
+                    });
+                    button.innerHTML = '<i class="fas fa-check"></i> Added!';
+                    setTimeout(() => {
+                        button.innerHTML = origHTML;
+                        button.disabled = false;
+                    }, 1200);
+                } else {
+                    showToast(data.message, 'error');
+                    button.innerHTML = origHTML;
+                    button.disabled = false;
+                }
+            })
+            .catch(() => {
+                showToast('Something went wrong.', 'error');
+                button.innerHTML = origHTML;
+                button.disabled = false;
+            });
+        });
+    });
+});
+</script>
+{% endblock %}
