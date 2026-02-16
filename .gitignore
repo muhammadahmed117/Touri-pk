@@ -10,16 +10,16 @@ __pycache__/
 venv/
 env/
 ENV/
-.venv
 
 # Django
 *.log
 db.sqlite3
 db.sqlite3-journal
-media/
+/media/
+/static/
 staticfiles/
 
-# IDEs
+# IDE
 .vscode/
 .idea/
 *.swp
@@ -32,10 +32,12 @@ Thumbs.db
 
 # Environment variables
 .env
-
-# Migrations (optional - keep if you want to track them)
-# */migrations/*
+.env.local
 
 # Cache
 .cache/
 *.cache
+
+# Backups
+*.bak
+*.backup
