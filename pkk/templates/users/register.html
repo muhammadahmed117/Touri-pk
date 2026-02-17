@@ -42,9 +42,41 @@
                     <form method="post" novalidate class="space-y-4 sm:space-y-5">
                         {% csrf_token %}
 
-                        {% if form.non_field_errors %}
-                        <div class="p-3 sm:p-4 rounded-lg sm:rounded-xl bg-gradient-to-r from-red-50 to-rose-50 border-l-4 border-red-500 text-red-800 text-sm">
-                            {{ form.non_field_errors }}
+                        {% if form.errors %}
+                        <div class="p-4 rounded-xl bg-gradient-to-r from-red-50 to-rose-50 border-2 border-red-500 text-red-800 shadow-lg animate-slide-up">
+                            <div class="flex items-start gap-3">
+                                <i class="fas fa-exclamation-triangle text-2xl text-red-600 mt-1"></i>
+                                <div class="flex-1">
+                                    <h4 class="font-bold text-base mb-2">Please fix the following errors:</h4>
+                                    <ul class="list-disc list-inside space-y-1 text-sm">
+                                        {% if form.non_field_errors %}
+                                            {% for error in form.non_field_errors %}
+                                            <li>{{ error }}</li>
+                                            {% endfor %}
+                                        {% endif %}
+                                        {% if form.username.errors %}
+                                            {% for error in form.username.errors %}
+                                            <li><strong>Username:</strong> {{ error }}</li>
+                                            {% endfor %}
+                                        {% endif %}
+                                        {% if form.email.errors %}
+                                            {% for error in form.email.errors %}
+                                            <li><strong>Email:</strong> {{ error }}</li>
+                                            {% endfor %}
+                                        {% endif %}
+                                        {% if form.password1.errors %}
+                                            {% for error in form.password1.errors %}
+                                            <li><strong>Password:</strong> {{ error }}</li>
+                                            {% endfor %}
+                                        {% endif %}
+                                        {% if form.password2.errors %}
+                                            {% for error in form.password2.errors %}
+                                            <li><strong>Confirm Password:</strong> {{ error }}</li>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </ul>
+                                </div>
+                            </div>
                         </div>
                         {% endif %}
 
@@ -54,17 +86,21 @@
                                 <i class="fas fa-user text-emerald-600"></i>
                                 {{ form.username.label }} <span class="text-red-500">*</span>
                             </label>
-                            <div class="relative">
+                            <div class="relative {% if form.username.errors %}border-2 border-red-500 rounded-xl{% endif %}">
                                 {{ form.username }}
                                 <div class="absolute inset-0 rounded-xl bg-gradient-to-r from-emerald-400 to-teal-400 opacity-0 group-hover:opacity-20 transition-opacity duration-300 pointer-events-none"></div>
                             </div>
                             {% if form.username.errors %}
-                            <div class="text-red-600 text-xs sm:text-sm mt-2 flex items-center gap-1 animate-slide-up">
-                                <i class="fas fa-exclamation-triangle"></i>
-                                {{ form.username.errors }}
+                            <div class="text-red-700 text-xs sm:text-sm mt-2 p-3 bg-red-50 rounded-lg border border-red-200 flex items-start gap-2 animate-slide-up">
+                                <i class="fas fa-exclamation-circle text-red-600 mt-0.5"></i>
+                                <div class="flex-1">
+                                    {% for error in form.username.errors %}
+                                    <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
                             </div>
                             {% endif %}
-                            {% if form.username.help_text %}
+                            {% if form.username.help_text and not form.username.errors %}
                             <small class="text-gray-500 text-xs mt-1 block">{{ form.username.help_text }}</small>
                             {% endif %}
                         </div>
@@ -75,16 +111,21 @@
                                 <i class="fas fa-envelope text-emerald-600"></i>
                                 {{ form.email.label }} <span class="text-red-500">*</span>
                             </label>
-                            <div class="relative">
+                            <div class="relative {% if form.email.errors %}border-2 border-red-500 rounded-xl{% endif %}">
                                 {{ form.email }}
                                 <div class="absolute inset-0 rounded-xl bg-gradient-to-r from-emerald-400 to-teal-400 opacity-0 group-hover:opacity-20 transition-opacity duration-300 pointer-events-none"></div>
                             </div>
                             {% if form.email.errors %}
-                            <div class="text-red-600 text-xs sm:text-sm mt-2 flex items-center gap-1 animate-slide-up">
-                                {{ form.email.errors }}
+                            <div class="text-red-700 text-xs sm:text-sm mt-2 p-3 bg-red-50 rounded-lg border border-red-200 flex items-start gap-2 animate-slide-up">
+                                <i class="fas fa-exclamation-circle text-red-600 mt-0.5"></i>
+                                <div class="flex-1">
+                                    {% for error in form.email.errors %}
+                                    <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
                             </div>
                             {% endif %}
-                            {% if form.email.help_text %}
+                            {% if form.email.help_text and not form.email.errors %}
                             <small class="text-gray-500 text-xs mt-1 block">{{ form.email.help_text }}</small>
                             {% endif %}
                         </div>
@@ -95,16 +136,21 @@
                                 <i class="fas fa-lock text-emerald-600"></i>
                                 {{ form.password1.label }} <span class="text-red-500">*</span>
                             </label>
-                            <div class="relative">
+                            <div class="relative {% if form.password1.errors %}border-2 border-red-500 rounded-xl{% endif %}">
                                 {{ form.password1 }}
                                 <div class="absolute inset-0 rounded-xl bg-gradient-to-r from-emerald-400 to-teal-400 opacity-0 group-hover:opacity-20 transition-opacity duration-300 pointer-events-none"></div>
                             </div>
                             {% if form.password1.errors %}
-                            <div class="text-red-600 text-xs sm:text-sm mt-2 flex items-center gap-1 animate-slide-up">
-                                {{ form.password1.errors }}
+                            <div class="text-red-700 text-xs sm:text-sm mt-2 p-3 bg-red-50 rounded-lg border border-red-200 flex items-start gap-2 animate-slide-up">
+                                <i class="fas fa-exclamation-circle text-red-600 mt-0.5"></i>
+                                <div class="flex-1">
+                                    {% for error in form.password1.errors %}
+                                    <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
                             </div>
                             {% endif %}
-                            {% if form.password1.help_text %}
+                            {% if form.password1.help_text and not form.password1.errors %}
                             <small class="text-gray-500 text-xs mt-1 block">{{ form.password1.help_text }}</small>
                             {% endif %}
                         </div>
@@ -115,16 +161,21 @@
                                 <i class="fas fa-lock text-emerald-600"></i>
                                 {{ form.password2.label }} <span class="text-red-500">*</span>
                             </label>
-                            <div class="relative">
+                            <div class="relative {% if form.password2.errors %}border-2 border-red-500 rounded-xl{% endif %}">
                                 {{ form.password2 }}
                                 <div class="absolute inset-0 rounded-xl bg-gradient-to-r from-emerald-400 to-teal-400 opacity-0 group-hover:opacity-20 transition-opacity duration-300 pointer-events-none"></div>
                             </div>
                             {% if form.password2.errors %}
-                            <div class="text-red-600 text-xs sm:text-sm mt-2 flex items-center gap-1 animate-slide-up">
-                                {{ form.password2.errors }}
+                            <div class="text-red-700 text-xs sm:text-sm mt-2 p-3 bg-red-50 rounded-lg border border-red-200 flex items-start gap-2 animate-slide-up">
+                                <i class="fas fa-exclamation-circle text-red-600 mt-0.5"></i>
+                                <div class="flex-1">
+                                    {% for error in form.password2.errors %}
+                                    <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
                             </div>
                             {% endif %}
-                            {% if form.password2.help_text %}
+                            {% if form.password2.help_text and not form.password2.errors %}
                             <small class="text-gray-500 text-xs mt-1 block">{{ form.password2.help_text }}</small>
                             {% endif %}
                             <div class="form-check mt-3 flex items-center gap-2">
@@ -202,10 +253,128 @@
             if (!input) return;
             input.type = checkbox.checked ? 'text' : 'password';
         }
+
+        // Real-time validation functions
+        function validateField(input) {
+            var parent = input.closest('.relative.group');
+            if (!parent) return;
+            
+            var fieldName = input.name;
+            var value = input.value.trim();
+            var isValid = true;
+            var errorMsg = '';
+
+            // Username validation
+            if (fieldName === 'username') {
+                if (value.length < 3) {
+                    isValid = false;
+                    errorMsg = 'Username must be at least 3 characters';
+                } else if (!/^[a-zA-Z0-9_]+$/.test(value)) {
+                    isValid = false;
+                    errorMsg = 'Username can only contain letters, numbers, and underscores';
+                }
+            }
+
+            // Email validation
+            if (fieldName === 'email') {
+                var emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailPattern.test(value)) {
+                    isValid = false;
+                    errorMsg = 'Please enter a valid email address';
+                }
+            }
+
+            // Password validation
+            if (fieldName === 'password1') {
+                if (value.length < 8) {
+                    isValid = false;
+                    errorMsg = 'Password must be at least 8 characters';
+                } else if (!/[A-Z]/.test(value)) {
+                    isValid = false;
+                    errorMsg = 'Password must contain at least one uppercase letter';
+                } else if (!/[a-z]/.test(value)) {
+                    isValid = false;
+                    errorMsg = 'Password must contain at least one lowercase letter';
+                } else if (!/[0-9]/.test(value)) {
+                    isValid = false;
+                    errorMsg = 'Password must contain at least one number';
+                }
+            }
+
+            // Confirm password validation
+            if (fieldName === 'password2') {
+                var password1 = document.querySelector('input[name="password1"]');
+                if (password1 && value !== password1.value) {
+                    isValid = false;
+                    errorMsg = 'Passwords do not match';
+                }
+            }
+
+            // Apply visual feedback
+            if (value === '') {
+                // Empty field - remove all styling
+                input.classList.remove('border-red-500', 'border-green-500', 'border-2');
+                removeInlineError(parent);
+            } else if (isValid) {
+                // Valid field - green border
+                input.classList.remove('border-red-500');
+                input.classList.add('border-green-500', 'border-2');
+                removeInlineError(parent);
+            } else {
+                // Invalid field - red border with error message
+                input.classList.remove('border-green-500');
+                input.classList.add('border-red-500', 'border-2');
+                showInlineError(parent, errorMsg);
+            }
+        }
+
+        function showInlineError(parent, message) {
+            removeInlineError(parent);
+            var errorDiv = document.createElement('div');
+            errorDiv.className = 'inline-validation-error text-red-600 text-xs mt-1 animate-slide-up';
+            errorDiv.innerHTML = '<i class="fas fa-exclamation-circle mr-1"></i>' + message;
+            parent.appendChild(errorDiv);
+        }
+
+        function removeInlineError(parent) {
+            var existing = parent.querySelector('.inline-validation-error');
+            if (existing) {
+                existing.remove();
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function () {
             document.querySelectorAll('.toggle-password').forEach(function (cb) {
                 cb.addEventListener('change', function () { toggleVisibility(cb); });
             });
+            
+            // Add real-time validation to all form inputs
+            var formInputs = document.querySelectorAll('input[name="username"], input[name="email"], input[name="password1"], input[name="password2"]');
+            formInputs.forEach(function(input) {
+                // Validate on blur (when user leaves the field)
+                input.addEventListener('blur', function() {
+                    if (this.value.trim() !== '') {
+                        validateField(this);
+                    }
+                });
+                
+                // Also validate on input for password matching
+                if (input.name === 'password2') {
+                    input.addEventListener('input', function() {
+                        if (this.value !== '') {
+                            validateField(this);
+                        }
+                    });
+                }
+            });
+            
+            // Auto scroll to error summary if there are errors
+            var errorBox = document.querySelector('.border-red-500.shadow-lg');
+            if (errorBox) {
+                setTimeout(function() {
+                    errorBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 100);
+            }
         });
     })();
 </script>

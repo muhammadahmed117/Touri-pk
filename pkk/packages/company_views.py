@@ -3,9 +3,15 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils.text import slugify
 from django.db.models import Q
+from django.core.exceptions import ValidationError
 from functools import wraps
 from .models import Company, Package, Booking, PackageReview
 from content.models import Product, AdminNotification
+from users.security_utils import validate_file_upload, log_security_event
+import logging
+import re
+
+logger = logging.getLogger(__name__)
 
 
 def company_required(view_func):
@@ -163,11 +169,12 @@ def add_package(request):
         if min_p and max_p and max_p < min_p:
             errors.append('Max people cannot be less than Min people.')
 
+        # Validate image upload
         if image:
-            if image.size > 5 * 1024 * 1024:
-                errors.append('Image must be less than 5MB.')
-            if not image.content_type.startswith('image/'):
-                errors.append('Please upload a valid image file (JPEG, PNG).')
+            try:
+                validate_file_upload(image, max_size_mb=5)
+            except ValidationError as e:
+                errors.append(str(e))
 
         if name:
             base_slug = slugify(name)
@@ -292,6 +299,13 @@ def edit_package(request, package_id):
 
         if min_p and max_p and max_p < min_p:
             errors.append('Max people cannot be less than Min people.')
+
+        # Validate image upload if provided
+        if image:
+            try:
+                validate_file_upload(image, max_size_mb=5)
+            except ValidationError as e:
+                errors.append(str(e))
 
         # Check slug uniqueness if name changed
         new_slug = slugify(name)
@@ -422,11 +436,12 @@ def add_product(request):
             errors.append('Weight must be a valid number.')
             weight_val = 1.0
 
+        # Validate image upload
         if image:
-            if image.size > 5 * 1024 * 1024:
-                errors.append('Image must be less than 5MB.')
-            if not image.content_type.startswith('image/'):
-                errors.append('Please upload a valid image file.')
+            try:
+                validate_file_upload(image, max_size_mb=5)
+            except ValidationError as e:
+                errors.append(str(e))
 
         if errors:
             for err in errors:
@@ -510,6 +525,13 @@ def edit_product(request, product_id):
                 errors.append('Weight must be greater than 0.')
         except (ValueError, TypeError):
             weight_val = float(product.weight_kg)
+
+        # Validate image upload if provided
+        if image:
+            try:
+                validate_file_upload(image, max_size_mb=5)
+            except ValidationError as e:
+                errors.append(str(e))
 
         if errors:
             for err in errors:

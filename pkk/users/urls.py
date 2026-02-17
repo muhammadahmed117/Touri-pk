@@ -6,7 +6,7 @@ urlpatterns = [
     path('register/', views.UserRegisterView.as_view(), name='register'),
     path('register/company/', views.CompanyRegisterView.as_view(), name='register_company'),
     path('login/', views.UserLoginView.as_view(), name='login'),
-    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
+    path('logout/', views.logout_view, name='logout'),
     path('dashboard/', views.dashboard, name='dashboard'),
     
     # Password reset URLs (important for security)

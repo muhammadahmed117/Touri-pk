@@ -9,6 +9,7 @@ from packages.models import Company
 from .utils.weather import get_weather_data
 from django.conf import settings
 from django.utils import timezone
+from users.security_utils import log_security_event
 import stripe
 import json
 import logging
@@ -267,6 +268,19 @@ def payment_success(request, order_id):
         order.paid_at = timezone.now()
         order.save()
         
+        # Log successful payment
+        log_security_event(
+            'payment_success',
+            request.user,
+            {
+                'order_id': order.id,
+                'order_number': order.order_number,
+                'amount': str(order.total_price),
+                'destination': order.destination
+            },
+            level='info'
+        )
+        
         # Notify admin about payment
         AdminNotification.objects.create(
             notification_type='payment',
@@ -512,6 +526,17 @@ def place_order(request):
                 messages.error(request, 'Please enter a valid Transaction ID (5-50 characters, letters, numbers & hyphens only).')
                 return redirect('content:checkout')
         
+        # Revalidate stock availability (race condition protection)
+        for cart_item in cart_items:
+            # Refresh from database to get current stock
+            cart_item.product.refresh_from_db()
+            if not cart_item.product.is_in_stock():
+                messages.error(request, f'{cart_item.product.name} is out of stock. Please update your cart.')
+                return redirect('content:view_cart')
+            if cart_item.quantity > cart_item.product.stock_quantity:
+                messages.error(request, f'Only {cart_item.product.stock_quantity} {cart_item.product.name} available. Please update your cart.')
+                return redirect('content:view_cart')
+        
         # Calculate totals with dynamic shipping
         shipping_fee = cart.get_shipping_fee()
         subtotal = cart.get_total()
@@ -533,7 +558,7 @@ def place_order(request):
             notes=request.POST.get('notes', ''),
         )
         
-        # Create order items and reduce stock
+        # Create order items and reduce stock atomically
         for cart_item in cart_items:
             OrderItem.objects.create(
                 order=order,
@@ -542,12 +567,26 @@ def place_order(request):
                 price=cart_item.product.price
             )
             
-            # Reduce stock
+            # Reduce stock using F() expression (atomic operation)
             cart_item.product.stock_quantity = F('stock_quantity') - cart_item.quantity
-            cart_item.product.save()
+            cart_item.product.save(update_fields=['stock_quantity'])
         
         # Clear cart
         cart_items.delete()
+        
+        # Log successful order placement
+        log_security_event(
+            'order_placed',
+            request.user,
+            {
+                'order_id': order.id,
+                'order_number': order.order_number,
+                'amount': str(total),
+                'payment_method': payment_method,
+                'items_count': len(cart_items)
+            },
+            level='info'
+        )
         
         messages.success(request, f'Order #{order.order_number} placed successfully!')
         return redirect('content:order_confirmation', order_id=order.id)

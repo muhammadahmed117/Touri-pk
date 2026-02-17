@@ -199,7 +199,8 @@ def booking_confirmation(request):
         booking = get_object_or_404(Booking, id=booking_id, user=request.user)
         context = {'booking': booking}
         return render(request, 'packages/booking_confirmation.html', context)
-    except:
+    except Exception as e:
+        logger.error(f'Error retrieving booking confirmation (ID:{booking_id}): {str(e)}')
         messages.error(request, 'Unable to retrieve booking information.')
         return redirect('packages:package_list')
 
@@ -221,7 +222,8 @@ def payment_page(request, booking_id):
             'stripe_publishable_key': settings.STRIPE_PUBLISHABLE_KEY,
         }
         return render(request, 'packages/payment_page.html', context)
-    except:
+    except Exception as e:
+        logger.error(f'Error loading payment page (Booking ID:{booking_id}): {str(e)}')
         messages.error(request, 'Booking not found.')
         return redirect('packages:package_list')
 

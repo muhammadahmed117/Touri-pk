@@ -1064,10 +1064,12 @@
                             </div>
                         </div>
                         {% else %}
+                        {% if request.resolver_match.url_name != 'login' %}
                         <a class="nav-icon" href="{% url 'login' %}">
                             <i class="fas fa-sign-in-alt"></i>
                             <span>Login</span>
                         </a>
+                        {% endif %}
                         {% endif %}
                     </div>
                 </div>
@@ -1141,12 +1143,16 @@
                             {% csrf_token %}
                         </form>
                         {% else %}
+                        {% if request.resolver_match.url_name != 'login' %}
                         <a class="mobile-nav-item" href="{% url 'login' %}">
                             <i class="fas fa-sign-in-alt"></i> Login
                         </a>
+                        {% endif %}
+                        {% if request.resolver_match.url_name != 'register' %}
                         <a class="mobile-nav-item" href="{% url 'register' %}">
                             <i class="fas fa-user-plus"></i> Register
                         </a>
+                        {% endif %}
                         {% endif %}
                     </div>
                 </div>

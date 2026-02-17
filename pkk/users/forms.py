@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.core.exceptions import ValidationError
 from .models import CustomUser
+from .security_utils import validate_file_upload
 import re
 
 
@@ -287,23 +288,17 @@ class CompanyUserRegistrationForm(UserRegistrationForm):
             del self.fields['username']
 
     def clean_cnic_front(self):
-        """Validate CNIC front image"""
+        """Validate CNIC front image with comprehensive security checks"""
         image = self.cleaned_data.get('cnic_front')
         if image:
-            if image.size > 5 * 1024 * 1024:  # 5MB
-                raise ValidationError('CNIC front image must be less than 5MB.')
-            if not image.content_type.startswith('image/'):
-                raise ValidationError('Please upload a valid image file.')
+            validate_file_upload(image, max_size_mb=5)
         return image
 
     def clean_cnic_back(self):
-        """Validate CNIC back image"""
+        """Validate CNIC back image with comprehensive security checks"""
         image = self.cleaned_data.get('cnic_back')
         if image:
-            if image.size > 5 * 1024 * 1024:  # 5MB
-                raise ValidationError('CNIC back image must be less than 5MB.')
-            if not image.content_type.startswith('image/'):
-                raise ValidationError('Please upload a valid image file.')
+            validate_file_upload(image, max_size_mb=5)
         return image
 
     def clean_company_name(self):

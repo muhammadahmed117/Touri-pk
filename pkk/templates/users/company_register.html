@@ -28,9 +28,61 @@
                     <form method="post" enctype="multipart/form-data" novalidate>
                         {% csrf_token %}
 
-                        {% if form.non_field_errors %}
-                        <div class="alert alert-danger">
-                            {{ form.non_field_errors }}
+                        {% if form.errors %}
+                        <div class="alert alert-danger border-2 border-danger shadow-lg animate-fade-in" role="alert">
+                            <div class="d-flex align-items-start gap-3">
+                                <i class="fas fa-exclamation-triangle text-danger fs-2"></i>
+                                <div class="flex-fill">
+                                    <h5 class="alert-heading fw-bold mb-3">Please fix the following errors:</h5>
+                                    <ul class="mb-0 list-unstyled">
+                                        {% if form.non_field_errors %}
+                                            {% for error in form.non_field_errors %}
+                                            <li class="mb-2"><i class="fas fa-times-circle me-2"></i>{{ error }}</li>
+                                            {% endfor %}
+                                        {% endif %}
+                                        {% if form.company_name.errors %}
+                                            {% for error in form.company_name.errors %}
+                                            <li class="mb-2"><i class="fas fa-times-circle me-2"></i><strong>Company Name:</strong> {{ error }}</li>
+                                            {% endfor %}
+                                        {% endif %}
+                                        {% if form.company_email.errors %}
+                                            {% for error in form.company_email.errors %}
+                                            <li class="mb-2"><i class="fas fa-times-circle me-2"></i><strong>Company Email:</strong> {{ error }}</li>
+                                            {% endfor %}
+                                        {% endif %}
+                                        {% if form.company_phone.errors %}
+                                            {% for error in form.company_phone.errors %}
+                                            <li class="mb-2"><i class="fas fa-times-circle me-2"></i><strong>Company Phone:</strong> {{ error }}</li>
+                                            {% endfor %}
+                                        {% endif %}
+                                        {% if form.company_description.errors %}
+                                            {% for error in form.company_description.errors %}
+                                            <li class="mb-2"><i class="fas fa-times-circle me-2"></i><strong>Company Description:</strong> {{ error }}</li>
+                                            {% endfor %}
+                                        {% endif %}
+                                        {% if form.cnic_front.errors %}
+                                            {% for error in form.cnic_front.errors %}
+                                            <li class="mb-2"><i class="fas fa-times-circle me-2"></i><strong>CNIC Front:</strong> {{ error }}</li>
+                                            {% endfor %}
+                                        {% endif %}
+                                        {% if form.cnic_back.errors %}
+                                            {% for error in form.cnic_back.errors %}
+                                            <li class="mb-2"><i class="fas fa-times-circle me-2"></i><strong>CNIC Back:</strong> {{ error }}</li>
+                                            {% endfor %}
+                                        {% endif %}
+                                        {% if form.password1.errors %}
+                                            {% for error in form.password1.errors %}
+                                            <li class="mb-2"><i class="fas fa-times-circle me-2"></i><strong>Password:</strong> {{ error }}</li>
+                                            {% endfor %}
+                                        {% endif %}
+                                        {% if form.password2.errors %}
+                                            {% for error in form.password2.errors %}
+                                            <li class="mb-2"><i class="fas fa-times-circle me-2"></i><strong>Confirm Password:</strong> {{ error }}</li>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </ul>
+                                </div>
+                            </div>
                         </div>
                         {% endif %}
 
@@ -46,11 +98,18 @@
                             <label for="{{ form.company_name.id_for_label }}" class="form-label">
                                 Company Name <span class="text-danger">*</span>
                             </label>
-                            {{ form.company_name }}
+                            <div class="{% if form.company_name.errors %}border border-2 border-danger rounded{% endif %}">
+                                {{ form.company_name }}
+                            </div>
                             {% if form.company_name.errors %}
-                            <div class="text-danger small mt-1">{{ form.company_name.errors }}</div>
+                            <div class="alert alert-danger alert-sm mt-2 p-2">
+                                <i class="fas fa-exclamation-circle me-1"></i>
+                                {% for error in form.company_name.errors %}
+                                <div>{{ error }}</div>
+                                {% endfor %}
+                            </div>
                             {% endif %}
-                            {% if form.company_name.help_text %}
+                            {% if form.company_name.help_text and not form.company_name.errors %}
                             <small class="form-text text-muted">{{ form.company_name.help_text }}</small>
                             {% endif %}
                         </div>
@@ -61,11 +120,18 @@
                                 <label for="{{ form.company_email.id_for_label }}" class="form-label">
                                     Company Email <span class="text-danger">*</span>
                                 </label>
-                                {{ form.company_email }}
+                                <div class="{% if form.company_email.errors %}border border-2 border-danger rounded{% endif %}">
+                                    {{ form.company_email }}
+                                </div>
                                 {% if form.company_email.errors %}
-                                <div class="text-danger small mt-1">{{ form.company_email.errors }}</div>
+                                <div class="alert alert-danger alert-sm mt-2 p-2">
+                                    <i class="fas fa-exclamation-circle me-1"></i>
+                                    {% for error in form.company_email.errors %}
+                                    <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
                                 {% endif %}
-                                {% if form.company_email.help_text %}
+                                {% if form.company_email.help_text and not form.company_email.errors %}
                                 <small class="form-text text-muted">{{ form.company_email.help_text }}</small>
                                 {% endif %}
                             </div>
@@ -73,11 +139,18 @@
                                 <label for="{{ form.company_phone.id_for_label }}" class="form-label">
                                     Company Phone <span class="text-danger">*</span>
                                 </label>
-                                {{ form.company_phone }}
+                                <div class="{% if form.company_phone.errors %}border border-2 border-danger rounded{% endif %}">
+                                    {{ form.company_phone }}
+                                </div>
                                 {% if form.company_phone.errors %}
-                                <div class="text-danger small mt-1">{{ form.company_phone.errors }}</div>
+                                <div class="alert alert-danger alert-sm mt-2 p-2">
+                                    <i class="fas fa-exclamation-circle me-1"></i>
+                                    {% for error in form.company_phone.errors %}
+                                    <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
                                 {% endif %}
-                                {% if form.company_phone.help_text %}
+                                {% if form.company_phone.help_text and not form.company_phone.errors %}
                                 <small class="form-text text-muted">{{ form.company_phone.help_text }}</small>
                                 {% endif %}
                             </div>
@@ -88,11 +161,18 @@
                             <label for="{{ form.company_description.id_for_label }}" class="form-label">
                                 Company Description <span class="text-danger">*</span>
                             </label>
-                            {{ form.company_description }}
+                            <div class="{% if form.company_description.errors %}border border-2 border-danger rounded{% endif %}">
+                                {{ form.company_description }}
+                            </div>
                             {% if form.company_description.errors %}
-                            <div class="text-danger small mt-1">{{ form.company_description.errors }}</div>
+                            <div class="alert alert-danger alert-sm mt-2 p-2">
+                                <i class="fas fa-exclamation-circle me-1"></i>
+                                {% for error in form.company_description.errors %}
+                                <div>{{ error }}</div>
+                                {% endfor %}
+                            </div>
                             {% endif %}
-                            {% if form.company_description.help_text %}
+                            {% if form.company_description.help_text and not form.company_description.errors %}
                             <small class="form-text text-muted">{{ form.company_description.help_text }}</small>
                             {% endif %}
                         </div>
@@ -112,11 +192,18 @@
                                 <label for="{{ form.cnic_front.id_for_label }}" class="form-label">
                                     CNIC Front Side <span class="text-danger">*</span>
                                 </label>
-                                {{ form.cnic_front }}
+                                <div class="{% if form.cnic_front.errors %}border border-2 border-danger rounded p-2{% endif %}">
+                                    {{ form.cnic_front }}
+                                </div>
                                 {% if form.cnic_front.errors %}
-                                <div class="text-danger small mt-1">{{ form.cnic_front.errors }}</div>
+                                <div class="alert alert-danger alert-sm mt-2 p-2">
+                                    <i class="fas fa-exclamation-circle me-1"></i>
+                                    {% for error in form.cnic_front.errors %}
+                                    <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
                                 {% endif %}
-                                {% if form.cnic_front.help_text %}
+                                {% if form.cnic_front.help_text and not form.cnic_front.errors %}
                                 <small class="form-text text-muted">{{ form.cnic_front.help_text }}</small>
                                 {% endif %}
                                 <div class="mt-2">
@@ -128,11 +215,18 @@
                                 <label for="{{ form.cnic_back.id_for_label }}" class="form-label">
                                     CNIC Back Side <span class="text-danger">*</span>
                                 </label>
-                                {{ form.cnic_back }}
+                                <div class="{% if form.cnic_back.errors %}border border-2 border-danger rounded p-2{% endif %}">
+                                    {{ form.cnic_back }}
+                                </div>
                                 {% if form.cnic_back.errors %}
-                                <div class="text-danger small mt-1">{{ form.cnic_back.errors }}</div>
+                                <div class="alert alert-danger alert-sm mt-2 p-2">
+                                    <i class="fas fa-exclamation-circle me-1"></i>
+                                    {% for error in form.cnic_back.errors %}
+                                    <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
                                 {% endif %}
-                                {% if form.cnic_back.help_text %}
+                                {% if form.cnic_back.help_text and not form.cnic_back.errors %}
                                 <small class="form-text text-muted">{{ form.cnic_back.help_text }}</small>
                                 {% endif %}
                                 <div class="mt-2">
@@ -148,18 +242,32 @@
                                 <label for="{{ form.password1.id_for_label }}" class="form-label">
                                     {{ form.password1.label }} <span class="text-danger">*</span>
                                 </label>
-                                {{ form.password1 }}
+                                <div class="{% if form.password1.errors %}border border-2 border-danger rounded{% endif %}">
+                                    {{ form.password1 }}
+                                </div>
                                 {% if form.password1.errors %}
-                                <div class="text-danger small mt-1">{{ form.password1.errors }}</div>
+                                <div class="alert alert-danger alert-sm mt-2 p-2">
+                                    <i class="fas fa-exclamation-circle me-1"></i>
+                                    {% for error in form.password1.errors %}
+                                    <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
                                 {% endif %}
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="{{ form.password2.id_for_label }}" class="form-label">
                                     {{ form.password2.label }} <span class="text-danger">*</span>
                                 </label>
-                                {{ form.password2 }}
+                                <div class="{% if form.password2.errors %}border border-2 border-danger rounded{% endif %}">
+                                    {{ form.password2 }}
+                                </div>
                                 {% if form.password2.errors %}
-                                <div class="text-danger small mt-1">{{ form.password2.errors }}</div>
+                                <div class="alert alert-danger alert-sm mt-2 p-2">
+                                    <i class="fas fa-exclamation-circle me-1"></i>
+                                    {% for error in form.password2.errors %}
+                                    <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
                                 {% endif %}
                             </div>
                         </div>
@@ -204,6 +312,26 @@
         border-color: #1a1a2e;
         box-shadow: 0 0 0 0.2rem rgba(26, 26, 46, 0.25);
     }
+    
+    .animate-fade-in {
+        animation: fadeIn 0.5s ease-in;
+    }
+    
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .alert-sm {
+        font-size: 0.875rem;
+        border-radius: 0.375rem;
+    }
 </style>
 <script>
     (function () {
@@ -231,12 +359,155 @@
             });
         }
 
+        // Real-time validation for company registration
+        function validateField(input) {
+            var parent = input.closest('.mb-3') || input.closest('.col-md-6');
+            if (!parent) return;
+            
+            var fieldName = input.name;
+            var value = input.value.trim();
+            var isValid = true;
+            var errorMsg = '';
+
+            // Company name validation
+            if (fieldName === 'company_name') {
+                if (value.length < 3) {
+                    isValid = false;
+                    errorMsg = 'Company name must be at least 3 characters';
+                } else if (value.length > 200) {
+                    isValid = false;
+                    errorMsg = 'Company name cannot exceed 200 characters';
+                }
+            }
+
+            // Email validation
+            if (fieldName === 'company_email') {
+                var emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailPattern.test(value)) {
+                    isValid = false;
+                    errorMsg = 'Please enter a valid email address';
+                }
+            }
+
+            // Phone validation
+            if (fieldName === 'company_phone') {
+                var phonePattern = /^[\d\s\+\-\(\)]{10,20}$/;
+                if (!phonePattern.test(value)) {
+                    isValid = false;
+                    errorMsg = 'Please enter a valid phone number (10-20 digits)';
+                }
+            }
+
+            // Description validation
+            if (fieldName === 'company_description') {
+                if (value.length < 20) {
+                    isValid = false;
+                    errorMsg = 'Description must be at least 20 characters';
+                } else if (value.length > 1000) {
+                    isValid = false;
+                    errorMsg = 'Description cannot exceed 1000 characters';
+                }
+            }
+
+            // Password validation
+            if (fieldName === 'password1') {
+                if (value.length < 8) {
+                    isValid = false;
+                    errorMsg = 'Password must be at least 8 characters';
+                } else if (!/[A-Z]/.test(value)) {
+                    isValid = false;
+                    errorMsg = 'Password must contain at least one uppercase letter';
+                } else if (!/[a-z]/.test(value)) {
+                    isValid = false;
+                    errorMsg = 'Password must contain at least one lowercase letter';
+                } else if (!/[0-9]/.test(value)) {
+                    isValid = false;
+                    errorMsg = 'Password must contain at least one number';
+                }
+            }
+
+            // Confirm password validation
+            if (fieldName === 'password2') {
+                var password1 = document.querySelector('input[name="password1"]');
+                if (password1 && value !== password1.value) {
+                    isValid = false;
+                    errorMsg = 'Passwords do not match';
+                }
+            }
+
+            // Apply visual feedback
+            var inputWrapper = input.closest('.border-2') || input.parentElement;
+            if (value === '') {
+                // Empty field - remove all styling
+                input.classList.remove('border-danger', 'border-success', 'border', 'border-2');
+                inputWrapper.classList.remove('border-danger', 'border-success', 'border', 'border-2');
+                removeInlineError(parent);
+            } else if (isValid) {
+                // Valid field - green border
+                input.classList.remove('border-danger');
+                input.classList.add('border-success', 'border', 'border-2');
+                inputWrapper.classList.remove('border-danger');
+                inputWrapper.classList.add('border-success', 'border', 'border-2');
+                removeInlineError(parent);
+            } else {
+                // Invalid field - red border with error message
+                input.classList.remove('border-success');
+                input.classList.add('border-danger', 'border', 'border-2');
+                inputWrapper.classList.remove('border-success');
+                inputWrapper.classList.add('border-danger', 'border', 'border-2');
+                showInlineError(parent, errorMsg);
+            }
+        }
+
+        function showInlineError(parent, message) {
+            removeInlineError(parent);
+            var errorDiv = document.createElement('div');
+            errorDiv.className = 'inline-validation-error text-danger small mt-1 animate-fade-in';
+            errorDiv.innerHTML = '<i class="fas fa-exclamation-circle me-1"></i>' + message;
+            parent.appendChild(errorDiv);
+        }
+
+        function removeInlineError(parent) {
+            var existing = parent.querySelector('.inline-validation-error');
+            if (existing) {
+                existing.remove();
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function () {
             document.querySelectorAll('.toggle-password').forEach(function (cb) {
                 cb.addEventListener('change', function () { toggleVisibility(cb); });
             });
             setupImagePreview('id_cnic_front', 'cnic-front-preview');
             setupImagePreview('id_cnic_back', 'cnic-back-preview');
+            
+            // Add real-time validation to all form inputs
+            var formInputs = document.querySelectorAll('input[name="company_name"], input[name="company_email"], input[name="company_phone"], textarea[name="company_description"], input[name="password1"], input[name="password2"]');
+            formInputs.forEach(function(input) {
+                // Validate on blur (when user leaves the field)
+                input.addEventListener('blur', function() {
+                    if (this.value.trim() !== '') {
+                        validateField(this);
+                    }
+                });
+                
+                // Also validate on input for password matching and description length
+                if (input.name === 'password2' || input.name === 'company_description') {
+                    input.addEventListener('input', function() {
+                        if (this.value !== '') {
+                            validateField(this);
+                        }
+                    });
+                }
+            });
+            
+            // Auto scroll to error summary if there are errors
+            var errorBox = document.querySelector('.alert-danger.border-2.border-danger');
+            if (errorBox) {
+                setTimeout(function() {
+                    errorBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 100);
+            }
         });
     })();
 </script>

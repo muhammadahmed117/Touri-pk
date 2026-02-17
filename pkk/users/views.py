@@ -14,6 +14,8 @@ from .models import CustomUser
 from .forms import UserRegistrationForm, UserLoginForm, CompanyUserRegistrationForm
 from content.models import Destination, Product
 from packages.models import Company, Booking
+from .security_utils import log_security_event, validate_file_upload
+from django.core.exceptions import ValidationError
 import logging
 
 logger = logging.getLogger(__name__)
@@ -53,16 +55,13 @@ class UserRegisterView(CreateView):
             return super().form_valid(form)
         except Exception as e:
             logger.error(f"Registration error: {str(e)}")
-            messages.error(self.request, 'Registration failed. Please try again.')
+            messages.error(self.request, f'Registration failed: {str(e)}. Please contact support if this persists.')
             return self.form_invalid(form)
 
     def form_invalid(self, form):
-        """Handle invalid form submission"""
+        """Handle invalid form submission - errors are shown in the form itself"""
         logger.warning(f"Invalid registration attempt: {form.errors}")
-        messages.error(
-            self.request,
-            'Please correct the errors below and try again.'
-        )
+        # Don't add generic message - detailed errors are shown in template
         return super().form_invalid(form)
 
     def get_context_data(self, **kwargs):
@@ -125,7 +124,17 @@ class CompanyRegisterView(CreateView):
                 approval_status='pending',
             )
 
-            logger.info(f"New company registered: {company_name} by {user.username}")
+            # Log company registration
+            log_security_event(
+                'company_registration',
+                user,
+                {
+                    'company_name': company_name,
+                    'email': form.cleaned_data['company_email'],
+                    'ip': self.request.META.get('REMOTE_ADDR')
+                },
+                level='info'
+            )
 
             messages.success(
                 self.request,
@@ -135,16 +144,13 @@ class CompanyRegisterView(CreateView):
             return redirect(self.success_url)
         except Exception as e:
             logger.error(f"Company registration error: {str(e)}")
-            messages.error(self.request, 'Registration failed. Please try again.')
+            messages.error(self.request, f'Company registration failed: {str(e)}. Please contact support if this persists.')
             return self.form_invalid(form)
 
     def form_invalid(self, form):
-        """Handle invalid form submission"""
+        """Handle invalid form submission - errors are shown in the form itself"""
         logger.warning(f"Invalid company registration attempt: {form.errors}")
-        messages.error(
-            self.request,
-            'Please correct the errors below and try again.'
-        )
+        # Don't add generic message - detailed errors are shown in template
         return super().form_invalid(form)
 
     def get_context_data(self, **kwargs):
@@ -186,7 +192,17 @@ class UserLoginView(FormView):
                     else:
                         self.request.session.set_expiry(0)  # Browser close
                     
-                    logger.info(f"User logged in: {user.email}")
+                    # Log successful login
+                    log_security_event(
+                        'successful_login',
+                        user,
+                        {
+                            'ip': self.request.META.get('REMOTE_ADDR'),
+                            'user_agent': self.request.META.get('HTTP_USER_AGENT', '')[:100],
+                            'remember_me': remember_me
+                        },
+                        level='info'
+                    )
                     
                     # Check if company user and approval status
                     if user.user_type == 'company':
@@ -202,7 +218,7 @@ class UserLoginView(FormView):
                                 # Logout the user since they can't access company features yet
                                 from django.contrib.auth import logout
                                 logout(self.request)
-                                return self.form_invalid(form)
+                                return redirect('login')
                             elif company and company.approval_status == 'rejected':
                                 messages.error(
                                     self.request,
@@ -210,7 +226,7 @@ class UserLoginView(FormView):
                                 )
                                 from django.contrib.auth import logout
                                 logout(self.request)
-                                return self.form_invalid(form)
+                                return redirect('login')
                         except Exception as e:
                             logger.error(f"Company status check error: {str(e)}")
                     
@@ -225,20 +241,32 @@ class UserLoginView(FormView):
                     else:
                         return redirect(self.success_url)
                 else:
+                    # Log disabled account login attempt
+                    log_security_event(
+                        'disabled_account_login',
+                        username,
+                        {'ip': self.request.META.get('REMOTE_ADDR')},
+                        level='warning'
+                    )
                     messages.error(self.request, 'Your account has been disabled.')
-                    logger.warning(f"Disabled account login attempt: {username}")
             else:
+                # Log failed login attempt
+                log_security_event(
+                    'failed_login',
+                    username,
+                    {'ip': self.request.META.get('REMOTE_ADDR')},
+                    level='warning'
+                )
                 messages.error(self.request, 'Invalid email or password.')
-                logger.warning(f"Failed login attempt for: {username}")
             
             return self.form_invalid(form)
         except Exception as e:
             logger.error(f"Login error: {str(e)}")
-            messages.error(self.request, 'Login failed. Please try again.')
+            messages.error(self.request, f'Login error: {str(e)}. Please contact support if this persists.')
             return self.form_invalid(form)
 
     def form_invalid(self, form):
-        """Handle invalid login"""
+        """Handle invalid login - errors are shown in the form itself"""
         return super().form_invalid(form)
 
     def get_context_data(self, **kwargs):
@@ -287,3 +315,31 @@ def dashboard(request):
         messages.error(request, 'Error loading dashboard data.')
         return render(request, 'users/dashboard.html', {})
 
+
+def logout_view(request):
+    """Custom logout view with better error handling"""
+    from django.contrib.auth import logout
+    from django.views.decorators.csrf import csrf_protect
+    from django.views.decorators.http import require_http_methods
+    
+    if request.method == 'POST':
+        try:
+            # Log logout before it happens
+            if request.user.is_authenticated:
+                log_security_event(
+                    'logout',
+                    request.user,
+                    {'ip': request.META.get('REMOTE_ADDR')},
+                    level='info'
+                )
+            
+            logout(request)
+            messages.success(request, 'You have been successfully logged out.')
+        except Exception as e:
+            logger.error(f"Logout error: {str(e)}")
+            messages.warning(request, 'Logged out (with minor issues).')
+        return redirect('home')
+    else:
+        # If GET request, show message and redirect
+        messages.info(request, 'Please use the logout button to sign out.')
+        return redirect('home')

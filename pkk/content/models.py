@@ -294,7 +294,18 @@ class Order(models.Model):
         if not self.order_number:
             import random
             import string
-            self.order_number = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
+            # Generate unique order number with collision handling
+            max_attempts = 10
+            for attempt in range(max_attempts):
+                order_number = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
+                if not Order.objects.filter(order_number=order_number).exists():
+                    self.order_number = order_number
+                    break
+            else:
+                # If collision after max attempts, use timestamp-based approach
+                from django.utils import timezone
+                timestamp = int(timezone.now().timestamp() * 1000)
+                self.order_number = f"{timestamp}{random.randint(100, 999)}"
         super().save(*args, **kwargs)
 
 class OrderItem(models.Model):
@@ -385,7 +396,18 @@ class CustomPackageOrder(models.Model):
         if not self.order_number:
             import random
             import string
-            self.order_number = 'CP-' + ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
+            # Generate unique order number with collision handling
+            max_attempts = 10
+            for attempt in range(max_attempts):
+                order_number = 'CP-' + ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
+                if not CustomPackageOrder.objects.filter(order_number=order_number).exists():
+                    self.order_number = order_number
+                    break
+            else:
+                # If collision after max attempts, use timestamp-based approach
+                from django.utils import timezone
+                timestamp = int(timezone.now().timestamp() * 1000)
+                self.order_number = f"CP-{timestamp}{random.randint(10, 99)}"
         super().save(*args, **kwargs)
 
 

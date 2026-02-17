@@ -210,14 +210,14 @@ SESSION_COOKIE_HTTPONLY = True  # Prevent JavaScript access to session cookie
 SESSION_COOKIE_SAMESITE = 'Lax'  # CSRF protection
 SESSION_SAVE_EVERY_REQUEST = False
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # Changed by remember_me
-SESSION_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = not DEBUG  # True in production, False in development
 
 # CSRF Protection
 CSRF_COOKIE_HTTPONLY = False  # Allow JavaScript access for AJAX requests
 CSRF_COOKIE_SAMESITE = 'Lax'
 CSRF_USE_SESSIONS = False
 CSRF_COOKIE_AGE = 31449600  # 1 year
-CSRF_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = not DEBUG  # True in production, False in development
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:8000',
@@ -248,20 +248,30 @@ EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='noreply@touripk.com')
 
+# File Upload Security
+FILE_UPLOAD_MAX_MEMORY_SIZE = 5242880  # 5MB
+DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880  # 5MB
+FILE_UPLOAD_PERMISSIONS = 0o644
+FILE_UPLOAD_DIRECTORY_PERMISSIONS = 0o755
+
+# Allowed file extensions for uploads
+ALLOWED_IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'webp']
+ALLOWED_DOCUMENT_EXTENSIONS = ['pdf', 'doc', 'docx']
+
+# Content Security
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = 'DENY'
+SECURE_BROWSER_XSS_FILTER = True
+
 # Security Settings for Production
 if not DEBUG:
     # HTTPS Settings
     SECURE_SSL_REDIRECT = True
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
-    SECURE_BROWSER_XSS_FILTER = True
-    SECURE_CONTENT_TYPE_NOSNIFF = True
-    X_FRAME_OPTIONS = 'DENY'
     SECURE_HSTS_SECONDS = 31536000  # 1 year
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
     SECURE_REFERRER_POLICY = 'same-origin'
+    # Note: SESSION_COOKIE_SECURE and CSRF_COOKIE_SECURE already set above with 'not DEBUG'
 else:
-    # Development settings
-    SESSION_COOKIE_SECURE = False
-    CSRF_COOKIE_SECURE = False
+    # Development: Still apply XSS and content-type protection
+    SECURE_SSL_REDIRECT = False

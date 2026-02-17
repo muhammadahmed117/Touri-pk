@@ -173,12 +173,18 @@ class Booking(models.Model):
     
     def save(self, *args, **kwargs):
         if not self.booking_reference:
-            # Generate unique booking reference
-            while True:
+            # Generate unique booking reference with collision handling
+            max_attempts = 10
+            for attempt in range(max_attempts):
                 ref = 'BK' + ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
                 if not Booking.objects.filter(booking_reference=ref).exists():
                     self.booking_reference = ref
                     break
+            else:
+                # If collision after max attempts, use timestamp-based approach
+                from django.utils import timezone
+                timestamp = int(timezone.now().timestamp() * 1000)
+                self.booking_reference = f"BK{timestamp}{random.randint(10, 99)}"
         super().save(*args, **kwargs)
 
 
